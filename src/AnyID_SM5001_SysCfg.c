@@ -737,57 +737,8 @@ void Sys_ServerTask(void)
         W232_ConfigInt();
         W232_EnableInt(ENABLE, DISABLE);
     }
+    
     WDG_FeedIWDog();
-
-  /*  
-    if(Uart_IsRcvFrame(g_sW232RcvFrame))
-    {
-       if(a_CheckStateBit(g_nDeviceServerTxBuf.state, W232_CNT_OP_STAT_RX_AT))
-        {
-            if(Device_CommunCheckRsp(&g_nDeviceServerTxBuf, g_sW232RcvFrame.buffer))   
-            {
-                a_SetState(g_nDeviceServerTxBuf.state, DEVICE_SERVER_TXSTAT_WAIT);
-                W232_ClearRxBuffer();
-            }
-            else
-            {
-                g_sW232RcvFrame.state = UART_FLAG_RCV;                          //¼ÌÐø½ÓÊÕ
-                g_sW232RcvFrame.idleTime = 0;
-            }
-        }
-
-            if(g_sW232RcvFrame.index > 0)
-            {
-
-                 if(!a_CheckStateBit(g_nDeviceServerTxBuf.state, DEVICE_SERVER_TXSTAT_WAIT))
-                 {
-                    if(Device_CheckRsp(&g_sW232Connect, g_sW232RcvFrame.buffer, g_sW232RcvFrame.index))
-                    {
-                        g_sW232RcvBuffer.tick = g_nSysTick;
-                        if(g_sW232RcvBuffer.flag == W232_RESPONES_CMD_RESP)
-                        {   
-                            g_sW232RcvBuffer.flag = W232_RESPONES_NULL;
-                            g_nDeviceServerTxBuf.result = W232_CNT_RESULT_OK; 
-                            //a_SetState(g_nDeviceServerTxBuf.state, W232_CNT_OP_STAT_STEP);
-                        }
-                        else
-                        {
-                            Device_ServerProcessRxInfo(&g_sW232RcvBuffer, g_nSysTick);
-                        }
-                    }    
-                 }
-                if(W232_ConnectCheckClose(g_sW232RcvFrame.buffer))
-                {
-                    W232_ConnectInit(&g_sW232Connect, W232_CNT_CMD_PWROFF, &g_sDeviceParams.serverParams);
-                    a_SetState(g_sW232Connect.state, W232_CNT_OP_STAT_TX);
-                    a_ClearStateBit(g_nSysState, SYS_STAT_LTEDTU);
-                }
-            }
-        
-        memset(&g_sW232RcvFrame, 0, sizeof(UART_RCVFRAME));
-
-    }
-   */ 
     
     if(Uart_IsRcvFrame(g_sW232RcvFrame))
     {

@@ -1,8 +1,8 @@
 #include "AnyID_SM5001_Device.h"
 
 
-const u8 DEVICE_VERSION[DEVICE_VERSION_SIZE]@0x08005000 = " SM5001 23060303 G230200";
-#define READER_SOFTWARE_VERSION    0x23060303
+const u8 DEVICE_VERSION[DEVICE_VERSION_SIZE]@0x08005000 = " SM5001 23060400 G230200";
+#define READER_SOFTWARE_VERSION    0x23060400
 
 
 READER_RSPFRAME g_sDeviceRspFrame = {0};
@@ -57,7 +57,7 @@ void Device_ReadDeviceParamenter(void)                                         /
     {
         u32 crc1 = 0, crc2 = 0;
 
-        crc1 = a_GetCrc((u8 *)(&g_sDeviceParams), (sizeof(DEVICE_PARAMS)) - 4);
+        crc1 = a_GetCrc((u8 *)(&g_sDeviceParams), (sizeof(DEVICE_PARAMS)) - DEVICE_CRC32_LEN);
         crc2 = g_sDeviceParams.crc;
 
         //检测参数是否正确，如果不正确，使用默认参数操作
@@ -71,7 +71,7 @@ void Device_ReadDeviceParamenter(void)                                         /
     {
         u32 crc1 = 0, crc2 = 0;
 
-        crc1 = a_GetCrc((u8 *)(&g_sDeviceParams), (sizeof(DEVICE_PARAMS)) - 4);
+        crc1 = a_GetCrc((u8 *)(&g_sDeviceParams), (sizeof(DEVICE_PARAMS)) - DEVICE_CRC32_LEN);
         crc2 = g_sDeviceParams.crc;
 
         //检测参数是否正确，如果不正确，使用默认参数操作                       .
@@ -84,6 +84,7 @@ void Device_ReadDeviceParamenter(void)                                         /
     {
         memset(&g_sDeviceParams, 0, sizeof(g_sDeviceParams));
         
+        g_sDeviceParams.mode =  DEVICE_MODE_SFG;
         g_sDeviceParams.gateTick = GATE_OP_DLY_TIM;
         g_sDeviceParams.gateTxTick =  GATE_OP_TX_TIM;             
         g_sDeviceParams.gateNum = GATE_SLAVER_NUM;
@@ -132,7 +133,7 @@ void Device_ReadMqttKey()                                         //OK
     {
         u32 crc1 = 0, crc2 = 0;
 
-        crc1 = a_GetCrc((u8 *)(&g_sMqttKey), (sizeof(MQTT_FRAM_KEY)) - 4);
+        crc1 = a_GetCrc((u8 *)(&g_sMqttKey), (sizeof(MQTT_FRAM_KEY)) - DEVICE_CRC32_LEN);
         crc2 = g_sMqttKey.crc;
 
         //检测参数是否正确，如果不正确，使用默认参数操作
@@ -146,7 +147,7 @@ void Device_ReadMqttKey()                                         //OK
     {
         u32 crc1 = 0, crc2 = 0;
 
-        crc1 = a_GetCrc((u8 *)(&g_sMqttKey), (sizeof(MQTT_FRAM_KEY)) - 4);
+        crc1 = a_GetCrc((u8 *)(&g_sMqttKey), (sizeof(MQTT_FRAM_KEY)) - DEVICE_CRC32_LEN);
         crc2 = g_sMqttKey.crc;
 
         //检测参数是否正确，如果不正确，使用默认参数操作
@@ -185,7 +186,7 @@ BOOL Device_WriteDeviceParamenter(void)
     BOOL b = FALSE;
 
     g_sDeviceParams.crc = 0;
-    g_sDeviceParams.crc = a_GetCrc((u8 *)(&g_sDeviceParams), (sizeof(DEVICE_PARAMS)) - 4);
+    g_sDeviceParams.crc = a_GetCrc((u8 *)(&g_sDeviceParams), (sizeof(DEVICE_PARAMS)) - DEVICE_CRC32_LEN);
 
     b = FRam_WriteBuffer(FRAME_INFO_ADDR, sizeof(DEVICE_PARAMS), (u8 *)(&g_sDeviceParams));
     b = FRam_WriteBuffer(FRAME_INFO_BACKUP_ADDR, sizeof(DEVICE_PARAMS), (u8 *)(&g_sDeviceParams));
@@ -199,7 +200,7 @@ BOOL Device_WriteMqttKey()
     BOOL b = FALSE;
 
     g_sMqttKey.crc = 0;
-    g_sMqttKey.crc = a_GetCrc((u8 *)(&g_sMqttKey), (sizeof(MQTT_FRAM_KEY)) - 4);
+    g_sMqttKey.crc = a_GetCrc((u8 *)(&g_sMqttKey), (sizeof(MQTT_FRAM_KEY)) - DEVICE_CRC32_LEN);
 
     b = FRam_WriteBuffer(FRAME_MQTT_KEY_ADDR, sizeof(MQTT_FRAM_KEY), (u8 *)(&g_sMqttKey));
     b = FRam_WriteBuffer(FRAME_MQTT_KEY_BACKUP_ADDR, sizeof(MQTT_FRAM_KEY), (u8 *)(&g_sMqttKey));
@@ -422,7 +423,10 @@ u16 Device_ResponseGateFrame(u8 add, u8 mode, READER_RSPFRAME *pOpResult)
           if(add <=(GATE_SLAVER_NUM << 1))
           {
              pOpResult->buffer[pos++] = g_aGateSlvInfo[add].sensorInfo.tmpr;
-            pOpResult->buffer[pos++] =  (g_aGateSlvInfo[add].sensorInfo.sensorState.fan << 3) | (g_aGateSlvInfo[add].sensorInfo.sensorState.smoke << 2) | (g_aGateSlvInfo[add].sensorInfo.sensorState.rfid << 1) | (g_aGateSlvInfo[add].sensorInfo.sensorState.door << 0);
+             pOpResult->buffer[pos++] =  (g_aGateSlvInfo[add].sensorInfo.sensorState.fan << 3) | 
+                                       (g_aGateSlvInfo[add].sensorInfo.sensorState.smoke << 2) | 
+                                        (g_aGateSlvInfo[add].sensorInfo.sensorState.rfid << 1) | 
+                                          (g_aGateSlvInfo[add].sensorInfo.sensorState.door << 0);
             
             pOpResult->buffer[pos++] = g_aGateSlvInfo[add].sensorInfo.batInfo.state >> 0;
             pOpResult->buffer[pos++] = g_aGateSlvInfo[add].sensorInfo.batInfo.verHard >> 8;
@@ -469,7 +473,6 @@ u16 Device_ResponseGateFrame(u8 add, u8 mode, READER_RSPFRAME *pOpResult)
                 pOpResult->buffer[pos++] = g_aGateSlvInfo[add].sensorInfo.batInfo.unitVol[i] >> 0;
 
             }
-
             
             pOpResult->buffer[pos++] = g_aGateSlvInfo[add].sensorInfo.chagInfo.state >> 0;
             memcpy(pOpResult->buffer + pos, g_aGateSlvInfo[add].sensorInfo.chagInfo.vendorName,CHAG_VENDOR_NAME_LEN);
@@ -501,9 +504,11 @@ u16 Device_ResponseGateFrame(u8 add, u8 mode, READER_RSPFRAME *pOpResult)
         {
           pOpResult->buffer[pos++] = index + 1;
           pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.tmpr >> 0;
-          pOpResult->buffer[pos++] = (g_aGateSlvInfo[index].sensorInfo.sensorState.fan << 3) | (g_aGateSlvInfo[index].sensorInfo.sensorState.smoke << 2) | (g_aGateSlvInfo[index].sensorInfo.sensorState.rfid << 1) | (g_aGateSlvInfo[index].sensorInfo.sensorState.door << 0);
+          pOpResult->buffer[pos++] = (g_aGateSlvInfo[index].sensorInfo.sensorState.fan << 3) |
+                                   (g_aGateSlvInfo[index].sensorInfo.sensorState.smoke << 2) | 
+                                    (g_aGateSlvInfo[index].sensorInfo.sensorState.rfid << 1) | 
+                                      (g_aGateSlvInfo[index].sensorInfo.sensorState.door << 0);
           pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.state >> 0;
-
           memcpy(pOpResult->buffer + pos, g_aGateSlvInfo[index].sensorInfo.batInfo.sn, BAT_SN_LEN);
           pos +=  BAT_SN_LEN ;
           pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.status.volValue >> 8;
@@ -517,17 +522,12 @@ u16 Device_ResponseGateFrame(u8 add, u8 mode, READER_RSPFRAME *pOpResult)
           pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.status.curValue >> 8;
           pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.status.curValue >> 0;
           pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.status.tmpr >> 0;
-          
           pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.status.dltVol >> 0;
-          
-    
           pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.err.fullState >> 0;
           pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.err.protectStatus1 >> 0;
           pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.err.alarmStatus1 >> 0;
           pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.err.alarmStatus2 >> 0;  
           pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.err.diagStatus >> 0;
-          
-          
           pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.chagInfo.state >> 0;
           pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.chagInfo.pwr >> 8;
           pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.chagInfo.pwr >> 0;
@@ -547,8 +547,6 @@ u16 Device_ResponseGateFrame(u8 add, u8 mode, READER_RSPFRAME *pOpResult)
       
     pOpResult->buffer[pos++] = UART_FRAME_PARAM_RFU;
     pOpResult->buffer[pos++] = UART_FRAME_PARAM_RFU;
-
-
     crc = a_GetCrc(pOpResult->buffer, pos); //从LEN开始计算crc
     pOpResult->buffer[pos++] = crc & 0xFF;
     pOpResult->buffer[pos++] = (crc >> 8) & 0xFF;
@@ -800,19 +798,17 @@ BOOL Device_GateProceRspFrame(u8 *pFrame, GATE_OPINFO *pOpInfo, u32 tick)
 u16 Device_WaterProceRspFrame(u8 *pFrame, WATER_INFO *pOpInfo, u8 len)
 {
     u8 cmd = 0;
-    u16 souceAddr = 0;
+    //u16 souceAddr = 0;
     u8 paramsLen = 0;
 
     cmd = *(pFrame + UART_FRAME_POS_CMD + 1);
-    souceAddr = (*(pFrame + UART_FRAME_POS_SOUCER_ADD) >> 8) | (*(pFrame + UART_FRAME_POS_SOUCER_ADD + 1) << 0);
+    //souceAddr = (*(pFrame + UART_FRAME_POS_SOUCER_ADD) >> 8) | (*(pFrame + UART_FRAME_POS_SOUCER_ADD + 1) << 0);
 
     pOpInfo->txBuf.cmd = cmd;
     pOpInfo->txBuf.flag = UART_FRAME_FLAG_OK;
     pOpInfo->txBuf.err = UART_FRAME_RSP_NOERR;
     pOpInfo->txBuf.len = 0;
-    
-    u8 keyLen = 0;
-    paramsLen = len - UART_FRAME_MIN_LEN;
+  paramsLen = len - UART_FRAME_MIN_LEN;
     switch(cmd)
     {
         case WATER_CMD_GET_UID:
@@ -835,7 +831,7 @@ u16 Device_WaterProceRspFrame(u8 *pFrame, WATER_INFO *pOpInfo, u8 len)
           case DEVICE_CMD_MQTT_GET_IMEI:
             if(paramsLen > 0)
             {
-                Water_WriteStr(g_nImsiStr);
+                //Water_WriteStr((char *)g_nImsiStr);
                 //Reader_Delayms(5000);
             }
             break; 
@@ -1144,6 +1140,7 @@ u16 Reader_ProcessUartFrame(u8 *pFrame, u8 add, u16 len, u32 tick)
                 if(paramsLen == 0x0C)
                 {
                          memcpy(&g_sMqttKey.uid, pFrame , FRAME_UID_LEN);
+                         g_sDeviceRspFrame.err = READER_RESPONSE_NOERR;
                          Device_WriteMqttKey();
                          g_sDeviceRspFrame.len = Device_ResponseFrame(NULL, 0, &g_sDeviceRspFrame);
                      // g_nDeviceTestInfo.flag = DEVICE_TEST_DOOR;        
@@ -1220,9 +1217,6 @@ void Device_ServerProcessRxInfo(W232_RCVBUFFER *pRcvBuffer, u32 tick)           
     {
         crc1 = Uart_GetFrameCrc(pRcvBuffer->buffer, pRcvBuffer->len);
         crc2 = a_GetCrc(pRcvBuffer->buffer, pRcvBuffer->len - 2);
-        #if SYS_ENABLE_WDT
-        WDG_InitIWDG();
-        #endif
 
     }
     else if(pRcvBuffer->len == 0)
@@ -1372,9 +1366,7 @@ u16 Device_HeartFormat(u8 *pBuffer, u32 tick)
     pBuffer[pos++] = g_nImei[6];
     pBuffer[pos++] = (g_nImei[7] & 0xF0);
 
-   /* memcpy(pBuffer + pos, &READER_SOFTWARE_VERSION, DEVICE_VERSION_LEN);
-    pos += DEVICE_VERSION_LEN;
-    */
+
     pBuffer[pos++] = (READER_SOFTWARE_VERSION >> 24) & 0xFF;
     pBuffer[pos++] = (READER_SOFTWARE_VERSION >> 16) & 0xFF;
     pBuffer[pos++] = (READER_SOFTWARE_VERSION >>  8) & 0xFF;
@@ -1408,7 +1400,10 @@ u16 Device_HeartFormat(u8 *pBuffer, u32 tick)
         pBuffer[pos++] = (g_aGateSlvInfo[index].softWare >>  8) & 0xFF;
         pBuffer[pos++] = (g_aGateSlvInfo[index].softWare >>  0) & 0xFF;
         pBuffer[pos++] = g_aGateSlvInfo[index].sensorInfo.tmpr;
-        pBuffer[pos++] = (g_aGateSlvInfo[index].sensorInfo.sensorState.fan << 3) | (g_aGateSlvInfo[index].sensorInfo.sensorState.smoke << 2) | (g_aGateSlvInfo[index].sensorInfo.sensorState.rfid << 1) | (g_aGateSlvInfo[index].sensorInfo.sensorState.door << 0);
+        pBuffer[pos++] = (g_aGateSlvInfo[index].sensorInfo.sensorState.fan << 3) | 
+                       (g_aGateSlvInfo[index].sensorInfo.sensorState.smoke << 2) | 
+                        (g_aGateSlvInfo[index].sensorInfo.sensorState.rfid << 1) | 
+                         (g_aGateSlvInfo[index].sensorInfo.sensorState.door << 0);
         pBuffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.state;
         pBuffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.status.volLev;
         pBuffer[pos++] = g_aGateSlvInfo[index].sensorInfo.chagInfo.state;
@@ -1571,8 +1566,6 @@ void Device_Ctr_BatVolce(u16 add, u8 mode, u8 step, u8 flag)
           {
             case DEVICE_STEP_FLAG_OK:
                 Device_Voice_Apo(SOUND_CNT_TIME_1S , SOUND_REPAT_NULL, SOUND_VOICE_DI, SOUND_VOC_DI);
-                   //Device_Voice_Apo((u16)add)
-             // evice_Voice_Apo(SOUND_CNT_TIME_1S * 8, SOUND_REPAT_NULL, SOUND_VOC_RETURN_OK, SOUND_VOICE_RTU_BAT_OK);
                   //借电池完成
               break;
             case DEVICE_STEP_FLAG_DOOR_FAIL:
@@ -1650,12 +1643,11 @@ BOOL Device_CheckRsp(W232_CONNECT *pCntOp, u8 *pRxBuf, u8 len)
     sprintf(strBuffcmdAccept,"$sys/%.6s/%.15s/cmd/response/%.36s/accepted", W232_PRDOCT_ID, g_nImsiStr,pCntOp->requestId);
     if(strstr((char const *)pRxBuf, strBuffRequst) != NULL)
     {
-
-
-        
         memcpy(pCntOp->requestId, pRxBuf + W232_RQUEST_ID_POS, W232_RQUEST_ID_LEN);
-       
-        if((*(pCntOp->requestId +  DEVICE_MQTT_FRAME_CMDID_TAG_1) == DEVICE_MQTT_FRAME_CMDID_MASK) && (*(pCntOp->requestId +  DEVICE_MQTT_FRAME_CMDID_TAG_2) == DEVICE_MQTT_FRAME_CMDID_MASK) && (*(pCntOp->requestId +  DEVICE_MQTT_FRAME_CMDID_TAG_3) == DEVICE_MQTT_FRAME_CMDID_MASK) && (*(pCntOp->requestId +  DEVICE_MQTT_FRAME_CMDID_TAG_4) == DEVICE_MQTT_FRAME_CMDID_MASK))
+        if((*(pCntOp->requestId +  DEVICE_MQTT_FRAME_CMDID_TAG_1) == DEVICE_MQTT_FRAME_CMDID_MASK) && 
+           (*(pCntOp->requestId +  DEVICE_MQTT_FRAME_CMDID_TAG_2) == DEVICE_MQTT_FRAME_CMDID_MASK) && 
+           (*(pCntOp->requestId +  DEVICE_MQTT_FRAME_CMDID_TAG_3) == DEVICE_MQTT_FRAME_CMDID_MASK) && 
+           (*(pCntOp->requestId +  DEVICE_MQTT_FRAME_CMDID_TAG_4) == DEVICE_MQTT_FRAME_CMDID_MASK))
         {
             bOK = TRUE;
             g_sW232RcvBuffer.flag = W232_RESPONES_CMD_GET;

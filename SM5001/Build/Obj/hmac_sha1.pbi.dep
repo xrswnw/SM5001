@@ -1,5 +1,5 @@
-hmac_sha1.pbi: E:\ANYID\Software\SM5001\src\hmac_sha1.c \
-  E:\ANYID\Software\SM5001\SM5001\..\inc\hmac_sha1.h \
+hmac_sha1.pbi: E:\Git\FY\SM5001\src\hmac_sha1.c \
+  E:\Git\FY\SM5001\SM5001\..\inc\hmac_sha1.h \
   C:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\stdlib.h \
   C:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\ycheck.h \
   C:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\yvals.h \

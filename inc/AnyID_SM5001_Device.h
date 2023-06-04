@@ -67,15 +67,15 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define DEVICE_ACTCTL_CTL_FRAME_LEN         0x05  
 #define DEVICE_RETURN_BAT_FRAME_LEN         0x0A
 
-#define DEVICE_FREAM_MIN_LEN                    5
+#define DEVICE_FREAM_MIN_LEN            5
 
-#define DEVICE_REPEAT_TIME                     3
+#define DEVICE_REPEAT_TIME              3
 
-#define DEVICE_IO_SAMPLE_TIME                   2
+#define DEVICE_IO_SAMPLE_TIME           2
 
-#define DEVICE_STEP_OVER                       0x00
-#define DEVICE_STEP_ONE                        0x01
-#define DEVICE_STEP_TWICE                      0x02
+#define DEVICE_STEP_OVER        0x00
+#define DEVICE_STEP_ONE         0x01
+#define DEVICE_STEP_TWICE       0x02
 
 #define DEVICE_STEP_FLAG_OK                     0x00
 #define DEVICE_STEP_FLAG_DOOR_FAIL              0x01
@@ -132,7 +132,7 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define DEVICE_SERVER_TXSTAT_RX_AT      0x00000080
 
 
-#define DEVICE_SERVERRSP_NUM			20
+#define DEVICE_SERVERRSP_NUM            20
 
 //modele
 
@@ -167,6 +167,10 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define DEVICE_TMPR_ALARM_DFT           30
 #define DEVICE_LED_LOWVOL_DFT           80
 
+#define DEVICE_CRC32_LEN                4
+
+#define DEVICE_MODE_SFG                 0x00
+#define DEVICE_MODE_NORMAL              0x01
 
 #define DEVIDE_MARK_MAIN                0x00000001
 #define DEVIDE_MARK_GATE                0x00000002
@@ -234,6 +238,7 @@ typedef struct deviceParams{
     W232_PARAMS serverParams;
     WINAVG_INFO temprUp;
     WINAVG_INFO temprDown;
+    u8 mode;
     u8 rfu1;                            
     u16 rfu2;
     u8 addr;
@@ -323,7 +328,6 @@ BOOL Device_CheckRsp(W232_CONNECT *pCntOp, u8 *pRxBuf, u8 len) ;
 BOOL Device_WriteDeviceParamenter(void);
 BOOL Device_Set_Cfg(u8 *pBuffer);
 BOOL Device_WriteMqttKey();
-//BOOL Device_CheckRsp(W232_CONNECT *pCntOp, u8 *pRxBuf) ;
 BOOL Device_GateProceRspFrame(u8 *pFrame, GATE_OPINFO *pOpInfo, u32 tick);
 BOOL Device_CommunCheckRsp(DEVICE_SENVER_TXBUFFER *pCntOp, u8 *pRxBuf);
 
