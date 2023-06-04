@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspace>
+    <project>
+        <path>$WS_DIR$\..\Boot\SM5001\Boot.ewp</path>
+    </project>
+    <project>
+        <path>$WS_DIR$\SM5001.ewp</path>
+    </project>
+    <batchBuild />
+</workspace>
