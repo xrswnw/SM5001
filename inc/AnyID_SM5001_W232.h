@@ -15,11 +15,11 @@ extern UART_RCVFRAME g_sW232RcvFrame;
 
 //#define TESTTOKEN       "version=2018-10-31&res=products%2F598243%2Fdevices%2F865396056278381&et=2599881240&method=md5&sign=KJKG%2Bc7bLEz25s%2Bid9OHtA%3D%3D"
 
-#define TESTTOKEN       "version=2018-10-31&res=products%2F598243%2Fdevices%2F866824062680547&et=2599881240&method=md5&sign=JtzsiVkkvKDIikTZ%2FuC03A%3D%3D"
+#define TESTTOKEN       "version=2018-10-31&res=products%2F598243&et=2599881240&method=md5&sign=n34n1AfhT1zyxT3Fftetug%3D%3D"
 
 #define W232_PRDOCT_ID                          "598243"    
 #define W232_IP_LEN                             4
-#define W232_STR_BUFFER_RSP_LEN                 1024
+#define W232_STR_BUFFER_RSP_LEN                 512
 #define W232_STR_BUFFER_LEN                     2048
 #define W232_STR_BUFFER_HEART_LEN               2048
 #define W232_PAR_ADDR_MOD_IP                    0
@@ -82,9 +82,12 @@ typedef struct w232Par{
 #define W232_CNT_OP_QMTSUB_CMD                  28
 #define W232_CNT_OP_QMTSUB_JSON_ACCEPT          29
 #define W232_CNT_OP_QMTSUB_JSON_REJECT          30
-#define W232_CNT_OP_QMTCFG_VERSION               31       
+#define W232_CNT_OP_QMTCFG_VERSION              31       
 #define W232_CNT_OP_QMTCFG_TIME                 32
 #define W232_CNT_OP_QMTSUB_RESPONSE_CMD         33
+#define W232_CNT_OP_QMTSUB_OTA                  34
+
+
 #define W232_CNT_OP_STAT_IDLE                   0x0001
 #define W232_CNT_OP_STAT_TX                     0x0002
 #define W232_CNT_OP_STAT_RX                     0x0004
@@ -127,7 +130,7 @@ typedef struct w232Par{
 #define W232_RTC_DATA_BUFFER_POS                45
 
 #define W232_CNT_INDEX_LEN                      2
-#define W232_TOKEN_LEN                          129//131//129//129//127
+#define W232_TOKEN_LEN                          99//131//129//129//127
 #define W232_CNT_IMEI_SRT_LEN					8
 
 #define W232_HEART_OFFLINE_TIME                 0x08

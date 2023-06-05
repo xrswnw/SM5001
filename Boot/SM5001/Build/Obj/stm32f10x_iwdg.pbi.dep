@@ -1,5 +1,5 @@
 stm32f10x_iwdg.pbi: \
-  E:\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\src\stm32f10x_iwdg.c \
+  E:\AnyID\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\src\stm32f10x_iwdg.c \
   E:\AnyID\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\inc\stm32f10x_iwdg.h \
   E:\AnyID\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\startup\stm32f10x.h \
   C:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\CMSIS\Core\Include\core_cm3.h \
@@ -18,7 +18,7 @@ stm32f10x_iwdg.pbi: \
   C:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\string.h \
   C:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\ysizet.h \
   C:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\DLib_Product_string.h \
-  E:\ANYID\Software\SM5001\Boot\SM5001\..\stm32f10x_conf.h \
+  E:\AnyID\Git\FY\SM5001\Boot\SM5001\..\stm32f10x_conf.h \
   E:\AnyID\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\inc\stm32f10x_flash.h \
   E:\AnyID\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\inc\stm32f10x_gpio.h \
   E:\AnyID\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\inc\stm32f10x_rcc.h \

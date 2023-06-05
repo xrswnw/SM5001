@@ -1,6 +1,6 @@
 AnyID_Uart_Receive.pbi: \
-  E:\ANYID\Software\SM5001\Boot\src\AnyID_Uart_Receive.c \
-  E:\ANYID\Software\SM5001\Boot\SM5001\..\inc\AnyID_Uart_Receive.h \
+  E:\AnyID\Git\FY\SM5001\Boot\src\AnyID_Uart_Receive.c \
+  E:\AnyID\Git\FY\SM5001\Boot\SM5001\..\inc\AnyID_Uart_Receive.h \
   E:\AnyID\AnyID_Embedded\V1.1.0\AnyID_lib_V1.1.0\inc\AnyID_Type.h \
   C:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\string.h \
   C:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\ycheck.h \

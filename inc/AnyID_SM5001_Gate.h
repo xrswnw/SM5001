@@ -13,7 +13,6 @@
 #define GATE_SMOKE_NORM               0
 
 
-
 #define GATE_BAT_NULL                   0
 #define GATE_BAT_IN                     1
 #define GATE_BAT_OUT                    2
@@ -103,15 +102,18 @@ typedef struct gateSensorInfo{
     CHAG_INFO chagInfo;
 }GATE_SENSORINFO;
 
+#define GATE_VERSION_LEN        8
+
 
 #define GATE_STAT_UNKNOW            0xFF        //未知状态
 #define GATE_STAT_OK                0x00        //正常
 #define GATE_STAT_COMERR            0x01        //通信故障
 typedef struct gateSlvInfo{
     BOOL bTxInfo;                               //是否需要向后台上报数据
-    u32 softWare;
     u32 txTick;
-    u8 state;
+    u8 state;  
+    char softWare[GATE_VERSION_LEN];
+    char hardWare[GATE_VERSION_LEN];
     GATE_SENSORINFO sensorInfo;
 }GATE_INFO;
 
@@ -132,10 +134,7 @@ typedef struct gateSlvState{
 #define GATE_FRAME_CMD_SET_PARAMS       0x3C
 #define GATE_FRAME_CMD_GET_PARAMS       0x3D
 
-
 #define GATE_FRAME_CMD_GATE_TEST        0x88
-
-
 
 #define GATE_RRAME_OPEN_DOOR            0x02
 typedef struct gateTxFrame{

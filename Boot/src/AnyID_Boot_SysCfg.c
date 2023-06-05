@@ -138,6 +138,13 @@ void Sys_Init(void)
     Sys_Delayms(10);        //一般是10ms
     FRam_InitInterface();
     Fram_ReadBootParamenter();
+    
+    
+    
+    //g_sFramBootParamenter.appState = FRAM_BOOT_APP_FAIL;//测试
+    
+    
+    
     //如果appState状态正常，但是版本信息校验错误，恢复默认状态
     if(g_sFramBootParamenter.appState == FRAM_BOOT_APP_OK)
     {

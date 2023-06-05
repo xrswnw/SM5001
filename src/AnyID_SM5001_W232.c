@@ -47,6 +47,8 @@ void W232_ConnectInit(W232_CONNECT *pCntOp, u8 cmd, W232_PARAMS *pParams)
         pCntOp->to[num] = W232_CNT_TIME_1S * 4 ;         pCntOp->repeat[num] = 50;    pCntOp->op[num++] = W232_CNT_OP_QMTSUB_JSON_ACCEPT;              //订阅主题
         pCntOp->to[num] = W232_CNT_TIME_1S * 4 ;         pCntOp->repeat[num] = 50;    pCntOp->op[num++] = W232_CNT_OP_QMTSUB_JSON_REJECT;  
         pCntOp->to[num] = W232_CNT_TIME_1S * 4 ;         pCntOp->repeat[num] = 50;    pCntOp->op[num++] = W232_CNT_OP_QMTSUB_RESPONSE_CMD;  
+        pCntOp->to[num] = W232_CNT_TIME_1S * 4 ;         pCntOp->repeat[num] = 50;    pCntOp->op[num++] = W232_CNT_OP_QMTSUB_OTA;  
+    
     }
     else
     {
@@ -183,8 +185,12 @@ void W232_ConnectTxCmd(W232_CONNECT *pCntOp, u32 sysTick)
             break;
         case W232_CNT_OP_QMTSUB_RESPONSE_CMD:
           
-          //$sys/598243/865396056278381/cmd/response/+/accepted
             sprintf(strBuff,"AT+QMTSUB=0,1,\"$sys/%.6s/%.15s/cmd/response/+/accepted\",1",W232_PRDOCT_ID,g_nImsiStr);
+            W232_WriteCmd(strBuff);
+            break;
+        case W232_CNT_OP_QMTSUB_OTA:
+          
+            sprintf(strBuff,"AT+QMTSUB=0,1,\"$sys/%.6s/%.15s/ota/inform\",1",W232_PRDOCT_ID,g_nImsiStr);
             W232_WriteCmd(strBuff);
             break;
         case W232_CNT_OP_QMTPUBEX:
@@ -224,25 +230,17 @@ BOOL W232_ConnectCheckRsp(W232_CONNECT *pCntOp, u8 *pRxBuf)
         case W232_CNT_OP_IMEI:
             if(strstr((char const *)pRxBuf, "OK") != NULL)
             {
-                //865396056277961
-                //865396056277227
-                //865396056278381
-                //866824062680315
                 memcpy(pCntOp->imei, pRxBuf + 2, W232_IMEI_LEN + 2);
                 memcpy(g_nImsiStr, pRxBuf + 2, W232_IMEI_LEN + 2);
                 memcpy(g_sMqttKey.imsiStr, pRxBuf + 2, W232_IMEI_LEN + 2);
                 a_Str2Hex((char *)pCntOp->imei, pCntOp->imeiStr);
                 a_Str2Hex((char *)g_nImsiStr, g_nImei);
-                
-                Water_WriteStr(g_nImsiStr);
-                
                 bOK = TRUE;
             }
             break;
         case W232_CNT_OP_IMSI:
             if(strstr((char const *)pRxBuf, "OK") != NULL)
             {
-                //460049440909799
                 memcpy(pCntOp->imsi, pRxBuf + 2, W232_IMEI_LEN + 2);
                 bOK = TRUE;
             }
@@ -269,7 +267,6 @@ BOOL W232_ConnectCheckRsp(W232_CONNECT *pCntOp, u8 *pRxBuf)
         case W232_CNT_OP_CPIN:
             if(strstr((char const *)pRxBuf, "READY") != NULL)
             {
-                
                 bOK = TRUE;
             }
             break;
@@ -294,67 +291,17 @@ BOOL W232_ConnectCheckRsp(W232_CONNECT *pCntOp, u8 *pRxBuf)
             }
             break;
         case W232_CNT_OP_OPEN:
-            if(strstr((char const *)pRxBuf, "CONNECT") != NULL)
-            {
-                bOK = TRUE;
-            }
-            break;
         case W232_CNT_OP_QMTCFG:
-            if(strstr((char const *)pRxBuf, "OK") != NULL)                      //参数配置
-            {
-                bOK = TRUE;
-            }
-            break;     
         case W232_CNT_OP_QMTCFG_TIME:
-            if(strstr((char const *)pRxBuf, "OK") != NULL)                      //参数配置
-            {
-                bOK = TRUE;
-            }
-            break;   
         case W232_CNT_OP_QMTCFG_VERSION:
-            if(strstr((char const *)pRxBuf, "OK") != NULL)                      //参数配置
-            {
-                bOK = TRUE;
-            }
-            break;
         case W232_CNT_OP_QMTOPEN:
-            if(strstr((char const *)pRxBuf, "OK") != NULL)
-            {
-                bOK = TRUE;
-            }
-            break;
         case W232_CNT_OP_QMTCONN:
-            if(strstr((char const *)pRxBuf, "OK") != NULL)
-            {
-                bOK = TRUE;
-            }
-            break;
         case W232_CNT_OP_QMTSUB:
-            if(strstr((char const *)pRxBuf, "OK") != NULL)
-            {
-                bOK = TRUE;
-
-            }
-            break;
         case W232_CNT_OP_QMTSUB_CMD:
-            if(strstr((char const *)pRxBuf, "OK") != NULL)
-            {
-                    bOK = TRUE;
-            }
-            break;
         case W232_CNT_OP_QMTSUB_JSON_ACCEPT:
-            if(strstr((char const *)pRxBuf, "OK") != NULL)
-            {
-                bOK = TRUE;
-            }
-            break;
         case W232_CNT_OP_QMTSUB_JSON_REJECT:
-            if(strstr((char const *)pRxBuf, "OK") != NULL)
-            {
-                bOK = TRUE;
-            }
-            break;
         case W232_CNT_OP_QMTSUB_RESPONSE_CMD:
+        case W232_CNT_OP_QMTSUB_OTA:
             if(strstr((char const *)pRxBuf, "OK") != NULL)
             {
                 bOK = TRUE;
@@ -363,6 +310,7 @@ BOOL W232_ConnectCheckRsp(W232_CONNECT *pCntOp, u8 *pRxBuf)
         case W232_CNT_OP_QMTPUBEX:
             if(strstr((char const *)pRxBuf, ">") != NULL)
             {
+              
                 sprintf(strBuff,"{\"id\":111,\"dp\":{\"index\":[{\"v\":100,\"t\":1682580203}]}}");
                 W232_WriteBuffer((u8 *)strBuff, 40);
                 W232_WriteBuffer((u8 *)strBuff, 40);
@@ -422,6 +370,7 @@ void W232_ConnectStep(W232_CONNECT *pCntOp)
         case W232_CNT_OP_QMTSUB_JSON_REJECT:
         case W232_CNT_OP_QMTSUB_RESPONSE_CMD:
         case W232_CNT_OP_QMTPUBEX:
+        case W232_CNT_OP_QMTSUB_OTA:
             if(pCntOp->result == W232_CNT_RESULT_OK)
             {
                 pCntOp->repeat[pCntOp->index] = 0;
@@ -543,6 +492,7 @@ BOOL W232_ConnectGetCClk(u8 *pRxBuf, u8 len, u8 *pRtc)
 
 void W232_PostRsp(W232_CONNECT *pCntOp,u8 *pBuffer, u16 len)
 {  
+  /*
     char strBuff[W232_STR_BUFFER_LEN] = {0};
     char strBuff1[W232_STR_BUFFER_LEN] = {0};
     char strRspbuffer[W232_STR_BUFFER_LEN] ={0};
@@ -569,6 +519,7 @@ void W232_PostRsp(W232_CONNECT *pCntOp,u8 *pBuffer, u16 len)
     }
     W232_Delayms(50);
     W232_WriteBuffer((u8 *)strBuff1,strlen(strBuff1));
+*/
 }
 
 

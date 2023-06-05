@@ -181,7 +181,7 @@ void Sys_Init(void)
 
     W232_ConnectInit(&g_sW232Connect, W232_CNT_CMD_PWRON, &g_sDeviceParams.serverParams);
     a_SetState(g_sW232Connect.state, W232_CNT_OP_STAT_TX);
-    Device_Voice_Apo(SOUND_CNT_TIME_1S * 2, SOUND_REPAT_NULL, SOUND_VOICE_DI, SOUND_VOC_DI);
+    //Device_Voice_Apo(SOUND_CNT_TIME_1S * 2, SOUND_REPAT_NULL, SOUND_VOICE_DI, SOUND_VOC_DI);
     Sys_EnableInt();
     
 }
@@ -211,7 +211,7 @@ void Sys_LedTask(void)
         if(a_CheckStateBit(g_nSysState, SYS_STAT_MQTT_ACCESS))
         {
             
-            if(g_nLedDelayTime&0x05)
+            if(g_nLedDelayTime & 0x0A)
             {
                 
                 Sys_LedOn();
@@ -225,18 +225,7 @@ void Sys_LedTask(void)
 
         if(a_CheckStateBit(g_nSysState, SYS_STAT_FIRE_TEST))
         {
-          /*
-            if(g_nLedDelayTime & 0x01)
-            {    
-                IO_Led_Open();
-            }
-            else
-            {
-                IO_Led_Close();
-                a_ClearStateBit(g_nSysState, SYS_STAT_FIRE_TEST);
-            }
-*/
-            
+     
         }
            
     }
@@ -622,14 +611,11 @@ void Sys_W232Task(void)
     if(Uart_IsRcvFrame(g_sW232RcvFrame))
     {
         if(a_CheckStateBit(g_sW232Connect.state, W232_CNT_OP_STAT_RX))
-        {
-           //Water_EnableTxDma(g_sW232RcvFrame.buffer, g_sW232RcvFrame.index);
-           
+        {        
             if(W232_ConnectCheckRsp(&g_sW232Connect, g_sW232RcvFrame.buffer))   //如果校验响应帧失败，就继续接收，否则复位接收缓冲区
             {
                 g_sW232Connect.result = W232_CNT_RESULT_OK;
                 a_SetState(g_sW232Connect.state, W232_CNT_OP_STAT_STEP);
-                
                 W232_ClearRxBuffer();
             }
             else
@@ -640,7 +626,6 @@ void Sys_W232Task(void)
         }
     }
     
-    //发送
     if(a_CheckStateBit(g_sW232Connect.state, W232_CNT_OP_STAT_TX))      //发送AT指令
     {
         a_ClearStateBit(g_sW232Connect.state, W232_CNT_OP_STAT_TX);
@@ -684,7 +669,6 @@ void Sys_W232Task(void)
             {
                 if(g_sW232Connect.cmd == W232_CNT_CMD_PWRON)            
                 {
-                    
                     g_sW232Connect.state = W232_CNT_OP_STAT_DTU;
                     a_SetStateBit(g_nSysState, SYS_STAT_LTEDTU);        //连接MQTT服务器成功
 
@@ -750,8 +734,7 @@ void Sys_ServerTask(void)
                 g_sW232RcvBuffer.tick = g_nSysTick;
                 a_ClearStateBit(g_nDeviceServerTxBuf.state, DEVICE_SERVER_TXSTAT_RX_AT);
                 a_ClearStateBit(g_nDeviceServerTxBuf.state, DEVICE_SERVER_TXSTAT_WAIT);
-               //g_nDeviceServerTxBuf.state = W232_CNT_OP_STAT_IDLE;
-                 a_SetStateBit(g_nDeviceServerTxBuf.state, DEVICE_SERVER_TXST_STEP); 
+                a_SetStateBit(g_nDeviceServerTxBuf.state, DEVICE_SERVER_TXST_STEP); 
                 W232_ClearRxBuffer();
             }
             else
@@ -921,7 +904,6 @@ void Sys_WaterTask()
             memset(g_sWaterInfo.uid, 0 ,FRAME_UID_LEN);
             a_SetStateBit(g_nDeviceTestInfo.flag, DEVICE_TEST_FLAG_DOOE_MODE);
             a_ClearStateBit(g_nSysState, SYS_STAT_KEY_CHK); 
-            //a_SetStateBit(g_nSysState, SYS_STAT_TEST_MODE); 
         }  
     }
 }
@@ -997,23 +979,27 @@ void Sys_HeratTask()
     if(a_CheckStateBit(g_nSysState, SYS_STAT_GATE_STAT_CHK))
     {
         
-        static u8 gateIndex = 0;
+        static u8 gateIndex = 0, statTick = 0;
         
-        Device_Gate_StateChk(gateIndex);
-        gateIndex ++ ;
-        if(gateIndex == ((GATE_SLAVER_NUM << 1) - 1))
+        statTick ++;
+        if(statTick == 10)
         {
-            gateIndex = DEVICE_SM5001_ID  ;
-           
-        }
-        else if(gateIndex == DEVICE_SM5001_ID)
-        {
-            a_SetState(gateIndex, SYS_NULL_TICK);
-        }
-        else
-        {
-          gateIndex ++;
-        
+            Device_Gate_StateChk(gateIndex);
+            a_SetState(statTick, SYS_NULL_TICK);
+            if(gateIndex == ((GATE_SLAVER_NUM << 1) - 1))
+            {
+                gateIndex = DEVICE_SM5001_ID  ;
+               
+            }
+            else if(gateIndex == DEVICE_SM5001_ID)
+            {
+                a_SetState(gateIndex, SYS_NULL_TICK);
+            }
+            else
+            {
+              gateIndex ++;
+            
+            }
         }
         a_ClearStateBit(g_nSysState, SYS_STAT_GATE_STAT_CHK);
         

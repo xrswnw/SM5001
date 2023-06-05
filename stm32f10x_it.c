@@ -140,15 +140,10 @@ void SysTick_Handler(void)
     if((g_nSysTick % 21) == 0)
     {
 
-        a_SetStateBit(g_nSysState, SYS_STAT_RUNLED | SYS_STAT_SENSOR_CHK | SYS_STAT_TEMP_CHK | SYS_STAT_MQTT_HEART | SYS_STAT_AD | SYS_STAT_VOICE_CHK |  SYS_STAT_WATER_CTR | SYS_STAT_TEST_TIM);  
+        a_SetStateBit(g_nSysState, SYS_STAT_RUNLED | SYS_STAT_SENSOR_CHK | SYS_STAT_TEMP_CHK | SYS_STAT_MQTT_HEART | SYS_STAT_AD | SYS_STAT_VOICE_CHK |  SYS_STAT_WATER_CTR | SYS_STAT_TEST_TIM | SYS_STAT_GATE_STAT_CHK);  
         a_SetStateBit(g_sElectInfo.state, ELECT_STAT_TX);
     }
     
-    if((g_nSysTick % 301) == 0)
-    {
-        a_SetStateBit(g_nSysState, SYS_STAT_GATE_TEST | SYS_STAT_GATE_STAT_CHK);  
-       
-    }
     
     Uart_IncIdleTime(STICK_TIME_MS, g_sUartRcvFrame);
     Uart_IncIdleTime(STICK_TIME_MS, g_sW232RcvFrame);

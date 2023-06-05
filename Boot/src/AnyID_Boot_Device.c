@@ -26,12 +26,12 @@ void Device_CommunTxCmd(DEVICE_SENVER_TXBUFFER *pCntOp, u32 sysTick)
             break;
         case DEVICE_HTTP_GET_REQUEST_CKECK:
 
-            //sprintf(g_nHttpAtBuf, EC20_STR_BUFFER_RSP_LEN,"GET https://iot-api.heclouds.com/fuse-ota/%.6s/%.15s/check?type=1&version=%.8s HTTP/1.1\r\nAuthorization:%.97s\r\n", EC20_PRDOCT_ID, g_nImsiStr, g_nSoftWare, HTTPTOKEN);
+           
             memset(g_nHttpAtBuf, 0, EC20_STR_BUFFER_RSP_LEN);
             memset(atBuf, 0, EC20_STR_BUFFER_RSP_LEN);
             
-            strcat(atBuf,"GET https://iot-api.heclouds.com/fuse-ota");
-            strcat(atBuf,"/");
+            strcat(atBuf,"GET https://iot-api.heclouds.com/fuse-ota/");
+            //strcat(atBuf,"/");
             strcat(atBuf,*(&EC20_PRDOCT_ID));
             strcat(atBuf,"/");
             strcat(atBuf, (const char *)(&g_nImsiStr));
@@ -39,9 +39,17 @@ void Device_CommunTxCmd(DEVICE_SENVER_TXBUFFER *pCntOp, u32 sysTick)
             strcat(atBuf,"check?type=1&version=");
             strcat(atBuf, (const char *)(&g_nSoftWare));
             memcpy(g_nHttpAtBuf, atBuf, strlen(atBuf) - 2);
-            strcat(g_nHttpAtBuf," HTTP/1.1\r\nAuthorization:");
+            strcat(g_nHttpAtBuf,"\r\n");
+            //strcat(g_nHttpAtBuf," HTTP/1.1\r\n");
+           // strcat(g_nHttpAtBuf,"Content-Type: application/json\r\n");
+            //strcat(g_nHttpAtBuf,"\r\n");
+            strcat(g_nHttpAtBuf,"authorization:");
             strcat(g_nHttpAtBuf,*(&HTTPTOKEN));
             strcat(g_nHttpAtBuf,"\r\n");
+            //strcat(g_nHttpAtBuf,"\r\n");
+            strcat(g_nHttpAtBuf,"host:iot-api.heclouds.com\r\n");
+            //strcat(g_nHttpAtBuf,"\r\n");
+            //strcat(g_nHttpAtBuf,"Content-Length:20\r\n\r\n");
             strcat(atLenBuf,"AT+QHTTPGET=");
             
             g_nlen = strlen(g_nHttpAtBuf);
@@ -58,7 +66,7 @@ void Device_CommunTxCmd(DEVICE_SENVER_TXBUFFER *pCntOp, u32 sysTick)
             break;
         case DEVICE_HTTP_GET_RONSPOND:
 
-            EC20_WriteCmd("AT+QHTTPREAD=80");
+            EC20_WriteCmd("AT+QHTTPREAD=184");
             break;
             
     }
@@ -114,6 +122,7 @@ BOOL Device_CommunCheckRsp(DEVICE_SENVER_TXBUFFER *pCntOp, u8 *pRxBuf)
             {
                 
                 bOK = TRUE;
+                Uart_WriteCmd(pRxBuf);
             }
             break;
     }
@@ -158,6 +167,7 @@ BOOL Device_CheckRsp(EC20_RCVBUFFER *pCntOp, u8 *pRxBuf, u16 len)
     else if(strstr((char const *)pRxBuf, "+QHTTPGET") != NULL)
     {
         bOK = TRUE;
+        Device_At_Rsp(EC20_CNT_TIME_1S, EC20_CNT_REPAT_NULL, DEVICE_HTTP_GET_RONSPOND);
        // Device_At_Rsp(EC20_CNT_TIME_1S, EC20_CNT_REPAT_NULL, DEVICE_HTTP_GET_RONSPOND);
     } 
     else if(strstr((char const *)pRxBuf, "+QHTTPREAD: 0") != NULL)

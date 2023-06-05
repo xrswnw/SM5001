@@ -35,6 +35,8 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 
 
 #define DEVICE_VERSION_SIZE                   50
+
+
 #define DEVICE_CMD_RESET                    0x04
 #define DEVICE_CMD_GET_CPUID                0xF8
 #define DEVICE_CMD_ACTCTL_CTL               0x21
@@ -59,7 +61,7 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define DEVICE_SERVER_SATA_TX               2
 #define DEVICE_SERVER_SATA_RX               3
 
-#define DEVICE_TEMPR_HIGH                       75
+#define DEVICE_TEMPR_HIGH                       60
 
 #define DEVICE_HEART_MIN                     570
 
@@ -188,8 +190,10 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 
 #define DEVICE_FLAG_MAST                5
 #define DEVICE_GATE_LEN                 9
-#define DEVICE_VERSION_LEN              4
+#define DEVICE_VERSION_LEN              8
 #define DEVICE_SERVER_RSP_LEN           1500
+
+#define DEVICE_KEY_UID_LEN              0x0C
 
 #define DEVICE_TEST_FLAG_DOOE_MODE           0x00000001
 
@@ -238,7 +242,6 @@ typedef struct deviceParams{
     W232_PARAMS serverParams;
     WINAVG_INFO temprUp;
     WINAVG_INFO temprDown;
-    u8 mode;
     u8 rfu1;                            
     u16 rfu2;
     u8 addr;
