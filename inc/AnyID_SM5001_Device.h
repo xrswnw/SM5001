@@ -197,7 +197,7 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 
 #define DEVICE_TEST_FLAG_DOOE_MODE           0x00000001
 
-#define DEVICE_TEST_DOOR_OPEN_TIM               5
+#define DEVICE_TEST_DOOR_OPEN_TIM               3
 #define DEVICE_GATE_OPEN_DOOR                   0x02
 
 
@@ -336,7 +336,9 @@ BOOL Device_CommunCheckRsp(DEVICE_SENVER_TXBUFFER *pCntOp, u8 *pRxBuf);
 
 
 u8 Device_UrlEncode(char *sign);
+u8 Device_Chk_Door();
 
+u16 Device_Mqtt_Requeat_Sck(u8 *pBuffer); 
 u16 Device_WaterProceRspFrame(u8 *pFrame, WATER_INFO *pOpInfo, u8 len);
 u16 Device_ResponseGateFrame(u8 add, u8 mode, READER_RSPFRAME *pOpResult);
 u16 Device_ResponseFrame(u8 *pParam, u8 len, READER_RSPFRAME *pOpResult);

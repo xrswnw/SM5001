@@ -5,7 +5,7 @@
 #include "AnyID_Stdlib.h"
 
 
-#define UART_BUFFER_MAX_LEN             (1024)
+#define UART_BUFFER_MAX_LEN             (2056)
 #define UART_FRAME_DATA_MAX_LEN         252
 #define UART_FRAME_PARAM_MAX_LEN        240
 #define UART_FRAME_DATA_MIN_LEN         8

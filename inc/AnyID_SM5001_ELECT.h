@@ -78,6 +78,7 @@ typedef struct electtInfo{
     u32 electValue;
     u32 value;
     u32 tick; 
+    u32 time;
     ELECT_TX_BUF txBuf;
     ELECT_RX_BUF rxBuf;
 }ELECT_INFO;

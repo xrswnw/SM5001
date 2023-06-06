@@ -119,26 +119,29 @@ void Gate_FormatCmd(GATE_OPINFO *pGateOpInfo, u8 *pParams, u16 paramsLen)
 
 void Gate_TxFrame(GATE_OPINFO *pGateOpInfo, u32 tick)
 {
-    Gate_Delayms(100);
-    if(pGateOpInfo->mode == GATE_MODE_INIT)
-    {
-        Gate_FormatCmd(pGateOpInfo, (u8 *)pGateOpInfo->pGateParams, GATE_PARAMS_LEN);
-        Gate_EnableTxDma(pGateOpInfo->txFrame.buffer, pGateOpInfo->txFrame.len);
-        pGateOpInfo->tick = tick;
-    }
-    else if(pGateOpInfo->mode == GATE_MODE_INFO)
-    {
-        Gate_FormatCmd(pGateOpInfo, NULL, 0);
-        Gate_EnableTxDma(pGateOpInfo->txFrame.buffer, pGateOpInfo->txFrame.len);
-        pGateOpInfo->tick = tick;
-    }
-    else if(pGateOpInfo->mode == GATE_MODE_CMD)
-    {
-        Gate_FormatCmd(pGateOpInfo, pGateOpInfo->slvCmd.params, pGateOpInfo->slvCmd.paramsLen);
-        Gate_EnableTxDma(pGateOpInfo->txFrame.buffer, pGateOpInfo->txFrame.len);
-        pGateOpInfo->tick = tick;
-        pGateOpInfo->tickCmd = tick;
-    }
+   // Gate_Delayms(100);
+
+        if(pGateOpInfo->mode == GATE_MODE_INIT)
+        {
+            Gate_FormatCmd(pGateOpInfo, (u8 *)pGateOpInfo->pGateParams, GATE_PARAMS_LEN);
+            Gate_EnableTxDma(pGateOpInfo->txFrame.buffer, pGateOpInfo->txFrame.len);
+            pGateOpInfo->tick = tick;
+        }
+        else if(pGateOpInfo->mode == GATE_MODE_INFO)
+        {
+            Gate_FormatCmd(pGateOpInfo, NULL, 0);
+            Gate_EnableTxDma(pGateOpInfo->txFrame.buffer, pGateOpInfo->txFrame.len);
+            pGateOpInfo->tick = tick;
+        }
+        else if(pGateOpInfo->mode == GATE_MODE_CMD)
+        {
+            Gate_FormatCmd(pGateOpInfo, pGateOpInfo->slvCmd.params, pGateOpInfo->slvCmd.paramsLen);
+            Gate_EnableTxDma(pGateOpInfo->txFrame.buffer, pGateOpInfo->txFrame.len);
+            pGateOpInfo->tick = tick;
+            pGateOpInfo->tickCmd = tick;
+        }
+      
+  
 
 }
 

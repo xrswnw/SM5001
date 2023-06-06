@@ -56,8 +56,8 @@ void W232_ConfigInt(void)
 
     NVIC_InitStructure.NVIC_IRQChannel = W232_INT_CHANNEL;
 
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = INT_PRIORITY_UART_RX >> 2;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = INT_PRIORITY_UART_RX & 0x03;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = INT_PRIORITY_GROUP >> 2;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = INT_PRIORITY_GROUP & 0x03;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 
     NVIC_Init(&NVIC_InitStructure);

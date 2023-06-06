@@ -181,7 +181,7 @@ void Sys_Init(void)
 
     W232_ConnectInit(&g_sW232Connect, W232_CNT_CMD_PWRON, &g_sDeviceParams.serverParams);
     a_SetState(g_sW232Connect.state, W232_CNT_OP_STAT_TX);
-    //Device_Voice_Apo(SOUND_CNT_TIME_1S * 2, SOUND_REPAT_NULL, SOUND_VOICE_DI, SOUND_VOC_DI);
+    Device_Voice_Apo(SOUND_CNT_TIME_1S * 2, SOUND_REPAT_NULL, SOUND_VOICE_DI, SOUND_VOC_OPEN_DEVICE);
     Sys_EnableInt();
     
 }
@@ -484,9 +484,14 @@ void Sys_ElectTask()
     if(a_CheckStateBit(g_sElectInfo.state, ELECT_STAT_TX)) 
     {
         a_ClearStateBit(g_sElectInfo.state, ELECT_STAT_TX);
-        g_sElectInfo.tick = g_nSysTick;
-        Elect_TransmitCmd(&g_sElectInfo.txBuf);
-        a_SetStateBit(g_sElectInfo.state, ELECT_STAT_WAIT);
+        g_sElectInfo.time ++;
+        if(g_sElectInfo.time == 30)
+        {
+              g_sElectInfo.tick = g_nSysTick;
+              a_SetState(g_sElectInfo.time, SYS_NULL_TICK);
+              Elect_TransmitCmd(&g_sElectInfo.txBuf);
+              a_SetStateBit(g_sElectInfo.state, ELECT_STAT_WAIT);   
+        }
         
     }
     if(a_CheckStateBit(g_sElectInfo.state, ELECT_STAT_WAIT)) 
@@ -676,7 +681,7 @@ void Sys_W232Task(void)
                     a_SetStateBit(g_nSysState, SYS_STAT_MQTT_ACCESS);
                     g_sDeviceParams.offLineTime = 0;
                     Device_WriteMqttKey();
-                    Device_Voice_Apo(SOUND_CNT_TIME_1S * 2, SOUND_REPAT_NULL, SOUND_VOICE_DI, SOUND_VOC_DI);
+                    Device_Voice_Apo(SOUND_CNT_TIME_1S * 2, SOUND_REPAT_NULL, SOUND_VOICE_DI, SOUND_VOC_OPEN_DEVICE);
 
                 }
                 else if(g_sW232Connect.cmd == W232_CNT_CMD_PWROFF) 
@@ -684,7 +689,12 @@ void Sys_W232Task(void)
                     W232_KeyLow();//关机指令执行完成，再次确认关闭
                     g_sW232Connect.state = W232_CNT_OP_STAT_IDLE;
                 }
+                else
+                {
+                
+                }
             }
+
         }
         else
         {
@@ -747,7 +757,7 @@ void Sys_ServerTask(void)
             if(g_sW232RcvFrame.index > 0)
             {
 
-                 if(!a_CheckStateBit(g_nDeviceServerTxBuf.state, DEVICE_SERVER_TXSTAT_RX_AT) && !a_CheckStateBit(g_nDeviceServerTxBuf.state, DEVICE_SERVER_TXSTAT_WAIT))
+                // if(!a_CheckStateBit(g_nDeviceServerTxBuf.state, DEVICE_SERVER_TXSTAT_RX_AT) && !a_CheckStateBit(g_nDeviceServerTxBuf.state, DEVICE_SERVER_TXSTAT_WAIT))
                  {
                     if(Device_CheckRsp(&g_sW232Connect, g_sW232RcvFrame.buffer, g_sW232RcvFrame.index))
                     {
@@ -898,7 +908,7 @@ void Sys_WaterTask()
     
     if(a_CheckStateBit(g_nSysState, SYS_STAT_KEY_CHK))
     {
-        if(!memcmp(g_sMqttKey.uid, g_sWaterInfo.uid, FRAME_UID_LEN))
+        if(!memcmp(g_sMqttKey.uid, g_sWaterInfo.uid, FRAME_UID_LEN) && !memcmp(g_nImsiStr, 0,W232_IMSI_LEN))
         {
             Device_Voice_Apo(SOUND_CNT_TIME_1S * 2, SOUND_REPAT_NULL, SOUND_VOICE_DI, SOUND_VOC_DI);
             memset(g_sWaterInfo.uid, 0 ,FRAME_UID_LEN);
@@ -1008,7 +1018,7 @@ void Sys_HeratTask()
     {
         Device_ReadMqttKey();
         memcpy(g_nImsiStr, g_sMqttKey.imsiStr,W232_IMSI_LEN);
-        if(memcmp(g_sMqttKey.imsiStr, g_nImsiStr,W232_IMSI_LEN))
+        if(memcmp(g_sMqttKey.imsiStr, g_nImsiStr,W232_IMSI_LEN) )
         {
           a_ClearStateBit(g_nSysState, SYS_STAT_LTEDTU);
           W232_ConnectInit(&g_sW232Connect, W232_CNT_CMD_PWRON, &g_sDeviceParams.serverParams);
@@ -1031,7 +1041,7 @@ void Sys_TestTask()
         return;
     }
 
-    static u8 addr = 0, tick =  0;
+    static u8 addr = 0, tick =  0,time = 0;
     
     if(a_CheckStateBit(g_nSysState, SYS_STAT_TEST_TIM)) 
     {
@@ -1039,7 +1049,7 @@ void Sys_TestTask()
           if(tick & DEVICE_TEST_DOOR_OPEN_TIM)
           {
               tick = 0;
-              if(addr < (GATE_SLAVER_NUM << 1))
+              if(addr <= (GATE_SLAVER_NUM << 1))
               {
                 Device_Ansy_Frame(addr , GATE_FRAME_CMD_SET_OUTINFO, GATE_RRAME_OPEN_DOOR);
                 Gate_TxFrame(&g_sGateOpInfo, g_nSysTick); 
@@ -1047,10 +1057,31 @@ void Sys_TestTask()
               }
               else
               {
-                 addr = 0;
-                 a_SetStateBit(g_nSysState, SYS_STAT_KEY_CHK)  ;
-                 a_ClearStateBit(g_nSysState, SYS_STAT_TEST_MODE)  ;
-                 a_ClearStateBit(g_nDeviceTestInfo.flag, DEVICE_TEST_FLAG_DOOE_MODE);
+                /*if(Device_Chk_Door())
+                {
+                  addr = Device_Chk_Door();
+                  time ++;
+                }
+                else*/
+                {
+                     addr = 0;
+                     time ++;
+                     /*
+                     a_SetStateBit(g_nSysState, SYS_STAT_KEY_CHK)  ;
+                     a_ClearStateBit(g_nSysState, SYS_STAT_TEST_MODE)  ;
+                     a_ClearStateBit(g_nDeviceTestInfo.flag, DEVICE_TEST_FLAG_DOOE_MODE);               */
+                }
+                
+                if(time >= 3)
+                {
+                   addr = 0;
+                    time = 0;
+                    a_SetStateBit(g_nSysState, SYS_STAT_KEY_CHK)  ;
+                    a_ClearStateBit(g_nSysState, SYS_STAT_TEST_MODE)  ;
+                    a_ClearStateBit(g_nDeviceTestInfo.flag, DEVICE_TEST_FLAG_DOOE_MODE);
+                }  
+
+                
               }
           }
           else

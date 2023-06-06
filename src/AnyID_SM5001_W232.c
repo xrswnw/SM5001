@@ -231,7 +231,7 @@ BOOL W232_ConnectCheckRsp(W232_CONNECT *pCntOp, u8 *pRxBuf)
             if(strstr((char const *)pRxBuf, "OK") != NULL)
             {
                 memcpy(pCntOp->imei, pRxBuf + 2, W232_IMEI_LEN + 2);
-                memcpy(g_nImsiStr, pRxBuf + 2, W232_IMEI_LEN + 2);
+                memcpy(g_nImsiStr, pRxBuf+ 2, W232_IMEI_LEN + 2);
                 memcpy(g_sMqttKey.imsiStr, pRxBuf + 2, W232_IMEI_LEN + 2);
                 a_Str2Hex((char *)pCntOp->imei, pCntOp->imeiStr);
                 a_Str2Hex((char *)g_nImsiStr, g_nImei);
@@ -530,7 +530,7 @@ void W232_DataHandle(W232_RCVBUFFER *pData, u8 *pBuffer)
     {
         u8 tempLen[2] = {0};
         //Water_WriteStr("²½Öè2\r\n");
-        memset(&g_sW232RcvBuffer, 0, sizeof(W232_RCVBUFFER));
+        memset(pData, 0, sizeof(W232_RCVBUFFER));
         memcpy(pData->idStr, pBuffer + W232_RTC_DATA_ID_POS, W232_CNT_INDEX_LEN * 4);
         memcpy(pData->addStr, pBuffer + W232_RTC_DATA_INDEX_POS, W232_CNT_INDEX_LEN);
         memcpy(pData->cmdStr, pBuffer + W232_RTC_DATA_CMD_POS, W232_CNT_INDEX_LEN);

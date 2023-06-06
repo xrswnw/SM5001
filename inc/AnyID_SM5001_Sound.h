@@ -76,6 +76,7 @@
 #define SOUND_VOC_BATTER_CODE_FAIL      9
 #define SOUND_VOC_PACKAGE_FAIL          10              //Ì×²Íµ½ÆÚ
 #define SOUND_VOC_FIRE_WARN             11
+#define SOUND_VOC_OPEN_DEVICE           12
 
 
 #define SOUND_VOICE_RTU_BAT             1

@@ -139,7 +139,6 @@ void SysTick_Handler(void)
 
     if((g_nSysTick % 21) == 0)
     {
-
         a_SetStateBit(g_nSysState, SYS_STAT_RUNLED | SYS_STAT_SENSOR_CHK | SYS_STAT_TEMP_CHK | SYS_STAT_MQTT_HEART | SYS_STAT_AD | SYS_STAT_VOICE_CHK |  SYS_STAT_WATER_CTR | SYS_STAT_TEST_TIM | SYS_STAT_GATE_STAT_CHK);  
         a_SetStateBit(g_sElectInfo.state, ELECT_STAT_TX);
     }
@@ -248,10 +247,12 @@ void WATER_TxDMAIRQHandler(void)
 }
 
 
-u8 g_nW232RxByte = 0;
+ u8 g_nW232RxByte = 0;
+
+
 void W232_IRQHandler(void)
 {
-    if(USART_GetITStatus(W232_PORT, USART_IT_RXNE) != RESET)
+    if(USART_GetITStatus(W232_PORT, USART_IT_RXNE) != RESET)        //reg
     {
         g_nW232RxByte = W232_ReadByte();
 
@@ -272,6 +273,33 @@ void W232_IRQHandler(void)
     }
     W232_PORT->SR &= (~0x3FF);
 }
+
+/*
+u16 g_nLteSr = 0;
+u16 g_nLteDr = 0;
+void W232_IRQHandler(void)
+{
+    if(W232_PORT->SR & USART_IT_RXNE)
+    {    
+        g_nLteDr = W232_ReadByte();
+        g_sW232RcvFrame.buffer[g_sW232RcvFrame.index++] =  g_nLteDr;
+        if(g_sW232RcvFrame.index  >= UART_BUFFER_MAX_LEN)
+        {
+           g_sW232RcvFrame.state |=  UART_FLAG_RCV;     //接收数据完成
+        }
+        else
+        {
+            g_sW232RcvFrame.state = UART_STAT_END;
+        }
+        g_sW232RcvFrame.idleTime = 0;
+    }
+
+    g_nLteSr = W232_PORT->SR;                                       //通过读取SR和DR清空中断标志
+    g_nLteDr = W232_PORT->DR;  
+}
+
+          */
+
 
 
 void ADC1_2_IRQHandler(void)

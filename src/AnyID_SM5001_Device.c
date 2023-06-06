@@ -14,7 +14,7 @@ DEVICE_IMPRSP_INFO g_nDeviceImpRspInfo = {0};
 void Device_Init()
 {
     Device_ReadDeviceParamenter();
-   /*
+  /*
     memcpy(g_sMqttKey.keyBuffer, TESTTOKEN, W232_TOKEN_LEN);
     g_sMqttKey.len = W232_TOKEN_LEN;
     memset(g_sMqttKey.keyBuffer + g_sMqttKey.len, 0, FRAME_MQTT_KEY_KEY - g_sMqttKey.len);
@@ -29,7 +29,8 @@ void Device_Init()
     g_sMqttKey.uid[7] = 0xE0;
     
     Device_WriteMqttKey();      
-         */                
+*/
+                         
     Device_ReadMqttKey();
 
     
@@ -770,7 +771,7 @@ BOOL Device_GateProceRspFrame(u8 *pFrame, GATE_OPINFO *pOpInfo, u32 tick)
 
             break;
             case GATE_FRAME_CMD_SET_PARAMS:   //  10
-              if(paramsLen == 4)
+              if(paramsLen > 0)
               {
                     //版本信息
                     memcpy(g_aGateSlvInfo[2 * (addr - 1)].softWare, pParams, GATE_VERSION_LEN);
@@ -1356,11 +1357,18 @@ u16 Device_HeartFormat(u8 *pBuffer, u32 tick)
     pBuffer[pos++] = g_nImei[6];
     pBuffer[pos++] = (g_nImei[7] & 0xF0);
     
+      /* 
+    pBuffer[pos++] = 0x23;
+    pBuffer[pos++] = 0x06;
+    pBuffer[pos++] = 0x05;
+    pBuffer[pos++] = 0x00;
+                               */ 
+     
     memcpy(pBuffer + pos, READER_SOFTWARE_VERSION, DEVICE_VERSION_LEN);
     pos += DEVICE_VERSION_LEN;
     memcpy(pBuffer + pos, READER_HARDWARE_VERSION, DEVICE_VERSION_LEN);
     pos += DEVICE_VERSION_LEN;
-   
+      
     pBuffer[pos++] = (g_sElectInfo.electValue >> 24) & 0xFF;
     pBuffer[pos++] = (g_sElectInfo.electValue >> 16) & 0xFF;
     pBuffer[pos++] = (g_sElectInfo.electValue >>  8) & 0xFF;
@@ -1384,15 +1392,20 @@ u16 Device_HeartFormat(u8 *pBuffer, u32 tick)
         {
             //memcpy(pBuffer + pos, &g_aGateSlvInfo[index].softWare, 4);
             //pos += 4;
-            /*pBuffer[pos++] = (g_aGateSlvInfo[index].softWare >> 24) & 0xFF;
-            pBuffer[pos++] = (g_aGateSlvInfo[index].softWare >> 16) & 0xFF;
-            pBuffer[pos++] = (g_aGateSlvInfo[index].softWare >>  8) & 0xFF;
-            pBuffer[pos++] = (g_aGateSlvInfo[index].softWare >>  0) & 0xFF;
-            */
-            memcpy(pBuffer + pos, g_aGateSlvInfo[index].softWare, GATE_VERSION_LEN);
+          /*  pBuffer[pos++] = 0x23;
+            pBuffer[pos++] = 0x06;
+            pBuffer[pos++] = 0x05;
+            pBuffer[pos++] = 0x02;
+                     */
+          /*
+            g_aGateSlvInfo[index].softWare = "23060600"
+            g_aGateSlvInfo[index].hardWare = "SM500200"
+*/
+            memcpy(pBuffer + pos, "23060600", GATE_VERSION_LEN);
             pos += GATE_VERSION_LEN;
-            memcpy(pBuffer + pos, g_aGateSlvInfo[index].hardWare, GATE_VERSION_LEN);
+            memcpy(pBuffer + pos, "SM500200", GATE_VERSION_LEN);
             pos += GATE_VERSION_LEN;
+             
             pBuffer[pos++] = g_aGateSlvInfo[index].sensorInfo.tmpr;
             pBuffer[pos++] = (g_aGateSlvInfo[index].sensorInfo.sensorState.fan << 3) | 
                            (g_aGateSlvInfo[index].sensorInfo.sensorState.smoke << 2) | 
@@ -1452,6 +1465,7 @@ void Device_IO_Ctr(u8 flag)
     
      if(a_CheckStateBit(g_sIoInfo.flag, IO_FLAG_TEMPR_UP) || a_CheckStateBit(g_sIoInfo.flag, IO_FLAG_FIRE) || a_CheckStateBit(g_sIoInfo.state, IO_STAT_WATER))//////smoke 
      {
+       /*
         if(!a_CheckStateBit(g_sIoInfo.state, IO_STAT_FAN) || a_CheckStateBit(g_sIoInfo.state, IO_STAT_RELAY))
        {
           IO_Fan_Open();
@@ -1459,6 +1473,21 @@ void Device_IO_Ctr(u8 flag)
           a_SetStateBit(g_sIoInfo.state,IO_STAT_FAN);
           a_ClearStateBit(g_sIoInfo.state,IO_STAT_RELAY);
        }
+*/
+       
+    if((a_CheckStateBit(g_sIoInfo.flag, IO_FLAG_TEMPR_UP) || a_CheckStateBit(g_sIoInfo.flag, IO_FLAG_FIRE)) && !a_CheckStateBit(g_sIoInfo.state, IO_STAT_FAN))//////smoke 
+     {
+          IO_Fan_Open();
+          a_SetStateBit(g_sIoInfo.state,IO_STAT_FAN);
+     }
+       
+    if(a_CheckStateBit(g_sIoInfo.state, IO_STAT_RELAY))
+    {
+          IO_Realy_Close();    //测试关闭
+          a_ClearStateBit(g_sIoInfo.state,IO_STAT_RELAY);
+    }
+       
+       
      }
     else
     {
@@ -1633,17 +1662,27 @@ BOOL Device_CheckRsp(W232_CONNECT *pCntOp, u8 *pRxBuf, u8 len)
     char strBuffcmdAccept[W232_STR_BUFFER_RSP_LEN] = {0};
     char strBuffcmdOta[W232_STR_BUFFER_RSP_LEN] = {0};
     
-    sprintf(strBuffRequst,"$sys/%.6s/%.15s/cmd/request/",W232_PRDOCT_ID,g_nImsiStr);
+   // sprintf(strBuffRequst,"$sys/%.6s/%.15s/cmd/request/",W232_PRDOCT_ID,g_nImsiStr);
+    sprintf(strBuffRequst,"cmd/request/");
+    sprintf(strBuffJsonAccept,"dp/post/json/accepted");
+    sprintf(strBuffJsonReject,"dp/post/json/rejected");
+    sprintf(strBuffcmdAccept,"cmd/response/%.36s/accepted",pCntOp->requestId);
+    sprintf(strBuffcmdOta,"ota/inform ");
+    
+   /* 
     sprintf(strBuffJsonAccept,"$sys/%.6s/%.15s/dp/post/json/accepted",W232_PRDOCT_ID, g_nImsiStr);
     sprintf(strBuffJsonReject,"$sys/%.6s/%.15s/dp/post/json/rejected",W232_PRDOCT_ID, g_nImsiStr);
     sprintf(strBuffcmdAccept,"$sys/%.6s/%.15s/cmd/response/%.36s/accepted", W232_PRDOCT_ID, g_nImsiStr,pCntOp->requestId);
     sprintf(strBuffcmdOta,"$sys/%.6s/%.15s/ota/inform ", W232_PRDOCT_ID, g_nImsiStr);
-    if(strstr((char const *)pRxBuf, strBuffRequst) != NULL)
+*/   
+ if(strstr((char const *)pRxBuf, strBuffRequst) != NULL)
     {
         memcpy(pCntOp->requestId, pRxBuf + W232_RQUEST_ID_POS, W232_RQUEST_ID_LEN);
+        u8 index;
+         index = Device_Mqtt_Requeat_Sck(pRxBuf + W232_RQUEST_ID_POS);
         if((*(pCntOp->requestId +  DEVICE_MQTT_FRAME_CMDID_TAG_1) == DEVICE_MQTT_FRAME_CMDID_MASK) &&        //过滤损坏数据帧，否则被服务器踢出
            (*(pCntOp->requestId +  DEVICE_MQTT_FRAME_CMDID_TAG_2) == DEVICE_MQTT_FRAME_CMDID_MASK) && 
-           (*(pCntOp->requestId +  DEVICE_MQTT_FRAME_CMDID_TAG_3) == DEVICE_MQTT_FRAME_CMDID_MASK) && 
+           (*(pCntOp->requestId +  DEVICE_MQTT_FRAME_CMDID_TAG_3) == DEVICE_MQTT_FRAME_CMDID_MASK) &&
            (*(pCntOp->requestId +  DEVICE_MQTT_FRAME_CMDID_TAG_4) == DEVICE_MQTT_FRAME_CMDID_MASK))
         {
             bOK = TRUE;
@@ -1651,11 +1690,6 @@ BOOL Device_CheckRsp(W232_CONNECT *pCntOp, u8 *pRxBuf, u8 len)
              memcpy(pCntOp->requestBuffer, pRxBuf + W232_RQUEST_ID_POS + W232_RQUEST_ID_LEN + 3, W232_RQUEST_BUFFER_LEN);
             W232_DataHandle(&g_sW232RcvBuffer, pRxBuf + W232_RQUEST_ID_POS + W232_RQUEST_ID_LEN + 3);
         }
-        else
-        {
-            bOK = FALSE;
-        }
-
     }
     else if(strstr((char const *)pRxBuf, strBuffJsonAccept) != NULL)
     {
@@ -1994,7 +2028,20 @@ u8 Device_UrlEncode(char *sign)
 
 }
 
-
+u8 Device_Chk_Door()
+{
+  u8 i = 0,index = 0;
+  for(i  = 0; i <= GATE_SLAVER_NUM << 1; i  ++)
+  {
+  
+     if(!g_aGateSlvInfo[i].sensorInfo.sensorState.door)
+     {
+        index = i;
+        break;
+     }
+  }
+   return index;
+}
 
 
 
@@ -2047,5 +2094,26 @@ u8 Device_Ota_Token(char *ver, char *res, unsigned int et, char *access_key, cha
 	//UsartPrintf(USART_DEBUG, "Token: %s\r\n", token_buf);
 	
 	return 0;
+
+}
+
+
+u16 Device_Mqtt_Requeat_Sck(u8 *pBuffer)
+{
+  u8 pos = 0,index = 0;
+  
+  for(pos = 0; pos <= 50; pos ++)
+  {
+    if(*(pBuffer + pos) != 0x22)
+    {
+         index ++;
+    }
+    else
+    {
+      break;
+    }
+  }
+  return index;
+
 
 }
