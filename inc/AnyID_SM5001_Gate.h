@@ -222,6 +222,9 @@ typedef struct gateParams{
 #define GATE_OP_BAT_STAT_OVER                       0x01
 #define GATE_OP_BAT_STAT_ING                        0x02
 
+
+#define GATE_FLAG_DOOR_TEST             1
+
 typedef struct gateSlvCmd{
     u8 index;
     u8 cmd;
@@ -251,6 +254,9 @@ typedef struct gateOpInfo{
     u32 comErr[GATE_SLAVER_NUM];
     u8 cmd;
     u8 rpt;
+    //
+    u8 flag;
+    //
     GATE_PARAMS *pGateParams;
     GATE_SLVCMD slvCmd;
     GATE_OPBAT brwBat;
@@ -269,12 +275,18 @@ extern GATE_OPINFO g_sGateOpInfo;
                                 }while(0)
 #define Gate_StartOpDelay(d, t) do{g_sGateOpInfo.state = GATE_OP_STAT_DLY; g_sGateOpInfo.tick = (t); }while(0)
 
+    
+typedef struct gateTestInfo{
+  u8 buffer[GATE_PARAMS_LEN];
+  u8 len;
+}GATE_TEST_INFO;
+                                  
                                   
                                  
 
 extern GATE_STAT g_aGateSlvStat[GATE_SLAVER_NUM << 1] ;
 extern GATE_INFO g_aGateSlvInfo[GATE_SLAVER_NUM << 1];      //每个从站有两个子设备（仓控）
-
+extern GATE_TEST_INFO g_nGateTestInfo ;
 BOOL Gate_CheckRspFrame(GATE_RXFRAME *pRxFrame, u16 *pStartPos);
 
 
@@ -286,5 +298,6 @@ void Gate_TxFrame(GATE_OPINFO *pGateOpInfo, u32 tick);
 void Gate_CfgSlaver(GATE_OPINFO *pGateOpInfo);
 void Gate_ChagSlaver(GATE_SLVCMD *pGateSlvCmd, u8 index, u8 subIndex, u8 mode);
 void Gate_BrwBat(GATE_SLVCMD *pGateSlvCmd, u8 index, u8 subIndex, u8 *pBatSn);
+u8 Gate_FormatTestFrame(u8 *pBuffer,u8 add,u8 id,u8 cmd);
 
 #endif

@@ -1,20 +1,20 @@
 #include "AnyID_SM5001_Device.h"
 
-const u8 DEVICE_VERSION[DEVICE_VERSION_SIZE]@0x08005000 = " SM5001 23060500 G230200";
+const u8 DEVICE_VERSION[DEVICE_VERSION_SIZE]@0x08005000 = " SM5001 23060700 G230200";
 
 #define READER_HARDWARE_VERSION    "SM500100"
-#define READER_SOFTWARE_VERSION    "23060500"
+#define READER_SOFTWARE_VERSION    "23060700"
 
 READER_RSPFRAME g_sDeviceRspFrame = {0};
 DEVICE_PARAMS g_sDeviceParams = {0};
-DEVICE_TEST g_nDeviceTestInfo  = {0};
+DEVICE_TEST g_nDeviceTestInfo  = {0};                                 
 DEVICE_SENVER_TXBUFFER g_nDeviceServerTxBuf = {0};
 DEVICE_IMPRSP_INFO g_nDeviceImpRspInfo = {0};
 
 void Device_Init()
 {
     Device_ReadDeviceParamenter();
-  /*
+   /*
     memcpy(g_sMqttKey.keyBuffer, TESTTOKEN, W232_TOKEN_LEN);
     g_sMqttKey.len = W232_TOKEN_LEN;
     memset(g_sMqttKey.keyBuffer + g_sMqttKey.len, 0, FRAME_MQTT_KEY_KEY - g_sMqttKey.len);
@@ -29,7 +29,7 @@ void Device_Init()
     g_sMqttKey.uid[7] = 0xE0;
     
     Device_WriteMqttKey();      
-*/
+           */
                          
     Device_ReadMqttKey();
 
@@ -649,7 +649,7 @@ BOOL Device_GateProceRspFrame(u8 *pFrame, GATE_OPINFO *pOpInfo, u32 tick)
             case GATE_FRAME_CMD_SET_OUTINFO:
               
               a_ClearStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_GATE);
-              if(!a_CheckStateBit(g_nDeviceTestInfo.flag, DEVICE_TEST_FLAG_DOOE_MODE))
+              if(!a_CheckStateBit(g_sGateOpInfo.flag, GATE_FLAG_DOOR_TEST))
               {
                   Device_At_Rsp(W232_CNT_TIME_500MS, W232_CNT_REPAT_NULL, W232_MQTT_TOPIC_CMD);
               }
@@ -774,11 +774,14 @@ BOOL Device_GateProceRspFrame(u8 *pFrame, GATE_OPINFO *pOpInfo, u32 tick)
               if(paramsLen > 0)
               {
                     //版本信息
+
                     memcpy(g_aGateSlvInfo[2 * (addr - 1)].softWare, pParams, GATE_VERSION_LEN);
                     memcpy(g_aGateSlvInfo[2 * (addr - 1) + 1].softWare, pParams, GATE_VERSION_LEN);
                     memcpy(g_aGateSlvInfo[2 * (addr - 1)].hardWare, pParams + GATE_VERSION_LEN, GATE_VERSION_LEN);
                     memcpy(g_aGateSlvInfo[2 * (addr - 1) + 1].hardWare, pParams + GATE_VERSION_LEN, GATE_VERSION_LEN);
-                  //g_aGateSlvInfo[2 * (addr - 1)].softWare = g_aGateSlvInfo[2 * (addr - 1) + 1].softWare = *(pParams + 0) << 24 | *(pParams + 1) << 16 | *(pParams + 2) << 8 | *(pParams + 3) << 0;  
+                  
+ 
+                //g_aGateSlvInfo[2 * (addr - 1)].softWare = g_aGateSlvInfo[2 * (addr - 1) + 1].softWare = *(pParams + 0) << 24 | *(pParams + 1) << 16 | *(pParams + 2) << 8 | *(pParams + 3) << 0;  
               } 
             break;
             case GATE_FRAME_CMD_GET_PARAMS:
@@ -880,14 +883,15 @@ u16 Reader_ProcessUartFrame(u8 *pFrame, u8 add, u16 len, u32 tick)
                         g_sDeviceRspFrame.len = Device_ResponseFrame(NULL, 0, &g_sDeviceRspFrame);
                         g_sDeviceRspFrame.flag = DEVICE_RESPONSE_FLAG_RESET;
                     }
+                    /*
                     else if(add == DEVICE_SM5003_ID)
                     {
-                    
+                        g_sDeviceRspFrame.err = READER_RESPONSE_ERR_DEVICE;
                     }
                     else if(add >= 1 && add <= GATE_SLAVER_NUM * 2)
                     {
-                    
-                    }
+                         g_sDeviceRspFrame.err = READER_RESPONSE_ERR_DEVICE;
+                    }   */
                     else
                     {
                         g_sDeviceRspFrame.err = READER_RESPONSE_ERR_DEVICE;
@@ -927,7 +931,7 @@ u16 Reader_ProcessUartFrame(u8 *pFrame, u8 add, u16 len, u32 tick)
                 {
                     if(add == DEVICE_SM5001_ID)
                     {
-                        g_nDeviceTestInfo.flag = DEVICE_TEST_FLAG_DOOE_MODE ;
+                        g_sGateOpInfo.flag = GATE_FLAG_DOOR_TEST ;
                         Device_Voice_Apo(SOUND_CNT_TIME_1S * 2, SOUND_REPAT_NULL, SOUND_VOICE_DI, SOUND_VOC_DI);
 
                     }
@@ -1675,11 +1679,10 @@ BOOL Device_CheckRsp(W232_CONNECT *pCntOp, u8 *pRxBuf, u8 len)
     sprintf(strBuffcmdAccept,"$sys/%.6s/%.15s/cmd/response/%.36s/accepted", W232_PRDOCT_ID, g_nImsiStr,pCntOp->requestId);
     sprintf(strBuffcmdOta,"$sys/%.6s/%.15s/ota/inform ", W232_PRDOCT_ID, g_nImsiStr);
 */   
- if(strstr((char const *)pRxBuf, strBuffRequst) != NULL)
+    if(strstr((char const *)pRxBuf, strBuffRequst) != NULL)
     {
         memcpy(pCntOp->requestId, pRxBuf + W232_RQUEST_ID_POS, W232_RQUEST_ID_LEN);
-        u8 index;
-         index = Device_Mqtt_Requeat_Sck(pRxBuf + W232_RQUEST_ID_POS);
+
         if((*(pCntOp->requestId +  DEVICE_MQTT_FRAME_CMDID_TAG_1) == DEVICE_MQTT_FRAME_CMDID_MASK) &&        //过滤损坏数据帧，否则被服务器踢出
            (*(pCntOp->requestId +  DEVICE_MQTT_FRAME_CMDID_TAG_2) == DEVICE_MQTT_FRAME_CMDID_MASK) && 
            (*(pCntOp->requestId +  DEVICE_MQTT_FRAME_CMDID_TAG_3) == DEVICE_MQTT_FRAME_CMDID_MASK) &&

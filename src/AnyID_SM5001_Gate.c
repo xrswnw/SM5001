@@ -3,6 +3,8 @@
 GATE_OPINFO g_sGateOpInfo = {0};
 GATE_INFO g_aGateSlvInfo[GATE_SLAVER_NUM << 1] = {0};
 GATE_STAT g_aGateSlvStat[GATE_SLAVER_NUM << 1] = {0};
+GATE_TEST_INFO g_nGateTestInfo=  {0};
+
 void Gate_Init(GATE_PARAMS *pGateParams, u32 tick)
 {
     u8 i = 0;
@@ -119,7 +121,6 @@ void Gate_FormatCmd(GATE_OPINFO *pGateOpInfo, u8 *pParams, u16 paramsLen)
 
 void Gate_TxFrame(GATE_OPINFO *pGateOpInfo, u32 tick)
 {
-   // Gate_Delayms(100);
 
         if(pGateOpInfo->mode == GATE_MODE_INIT)
         {
@@ -140,8 +141,6 @@ void Gate_TxFrame(GATE_OPINFO *pGateOpInfo, u32 tick)
             pGateOpInfo->tick = tick;
             pGateOpInfo->tickCmd = tick;
         }
-      
-  
 
 }
 
@@ -213,3 +212,36 @@ void Gate_BrwBat(GATE_SLVCMD *pGateSlvCmd, u8 index, u8 subIndex, u8 *pBatSn)
     memcpy(pGateSlvCmd->params + pGateSlvCmd->paramsLen, pBatSn, BAT_SN_LEN);
     pGateSlvCmd->paramsLen += BAT_SN_LEN;
 }
+
+
+
+u8 Gate_FormatTestFrame(u8 *pBuffer,u8 add,u8 id,u8 cmd)
+{
+    u16 pos = 0;
+    u16 crc  = 0;
+    u16 addr = 0;
+
+    addr = (add -1)>> 1;
+    pBuffer[pos++] = UART_FRAME_FLAG_HEAD1;     // frame head first byte
+    pBuffer[pos++] = UART_FRAME_FLAG_HEAD2;     // frame haed second byte
+    pBuffer[pos++] = 0x00;                      // length
+    pBuffer[pos++] = 0x00;
+    pBuffer[pos++] = 0x00;
+    pBuffer[pos++] = (addr >> 0) & 0xFF; 
+    pBuffer[pos++] = (addr >> 8) & 0xFF;
+    pBuffer[pos++] = cmd;                       // cmd
+    pBuffer[pos++] = UART_FRAME_PARAM_RFU;      // RFU
+    pBuffer[pos++] = id;      // RFU
+    pBuffer[pos++] = 0x02;      // RFU
+    
+    pBuffer[2] = pos - 3 + 2; //减去帧头7E 55 LEN 的三个字节，加上CRC的两个字节
+
+    crc = a_GetCrc(pBuffer + UART_FRAME_POS_LEN, pos - 2); //从LEN开始计算crc
+    pBuffer[pos++] = (crc >> 0) & 0xFF;
+    pBuffer[pos++] = (crc >> 8) & 0xFF;
+    return pos;
+
+}
+
+
+

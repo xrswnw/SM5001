@@ -908,13 +908,13 @@ void Sys_WaterTask()
     
     if(a_CheckStateBit(g_nSysState, SYS_STAT_KEY_CHK))
     {
-        if(!memcmp(g_sMqttKey.uid, g_sWaterInfo.uid, FRAME_UID_LEN) && !memcmp(g_nImsiStr, 0,W232_IMSI_LEN))
+        if(!memcmp(g_sMqttKey.uid, g_sWaterInfo.uid, FRAME_UID_LEN) && Device_Chk_Uid(g_sMqttKey.uid))
         {
             Device_Voice_Apo(SOUND_CNT_TIME_1S * 2, SOUND_REPAT_NULL, SOUND_VOICE_DI, SOUND_VOC_DI);
             memset(g_sWaterInfo.uid, 0 ,FRAME_UID_LEN);
-            a_SetStateBit(g_nDeviceTestInfo.flag, DEVICE_TEST_FLAG_DOOE_MODE);
+            a_SetStateBit(g_sGateOpInfo.flag, GATE_FLAG_DOOR_TEST);
             a_ClearStateBit(g_nSysState, SYS_STAT_KEY_CHK); 
-        }  
+        }                                    
     }
 }
 
@@ -1036,53 +1036,39 @@ void Sys_HeratTask()
 
 void Sys_TestTask()
 {
-    if(!a_CheckStateBit(g_nDeviceTestInfo.flag, DEVICE_TEST_FLAG_DOOE_MODE)) 
+    if(!a_CheckStateBit(g_sGateOpInfo.flag, GATE_FLAG_DOOR_TEST)) 
     {
         return;
     }
 
-    static u8 addr = 0, tick =  0,time = 0;
+    static u8 addr = 0, tick =  0;
     
     if(a_CheckStateBit(g_nSysState, SYS_STAT_TEST_TIM)) 
     {
           a_ClearStateBit(g_nSysState, SYS_STAT_TEST_TIM); 
-          if(tick & DEVICE_TEST_DOOR_OPEN_TIM)
+          if(tick == DEVICE_TEST_DOOR_OPEN_TIM)
           {
               tick = 0;
               if(addr <= (GATE_SLAVER_NUM << 1))
               {
-                Device_Ansy_Frame(addr , GATE_FRAME_CMD_SET_OUTINFO, GATE_RRAME_OPEN_DOOR);
-                Gate_TxFrame(&g_sGateOpInfo, g_nSysTick); 
-                addr ++;
+                  u8 i = 0;
+                  for(i = 0; i <= 5; i++)
+                  {
+                    Device_Ansy_Frame(addr , GATE_FRAME_CMD_SET_OUTINFO, GATE_RRAME_OPEN_DOOR);
+                    Gate_TxFrame(&g_sGateOpInfo, g_nSysTick);
+                    Sys_Delayms(10) ;
+                  }
+                  addr ++;
               }
               else
               {
-                /*if(Device_Chk_Door())
-                {
-                  addr = Device_Chk_Door();
-                  time ++;
-                }
-                else*/
-                {
-                     addr = 0;
-                     time ++;
-                     /*
-                     a_SetStateBit(g_nSysState, SYS_STAT_KEY_CHK)  ;
-                     a_ClearStateBit(g_nSysState, SYS_STAT_TEST_MODE)  ;
-                     a_ClearStateBit(g_nDeviceTestInfo.flag, DEVICE_TEST_FLAG_DOOE_MODE);               */
-                }
-                
-                if(time >= 3)
-                {
-                   addr = 0;
-                    time = 0;
-                    a_SetStateBit(g_nSysState, SYS_STAT_KEY_CHK)  ;
-                    a_ClearStateBit(g_nSysState, SYS_STAT_TEST_MODE)  ;
-                    a_ClearStateBit(g_nDeviceTestInfo.flag, DEVICE_TEST_FLAG_DOOE_MODE);
-                }  
-
-                
-              }
+                  addr = 0;
+                  g_sGateOpInfo.state = GATE_OP_STAT_IDLE;
+                  a_SetStateBit(g_nSysState, SYS_STAT_KEY_CHK)  ;
+                  a_ClearStateBit(g_nSysState, SYS_STAT_TEST_MODE)  ;
+                  a_ClearStateBit(g_sGateOpInfo.flag, GATE_FLAG_DOOR_TEST);
+                  Device_Voice_Apo(SOUND_CNT_TIME_1S * 2, SOUND_REPAT_NULL, SOUND_VOICE_DI, SOUND_VOC_DI);
+              }  
           }
           else
           {

@@ -197,7 +197,7 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 
 #define DEVICE_TEST_FLAG_DOOE_MODE           0x00000001
 
-#define DEVICE_TEST_DOOR_OPEN_TIM               3
+#define DEVICE_TEST_DOOR_OPEN_TIM               5
 #define DEVICE_GATE_OPEN_DOOR                   0x02
 
 
@@ -227,6 +227,7 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
                                     })\
 
 
+#define Device_Chk_Uid(p)       (p[0] != 0x00 && p[1] != 0x00&& p[1] != 0x00&& p[2] != 0x00&& p[3] != 0x00&& p[4] != 0x00&& p[5] != 0x00&& p[6] != 0x00) 
 #define Gate_ClearOpInfo()      do{\
                                     g_sGateOpInfo.mode = 0;\
                                     g_sGateOpInfo.state = 0;\

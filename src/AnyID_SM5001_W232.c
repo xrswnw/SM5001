@@ -165,7 +165,7 @@ void W232_ConnectTxCmd(W232_CONNECT *pCntOp, u32 sysTick)
             break;
         case W232_CNT_OP_QMTCONN:
 
-           sprintf(strBuff,"AT+QMTCONN=0,\"%.15s\",\"%.6s\",\"%s\"",g_nImsiStr, W232_PRDOCT_ID, g_sMqttKey.keyBuffer);
+           sprintf(strBuff,"AT+QMTCONN=0,\"%.15s\",\"%.6s\",\"%s\"",g_nImsiStr, W232_PRDOCT_ID, TESTTOKEN);
             W232_WriteCmd(strBuff);
             break;
         case W232_CNT_OP_QMTSUB_CMD:
