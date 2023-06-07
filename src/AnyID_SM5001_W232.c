@@ -524,8 +524,9 @@ void W232_PostRsp(W232_CONNECT *pCntOp,u8 *pBuffer, u16 len)
 
 
 
-void W232_DataHandle(W232_RCVBUFFER *pData, u8 *pBuffer)
+BOOL W232_DataHandle(W232_RCVBUFFER *pData, u8 *pBuffer)
 {
+    BOOL bOk = FALSE;
     if(pData->flag == W232_RESPONES_CMD_GET)
     {
         u8 tempLen[2] = {0};
@@ -543,11 +544,15 @@ void W232_DataHandle(W232_RCVBUFFER *pData, u8 *pBuffer)
         if((tempLen[0] << 8)|(tempLen[1] << 0))
         {
             g_sW232RcvBuffer.len = ((tempLen[0] & 0xFF) << 8) | ((tempLen[1] & 0xFF) << 0);
-            memcpy(pData->bufferStr, pBuffer + W232_RTC_DATA_BUFFER_POS, g_sW232RcvBuffer.len * 2);
-            a_Str2Hex(pData->bufferStr,g_sW232RcvBuffer.buffer);
+            if(g_sW232RcvBuffer.len < UART_BUFFER_MAX_LEN)
+            {
+              bOk = TRUE;
+              memcpy(pData->bufferStr, pBuffer + W232_RTC_DATA_BUFFER_POS, g_sW232RcvBuffer.len * 2);
+              a_Str2Hex(pData->bufferStr,g_sW232RcvBuffer.buffer);
+            }
         }
         else
-        {
+        {     bOk = TRUE;
               memset(&g_sW232RcvBuffer.buffer, 0, W232_RQUEST_BUFFER_LEN);
         }
         //Water_WriteStr("²½Öè4\r\n");
@@ -559,5 +564,6 @@ void W232_DataHandle(W232_RCVBUFFER *pData, u8 *pBuffer)
         a_Str2Hex(pData->idStr, g_sW232RcvBuffer.id);
     
     }
+    return bOk;
   
 }

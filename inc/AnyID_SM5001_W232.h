@@ -199,7 +199,7 @@ void W232_ConnectInit(W232_CONNECT *pCntOp, u8 cmd, W232_PARAMS *pParams);
 void W232_ConnectTxCmd(W232_CONNECT *pCntOp, u32 sysTick);
 void W232_ConnectStep(W232_CONNECT *pCntOp);
 void W232_PostRsp(W232_CONNECT *pCntOp,u8 *pBuffer, u16 len);
-void W232_DataHandle(W232_RCVBUFFER *pData, u8 *pBuffer);
+BOOL W232_DataHandle(W232_RCVBUFFER *pData, u8 *pBuffer);
 void W232_PostRtBatRsp(W232_CONNECT *pCntOp,u8 *pBuffer, u8 addr, u32 id);
 void W232_PostBwBatRsp(W232_CONNECT *pCntOp,u8 *pBuffer, u8 addr, u32 id);
 

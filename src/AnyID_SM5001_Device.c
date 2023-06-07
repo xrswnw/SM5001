@@ -1,9 +1,9 @@
 #include "AnyID_SM5001_Device.h"
 
-const u8 DEVICE_VERSION[DEVICE_VERSION_SIZE]@0x08005000 = " SM5001 23060700 G230200";
+const u8 DEVICE_VERSION[DEVICE_VERSION_SIZE]@0x08005000 = " SM5001 23060701 G230200";
 
 #define READER_HARDWARE_VERSION    "SM500100"
-#define READER_SOFTWARE_VERSION    "23060700"
+#define READER_SOFTWARE_VERSION    "23060701"
 
 READER_RSPFRAME g_sDeviceRspFrame = {0};
 DEVICE_PARAMS g_sDeviceParams = {0};
@@ -366,7 +366,7 @@ u16 Device_ResponseCfg( READER_RSPFRAME *pOpResult)
     u16 crc = 0;
     
     pOpResult->buffer[pos++] = UART_FRAME_RESPONSE_FLAG; 
-    pOpResult->buffer[pos++] = UART_FRAME_RESPONSE_FLAG; 
+    //pOpResult->buffer[pos++] = UART_FRAME_RESPONSE_FLAG; 
     pOpResult->buffer[pos++] = g_sDeviceParams.gateTick;
     pOpResult->buffer[pos++] = g_sDeviceParams.gateTxTick;
     pOpResult->buffer[pos++] = g_sDeviceParams.gateNum;
@@ -1688,10 +1688,13 @@ BOOL Device_CheckRsp(W232_CONNECT *pCntOp, u8 *pRxBuf, u8 len)
            (*(pCntOp->requestId +  DEVICE_MQTT_FRAME_CMDID_TAG_3) == DEVICE_MQTT_FRAME_CMDID_MASK) &&
            (*(pCntOp->requestId +  DEVICE_MQTT_FRAME_CMDID_TAG_4) == DEVICE_MQTT_FRAME_CMDID_MASK))
         {
-            bOK = TRUE;
-            g_sW232RcvBuffer.flag = W232_RESPONES_CMD_GET;
-             memcpy(pCntOp->requestBuffer, pRxBuf + W232_RQUEST_ID_POS + W232_RQUEST_ID_LEN + 3, W232_RQUEST_BUFFER_LEN);
-            W232_DataHandle(&g_sW232RcvBuffer, pRxBuf + W232_RQUEST_ID_POS + W232_RQUEST_ID_LEN + 3);
+              g_sW232RcvBuffer.flag = W232_RESPONES_CMD_GET;
+              memcpy(pCntOp->requestBuffer, pRxBuf + W232_RQUEST_ID_POS + W232_RQUEST_ID_LEN + 3, W232_RQUEST_BUFFER_LEN);
+             if(W232_DataHandle(&g_sW232RcvBuffer, pRxBuf + W232_RQUEST_ID_POS + W232_RQUEST_ID_LEN + 3))
+             {
+                 bOK = TRUE;
+             }
+            //W232_DataHandle(&g_sW232RcvBuffer, pRxBuf + W232_RQUEST_ID_POS + W232_RQUEST_ID_LEN + 3);
         }
     }
     else if(strstr((char const *)pRxBuf, strBuffJsonAccept) != NULL)

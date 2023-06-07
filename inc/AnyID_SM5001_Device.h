@@ -50,10 +50,10 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define DEVICE_CMD_MQTT_GET_IMEI            0x53
 
 
-#define DEVICE_MQTT_FRAME_CMDID_TAG_1            8
-#define DEVICE_MQTT_FRAME_CMDID_TAG_2            13
-#define DEVICE_MQTT_FRAME_CMDID_TAG_3            18
-#define DEVICE_MQTT_FRAME_CMDID_TAG_4            23
+#define DEVICE_MQTT_FRAME_CMDID_TAG_1           8
+#define DEVICE_MQTT_FRAME_CMDID_TAG_2           13
+#define DEVICE_MQTT_FRAME_CMDID_TAG_3           18
+#define DEVICE_MQTT_FRAME_CMDID_TAG_4           23
 
 #define DEVICE_MQTT_FRAME_CMDID_MASK            0x2D
 #define DEVICE_SERVER_SATA_IDLE             0
@@ -180,13 +180,13 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define DEVIDE_MARK_BWBAT               0x00000008
 #define DEVICE_OUT_NULL                 0x00
 
-#define DEVICE_OUT_CTRL_POS_FAN                 0x01
-#define DEVICE_OUT_CTRL_POS_DOOR                0x02
+#define DEVICE_OUT_CTRL_POS_FAN         0x01
+#define DEVICE_OUT_CTRL_POS_DOOR        0x02
 
-#define DEVICE_OUT_CTRL_POS_MOTOR               0x01
+#define DEVICE_OUT_CTRL_POS_MOTOR       0x01
 
-#define DEVICE_GET_GATEINFO_MODE_ONCE           0x00
-#define DEVICE_GET_GATEINFO_MODE_ALL            0xFF
+#define DEVICE_GET_GATEINFO_MODE_ONCE   0x00
+#define DEVICE_GET_GATEINFO_MODE_ALL    0xFF
 
 #define DEVICE_FLAG_MAST                5
 #define DEVICE_GATE_LEN                 9
