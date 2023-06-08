@@ -40,7 +40,9 @@ void EC20_ConnectInit(EC20_CONNECT *pCntOp, u8 cmd, EC20_PARAMS *pParams)
         pCntOp->to[num] = EC20_CNT_TIME_1S;              pCntOp->repeat[num] = 10;    pCntOp->op[num++] = EC20_CNT_OP_APN;            //PDP参数配置
         pCntOp->to[num] = EC20_CNT_TIME_1S * 4;          pCntOp->repeat[num] = 2;    pCntOp->op[num++] = EC20_CNT_OP_DEACT;          //40s
         pCntOp->to[num] = EC20_CNT_TIME_1S * 15;         pCntOp->repeat[num] = 2;    pCntOp->op[num++] = EC20_CNT_OP_ACT;            //150s 激活 PDP
-        pCntOp->to[num] = EC20_CNT_TIME_1S * 15;         pCntOp->repeat[num] = 2;    pCntOp->op[num++] = EC20_CNT_OP_HTTP_QGET_IP;           
+        pCntOp->to[num] = EC20_CNT_TIME_1S * 15;         pCntOp->repeat[num] = 2;    pCntOp->op[num++] = EC20_CNT_OP_HTTP_QGET_IP; 
+        pCntOp->to[num] = EC20_CNT_TIME_1S * 15;         pCntOp->repeat[num] = 2;    pCntOp->op[num++] = EC20_CNT_OP_QIDNSCFG; 
+        
         
         //HTTP_CFG
         pCntOp->to[num] = EC20_CNT_TIME_1S ;         pCntOp->repeat[num] = 2;    pCntOp->op[num++] = EC20_CNT_OP_HTTP_QHTTPCFG_ID;       //HTTP服务器参数
@@ -126,6 +128,10 @@ void EC20_ConnectTxCmd(EC20_CONNECT *pCntOp, u32 sysTick)
         case EC20_CNT_OP_HTTP_QGET_IP:
           
             EC20_WriteCmd("AT+QIACT?");
+            break;
+        case EC20_CNT_OP_QIDNSCFG:
+          
+            EC20_WriteCmd("AT+QIDNSCFG");
             break;
         case EC20_CNT_OP_NTP:
           
@@ -242,6 +248,13 @@ BOOL EC20_ConnectCheckRsp(EC20_CONNECT *pCntOp, u8 *pRxBuf, u8 len)
                 bOK = TRUE;
             }
             break;
+        case EC20_CNT_OP_QIDNSCFG:
+            if(strstr((char const *)pRxBuf, "CONNECT") != NULL)
+            {
+                bOK = TRUE;
+            }
+            break;
+            
         case  EC20_CNT_OP_HTTP_QHTTPCFG_ID:
            if(strstr((char const *)pRxBuf, "OK") != NULL)
             {
@@ -307,6 +320,7 @@ void EC20_ConnectStep(EC20_CONNECT *pCntOp)
         case EC20_CNT_OP_OPEN:
         case EC20_CNT_OP_DTR1:
         case EC20_CNT_OP_NTP:
+        case EC20_CNT_OP_QIDNSCFG:
         case EC20_CNT_OP_HTTP_QGET_IP:
         case EC20_CNT_OP_HTTP_QHTTPCFG_ID:
         case EC20_CNT_OP_HTTP_QHTTPCFG_REQUST:

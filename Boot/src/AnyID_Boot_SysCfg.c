@@ -467,6 +467,7 @@ void Sys_EC20Task(void)
 
     if(Uart_IsRcvFrame(g_sEC20RcvFrame))
     {
+        Uart_WriteBuffer(g_sEC20RcvFrame.buffer, g_sEC20RcvFrame.index);
         if(a_CheckStateBit(g_sEC20Connect.state, EC20_CNT_OP_STAT_RX))
         {
             //Uart_WriteBuffer(g_sEC20RcvFrame.buffer, g_sEC20RcvFrame.index);
@@ -596,7 +597,7 @@ void Sys_ServerTask(void)
                 g_sEC20RcvFrame.idleTime = 0;
             }
         }
-        //Uart_WriteBuffer(g_sEC20RcvFrame.buffer, g_sEC20RcvFrame.index);
+        Uart_WriteBuffer(g_sEC20RcvFrame.buffer, g_sEC20RcvFrame.index);
 
         if(Device_CheckRsp(&g_sEC20RcvBuffer, g_sEC20RcvFrame.buffer, g_sEC20RcvFrame.index))
         {
@@ -610,8 +611,6 @@ void Sys_ServerTask(void)
         }
 
         EC20_ClearRxBuffer();
-        //memset(&g_sEC20RcvBuffer, 0, sizeof(EC20_RCVBUFFER));
-
     }
      
     if(a_CheckStateBit(g_sDeviceServerTxBuf.state, EC20_CNT_OP_STAT_TX_AT))      

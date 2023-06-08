@@ -25,6 +25,9 @@
 #define ELECT_FLAG_REG 		        0x04
 #define ELECT_FLAG_OVR		        0x08
 
+
+
+#define ELECT_SAMPLE_TIME               60
 #define ELECT_MODBUS_READ_REG           0x03
 #define ELECT_MODBUS_SET_REG            0x10
 

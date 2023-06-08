@@ -171,6 +171,7 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 
 #define DEVICE_CRC32_LEN                4
 
+#define DEVICE_STAT_CHK_TIM             5
 #define DEVICE_MODE_SFG                 0x00
 #define DEVICE_MODE_NORMAL              0x01
 
@@ -189,7 +190,7 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define DEVICE_GET_GATEINFO_MODE_ALL    0xFF
 
 #define DEVICE_FLAG_MAST                5
-#define DEVICE_GATE_LEN                 9
+#define DEVICE_GATE_LEN                 21
 #define DEVICE_VERSION_LEN              8
 #define DEVICE_SERVER_RSP_LEN           1500
 
@@ -326,8 +327,10 @@ void Device_CommunTxCmd(DEVICE_SENVER_TXBUFFER *pCntOp, u32 sysTick);
 void Device_CommunStep(DEVICE_SENVER_TXBUFFER *pCntOp);
 void Device_Gate_StateChk(u8 index);
 void Device_VoiceCtr();
+void Device_Gate_StateInit();
+void Device_Gate_StateRsp();
 
-  
+
 BOOL Device_CheckRsp(W232_CONNECT *pCntOp, u8 *pRxBuf, u8 len) ;
 BOOL Device_WriteDeviceParamenter(void);
 BOOL Device_Set_Cfg(u8 *pBuffer);

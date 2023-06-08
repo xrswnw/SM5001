@@ -16,7 +16,7 @@
         <LeaveTargetRunning>_ 0</LeaveTargetRunning>
     </JLinkDriver>
     <DebugChecksum>
-        <Checksum>4240377571</Checksum>
+        <Checksum>1158606687</Checksum>
     </DebugChecksum>
     <Trace1>
         <Enabled>0</Enabled>
@@ -57,9 +57,12 @@
         <ITMlogFile>$PROJ_DIR$\ITM.log</ITMlogFile>
     </SWOTraceHWSettings>
     <struct_types>
-        <Fmt0>GATE_SENSORINFO-tmpr	3	0</Fmt0>
-        <Fmt1>MQTT_FRAM_KEY-len	3	0</Fmt1>
-        <Fmt2>WINAVG_INFO-t	3	0</Fmt2>
+        <Fmt0>ELECT_INFO-electValue	4	0</Fmt0>
+        <Fmt1>GATE_SENSORINFO-tmpr	3	0</Fmt1>
+        <Fmt2>IO_INFO-state	1	0</Fmt2>
+        <Fmt3>IO_INFO-tempState	1	0</Fmt3>
+        <Fmt4>MQTT_FRAM_KEY-len	3	0</Fmt4>
+        <Fmt5>WINAVG_INFO-t	3	0</Fmt5>
     </struct_types>
     <watch_formats>
         <Fmt0>{W}1:index	3	0</Fmt0>
@@ -148,7 +151,7 @@
         <mode>0</mode>
     </DisassembleMode>
     <Breakpoints2>
-        <Bp0>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_Device.c}.2127.1" 0 0 1 "" 0 "" 0</Bp0>
+        <Bp0>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_Device.c}.2141.1" 0 0 1 "" 0 "" 0</Bp0>
         <Count>1</Count>
     </Breakpoints2>
     <Aliases>

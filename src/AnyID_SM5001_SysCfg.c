@@ -160,12 +160,9 @@ void Sys_Init(void)
     Device_InitInSensor();
     Gate_Init(&g_sDeviceParams.gateParams, g_nSysTick);
     Water_Init();
-    Sys_Delayms(500);
-    WDG_FeedIWDog();
-    Sys_Delayms(500);
-    WDG_FeedIWDog();
-    Sys_Delayms(500);
-    WDG_FeedIWDog();  
+    Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();  Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();
+    Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();  Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();
+
 #if SYS_ENABLE_WDT
     WDG_FeedIWDog();
 #endif
@@ -485,7 +482,7 @@ void Sys_ElectTask()
     {
         a_ClearStateBit(g_sElectInfo.state, ELECT_STAT_TX);
         g_sElectInfo.time ++;
-        if(g_sElectInfo.time == 30)
+        if(g_sElectInfo.time == ELECT_SAMPLE_TIME)
         {
               g_sElectInfo.tick = g_nSysTick;
               a_SetState(g_sElectInfo.time, SYS_NULL_TICK);
@@ -681,6 +678,7 @@ void Sys_W232Task(void)
                     a_SetStateBit(g_nSysState, SYS_STAT_MQTT_ACCESS);
                     g_sDeviceParams.offLineTime = 0;
                     Device_WriteMqttKey();
+                    Device_Gate_StateInit();
                     Device_Voice_Apo(SOUND_CNT_TIME_1S * 2, SOUND_REPAT_NULL, SOUND_VOICE_DI, SOUND_VOC_OPEN_DEVICE);
 
                 }
@@ -989,27 +987,13 @@ void Sys_HeratTask()
     if(a_CheckStateBit(g_nSysState, SYS_STAT_GATE_STAT_CHK))
     {
         
-        static u8 gateIndex = 0, statTick = 0;
+        static u8 statTick = 0;
         
         statTick ++;
-        if(statTick == 10)
-        {
-            Device_Gate_StateChk(gateIndex);
-            a_SetState(statTick, SYS_NULL_TICK);
-            if(gateIndex == ((GATE_SLAVER_NUM << 1) - 1))
-            {
-                gateIndex = DEVICE_SM5001_ID  ;
-               
-            }
-            else if(gateIndex == DEVICE_SM5001_ID)
-            {
-                a_SetState(gateIndex, SYS_NULL_TICK);
-            }
-            else
-            {
-              gateIndex ++;
-            
-            }
+        if(statTick == DEVICE_STAT_CHK_TIM)
+        { 
+          a_SetState(statTick, SYS_NULL_TICK);
+          Device_Gate_StateRsp();
         }
         a_ClearStateBit(g_nSysState, SYS_STAT_GATE_STAT_CHK);
         

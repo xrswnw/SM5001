@@ -96,6 +96,7 @@ typedef struct EC20Par{
 #define EC20_CNT_OP_QMTSUB_RESPONSE_CMD         33
 #define EC20_CNT_OP_HTTP_QICSGP                 34
 #define EC20_CNT_OP_HTTP_QIACT                  35
+#define EC20_CNT_OP_QIDNSCFG                    36
 
 #define EC20_CNT_OP_HTTP_QSSLCFG                37
 #define EC20_CNT_OP_HTTP_QHTTPURL               38
