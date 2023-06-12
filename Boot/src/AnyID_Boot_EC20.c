@@ -5,8 +5,6 @@ EC20_CONNECT g_sEC20Connect = {0};
 EC20_RCVBUFFER g_sEC20RcvBuffer = {0};
 EC20_PARAMS g_sEC20Params = {0};
 
-u8 bOk = 0; 
-
 u8 g_nSoftWare[EC20_SOFTVERSON_LEN] = {0};
 u8 g_nImei[EC20_IMEI_LEN];
 u8 g_nImsiStr[EC20_IMSI_LEN];
@@ -40,14 +38,17 @@ void EC20_ConnectInit(EC20_CONNECT *pCntOp, u8 cmd, EC20_PARAMS *pParams)
         pCntOp->to[num] = EC20_CNT_TIME_1S;              pCntOp->repeat[num] = 10;    pCntOp->op[num++] = EC20_CNT_OP_APN;            //PDP参数配置
         pCntOp->to[num] = EC20_CNT_TIME_1S * 4;          pCntOp->repeat[num] = 2;    pCntOp->op[num++] = EC20_CNT_OP_DEACT;          //40s
         pCntOp->to[num] = EC20_CNT_TIME_1S * 15;         pCntOp->repeat[num] = 2;    pCntOp->op[num++] = EC20_CNT_OP_ACT;            //150s 激活 PDP
-        pCntOp->to[num] = EC20_CNT_TIME_1S * 15;         pCntOp->repeat[num] = 2;    pCntOp->op[num++] = EC20_CNT_OP_HTTP_QGET_IP; 
-        pCntOp->to[num] = EC20_CNT_TIME_1S * 15;         pCntOp->repeat[num] = 2;    pCntOp->op[num++] = EC20_CNT_OP_QIDNSCFG; 
-        
-        
-        //HTTP_CFG
+        pCntOp->to[num] = EC20_CNT_TIME_1S * 15;         pCntOp->repeat[num] = 2;    pCntOp->op[num++] = EC20_CNT_OP_HTTP_QGET_IP;
+
         pCntOp->to[num] = EC20_CNT_TIME_1S ;         pCntOp->repeat[num] = 2;    pCntOp->op[num++] = EC20_CNT_OP_HTTP_QHTTPCFG_ID;       //HTTP服务器参数
-        pCntOp->to[num] = EC20_CNT_TIME_1S ;         pCntOp->repeat[num] = 2;    pCntOp->op[num++] = EC20_CNT_OP_HTTP_QHTTPCFG_REQUST;
+        pCntOp->to[num] = EC20_CNT_TIME_1S ;         pCntOp->repeat[num] = 2;    pCntOp->op[num++] = EC20_CNT_OP_HTTP_QHTTPCFG_REQUST;        
+        pCntOp->to[num] = EC20_CNT_TIME_1S ;         pCntOp->repeat[num] = 2;    pCntOp->op[num++] = EC20_CNT_OP_HTTP_QHTTPCFG_CONTENT_TYPE;  
         pCntOp->to[num] = EC20_CNT_TIME_1S ;         pCntOp->repeat[num] = 2;    pCntOp->op[num++] = EC20_CNT_OP_HTTP_QHTTPCFG_RESPONSE;
+
+        pCntOp->to[num] = EC20_CNT_TIME_1S ;         pCntOp->repeat[num] = 2;    pCntOp->op[num++] = EC20_CNT_OP_HTTP_LINK;
+        pCntOp->to[num] = EC20_CNT_TIME_1S ;         pCntOp->repeat[num] = 2;    pCntOp->op[num++] = EC20_CNT_OP_CHECK_LINK;
+        pCntOp->to[num] = EC20_CNT_TIME_1S ;         pCntOp->repeat[num] = 2;    pCntOp->op[num++] = EC20_CNT_OP_OPEN;
+
     }
     else
     {
@@ -130,8 +131,8 @@ void EC20_ConnectTxCmd(EC20_CONNECT *pCntOp, u32 sysTick)
             EC20_WriteCmd("AT+QIACT?");
             break;
         case EC20_CNT_OP_QIDNSCFG:
-          
-            EC20_WriteCmd("AT+QIDNSCFG");
+
+            EC20_WriteCmd("AT+QIDNSCFG=1,\"114.114.114.114\",\"114.114.115.115\"");
             break;
         case EC20_CNT_OP_NTP:
           
@@ -148,12 +149,30 @@ void EC20_ConnectTxCmd(EC20_CONNECT *pCntOp, u32 sysTick)
             break;
         case EC20_CNT_OP_HTTP_QHTTPCFG_REQUST:
 
-            EC20_WriteCmd("AT+QHTTPCFG=\"requestheader\",0");
+            EC20_WriteCmd("AT+QHTTPCFG=\"requestheader\",1");
+            break;
+        case EC20_CNT_OP_HTTP_QHTTPCFG_CONTENT_TYPE:
+
+            EC20_WriteCmd("AT+QHTTPCFG=\"contenttype\",0");
             break;
         case EC20_CNT_OP_HTTP_QHTTPCFG_RESPONSE:
 
             EC20_WriteCmd("AT+QHTTPCFG=\"responseheader\",1");
             break;
+        case EC20_CNT_OP_HTTP_LINK:
+
+             EC20_WriteCmd("AT+QHTTPURL=27,6000");
+            break;
+        case EC20_CNT_OP_OPEN:
+    
+            EC20_WriteCmd("AT+QIOPEN=1,1,\"TCP\",\"iot-api.heclouds.com\",80,0,2");                             //透传模式
+            break;
+        case EC20_CNT_OP_CHECK_LINK:
+    
+            EC20_WriteCmd("AT+QHTTPURL?");
+            break;
+            
+        
     }
     pCntOp->tick = sysTick;
 }
@@ -249,36 +268,24 @@ BOOL EC20_ConnectCheckRsp(EC20_CONNECT *pCntOp, u8 *pRxBuf, u8 len)
             }
             break;
         case EC20_CNT_OP_QIDNSCFG:
+        case  EC20_CNT_OP_HTTP_QHTTPCFG_ID:
+        case  EC20_CNT_OP_HTTP_QHTTPCFG_CONTENT_TYPE:
+        case  EC20_CNT_OP_HTTP_QHTTPCFG_REQUST:
+        case  EC20_CNT_OP_HTTP_QHTTPCFG_RESPONSE:
+        case  EC20_CNT_OP_HTTP_QSSLCFG:
+        case EC20_CNT_OP_CHECK_LINK:
+            if(strstr((char const *)pRxBuf, "OK") != NULL)
+            {
+                    bOK = TRUE;
+            }
+        break; 
+        case  EC20_CNT_OP_HTTP_LINK:
             if(strstr((char const *)pRxBuf, "CONNECT") != NULL)
             {
                 bOK = TRUE;
+                EC20_WriteCmd("http://iot-api.heclouds.com");
             }
-            break;
-            
-        case  EC20_CNT_OP_HTTP_QHTTPCFG_ID:
-           if(strstr((char const *)pRxBuf, "OK") != NULL)
-            {
-                bOK = TRUE;
-            }
-            break;
-        case  EC20_CNT_OP_HTTP_QHTTPCFG_REQUST:
-           if(strstr((char const *)pRxBuf, "OK") != NULL)
-            {
-                bOK = TRUE;
-            }
-            break;
-        case  EC20_CNT_OP_HTTP_QHTTPCFG_RESPONSE:
-           if(strstr((char const *)pRxBuf, "OK") != NULL)
-            {
-                bOK = TRUE;
-            }
-            break;
-        case  EC20_CNT_OP_HTTP_QSSLCFG:
-           if(strstr((char const *)pRxBuf, "OK") != NULL)
-            {
-                bOK = TRUE;
-            }
-            break;    
+            break;   
     }
     return bOK;
 }
@@ -325,9 +332,12 @@ void EC20_ConnectStep(EC20_CONNECT *pCntOp)
         case EC20_CNT_OP_HTTP_QHTTPCFG_ID:
         case EC20_CNT_OP_HTTP_QHTTPCFG_REQUST:
         case EC20_CNT_OP_HTTP_QHTTPCFG_RESPONSE:
+        case EC20_CNT_OP_HTTP_QHTTPCFG_CONTENT_TYPE:
         case EC20_CNT_OP_HTTP_QHTTPCFG_SSL:
         case EC20_CNT_OP_HTTP_QSSLCFG:
         case EC20_CNT_OP_HTTP_QHTTPURL:
+        case EC20_CNT_OP_HTTP_LINK:
+        case EC20_CNT_OP_CHECK_LINK:
             if(pCntOp->result == EC20_CNT_RESULT_OK)
             {
                 pCntOp->repeat[pCntOp->index] = 0;

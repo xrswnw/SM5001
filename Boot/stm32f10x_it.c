@@ -140,11 +140,11 @@ void SysTick_Handler(void)
 
     if((g_nSysTick % 21) == 0)
     {
-        a_SetStateBit(g_nSysState, SYS_STAT_RUNLED);
+        a_SetStateBit(g_nSysState, SYS_STAT_RUNLED | SYS_STAT_UPDATA);
     }
-    if((g_nSysTick % 501) == 0)
+    if((g_nSysTick % 4001) == 0)
     {
-        a_SetStateBit(g_nSysState, SYS_STAT_HTTP_TEST);
+        //a_SetStateBit(g_nSysState, SYS_STAT_HTTP_TEST);
     }
     
    // Uart_IncIdleTime(STICK_TIME_MS, g_sUartRcvFrame);  

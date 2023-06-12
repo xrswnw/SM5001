@@ -108,6 +108,11 @@ typedef struct EC20Par{
 #define EC20_CNT_OP_HTTP_QHTTPCFG_REQUST        45
 #define EC20_CNT_OP_HTTP_QHTTPCFG_RESPONSE      46
 #define EC20_CNT_OP_HTTP_QHTTPCFG_SSL           47
+#define EC20_CNT_OP_HTTP_QHTTPCFG_CONTENT_TYPE  48
+
+#define EC20_CNT_OP_HTTP_LINK                   50
+#define EC20_CNT_OP_CHECK_LINK                  51
+
 
 
 #define EC20_CNT_OP_STAT_IDLE                   0x0001

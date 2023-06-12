@@ -141,7 +141,7 @@ void Sys_Init(void)
     
     
     
-    //g_sFramBootParamenter.appState = FRAM_BOOT_APP_FAIL;//测试
+    g_sFramBootParamenter.appState = FRAM_BOOT_APP_FAIL;//测试
     
     
     
@@ -174,6 +174,7 @@ void Sys_Init(void)
     else
     {
         a_SetState(g_nSysState, SYS_STAT_DOWNLOAD);
+        g_sDeviceUpDataInfo.flag = DEVICE_UPDATA_FLAG_RQ;
     }
     
 
@@ -470,8 +471,6 @@ void Sys_EC20Task(void)
         Uart_WriteBuffer(g_sEC20RcvFrame.buffer, g_sEC20RcvFrame.index);
         if(a_CheckStateBit(g_sEC20Connect.state, EC20_CNT_OP_STAT_RX))
         {
-            //Uart_WriteBuffer(g_sEC20RcvFrame.buffer, g_sEC20RcvFrame.index);
-
             if(EC20_ConnectCheckRsp(&g_sEC20Connect, g_sEC20RcvFrame.buffer, g_sEC20RcvFrame.index))   //如果校验响应帧失败，就继续接收，否则复位接收缓冲区
             {
                 g_sEC20Connect.result = EC20_CNT_RESULT_OK;
@@ -587,7 +586,7 @@ void Sys_ServerTask(void)
           
             if(Device_CommunCheckRsp(&g_sDeviceServerTxBuf, g_sEC20RcvFrame.buffer))   
             {
-                g_sDeviceServerTxBuf.index++;                                           //AT
+                //g_sDeviceServerTxBuf.index++;                                           //AT
                 a_SetState(g_sDeviceServerTxBuf.state, DEVICE_SERVER_TXSTAT_WAIT);
                 //EC20_ClearRxBuffer();
             }
@@ -596,6 +595,7 @@ void Sys_ServerTask(void)
                 g_sEC20RcvFrame.state = UART_FLAG_RCV;                          //继续接收
                 g_sEC20RcvFrame.idleTime = 0;
             }
+            g_sDeviceServerTxBuf.index++;   
         }
         Uart_WriteBuffer(g_sEC20RcvFrame.buffer, g_sEC20RcvFrame.index);
 
@@ -609,6 +609,7 @@ void Sys_ServerTask(void)
             a_SetState(g_sEC20Connect.state, EC20_CNT_OP_STAT_TX);
             a_ClearStateBit(g_nSysState, SYS_STAT_LTEDTU);
         }
+
 
         EC20_ClearRxBuffer();
     }
@@ -660,12 +661,37 @@ void Sys_ServerTask(void)
     {
         a_ClearStateBit(g_nSysState, SYS_STAT_HTTP_TEST);
         
-        Device_At_Rsp(EC20_CNT_TIME_1S, EC20_CNT_REPAT_NULL, DEVICE_HTTP_URL_LINK);
-        Device_At_Rsp(EC20_CNT_TIME_1S, EC20_CNT_REPAT_NULL, DEVICE_HTTP_GET_REQUEST_CKECK);
-
+       // if(g_nLinkFlag)
+        {
+            //Device_At_Rsp(EC20_CNT_TIME_1S, EC20_CNT_REPAT_NULL, DEVICE_HTTP_URL_LINK);
+            Device_At_Rsp(EC20_CNT_TIME_1S, EC20_CNT_REPAT_NULL, DEVICE_HTTP_GET_REQUEST_CKECK);
+        }
     }
 
 }
 
+void Sys_UpDataTask()
+{
+    static u8 upTime = 0, upTick = 0; 
+    
+    if(a_CheckStateBit(g_nSysState, SYS_STAT_UPDATA))
+    {
+        upTime ++;
+        
+        if(upTime == DEVICE_UPDATA_CHK_TIME)
+        {
+            upTime = 0;
+            if(g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_FLAG_RQ)
+            {
+                Device_At_Rsp(EC20_CNT_TIME_1S, EC20_CNT_REPAT_NULL, DEVICE_HTTP_GET_REQUEST_CKECK);
+            }
+        
+        }
+        a_ClearStateBit(g_nSysState, SYS_STAT_UPDATA);
+    }
 
+
+
+
+}
 

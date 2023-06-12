@@ -19,8 +19,10 @@ extern u8  g_nDeviceComType;
 #define SYS_STAT_RESET          0x00000100
 #define SYS_STAT_ALARMLED       0x00000200
 #define SYS_STAT_LTEDTU         0x00000400
+#define SYS_STAT_UPDATA         0x00000800
 
-#define SYS_STAT_HTTP_TEST         0x10000000
+
+#define SYS_STAT_HTTP_TEST      0x10000000
 
 void Sys_Jump(u32 address);
 typedef  void (*pSysFunction)(void);

@@ -1,36 +1,29 @@
 #include "AnyID_Boot_Device.h"
 
 DEVICE_SENVER_TXBUFFER g_sDeviceServerTxBuf = {0};
+DEVICE_UPDATA_INFO g_sDeviceUpDataInfo = {0};
+
 
 char g_nHttpAtBuf[EC20_STR_BUFFER_RSP_LEN] = {0};
 char g_nHttpBuf[EC20_STR_BUFFER_RSP_LEN] = {0};
+
 u8 g_nlen = 0;
 u8 g_nAtLen[3] = {0}; 
 void Device_CommunTxCmd(DEVICE_SENVER_TXBUFFER *pCntOp, u32 sysTick)
 {
     u8 op = 0;
 
-    char atLenBuf[EC20_STR_AT_LEN] = {0};
     char atBuf[EC20_STR_BUFFER_RSP_LEN] = {0};
     op = pCntOp->op[pCntOp->index];
     switch(op)
     {
-        case DEVICE_HTTP_URL_LINK:
-            
-            EC20_WriteCmd("AT+QHTTPURL=27,6000");
-            break;
-        case DEVICE_HTTP_GET_REQUEST:
 
-            EC20_WriteCmd("AT+QHTTPGET=25");
-            break;
         case DEVICE_HTTP_GET_REQUEST_CKECK:
-
-           
+          
             memset(g_nHttpAtBuf, 0, EC20_STR_BUFFER_RSP_LEN);
             memset(atBuf, 0, EC20_STR_BUFFER_RSP_LEN);
             
             strcat(atBuf,"GET http://iot-api.heclouds.com/fuse-ota/");
-            //strcat(atBuf,"/");
             strcat(atBuf,*(&EC20_PRDOCT_ID));
             strcat(atBuf,"/");
             strcat(atBuf, (const char *)(&g_nImsiStr));
@@ -38,36 +31,20 @@ void Device_CommunTxCmd(DEVICE_SENVER_TXBUFFER *pCntOp, u32 sysTick)
             strcat(atBuf,"check?type=1&version=");
             strcat(atBuf, (const char *)(&g_nSoftWare));
             memcpy(g_nHttpAtBuf, atBuf, strlen(atBuf) - 2);
-            //strcat(g_nHttpAtBuf,"\r\n");
             strcat(g_nHttpAtBuf," HTTP/1.1\r\n");
-           // strcat(g_nHttpAtBuf,"Content-Type: application/json\r\n");
-            //strcat(g_nHttpAtBuf,"\r\n");
+            strcat(g_nHttpAtBuf,"Content-Type: application/json\r\n");
             strcat(g_nHttpAtBuf,"authorization:");
             strcat(g_nHttpAtBuf,*(&HTTPTOKEN));
             strcat(g_nHttpAtBuf,"\r\n");
-            //strcat(g_nHttpAtBuf,"\r\n");
             strcat(g_nHttpAtBuf,"host:iot-api.heclouds.com\r\n");
-            //strcat(g_nHttpAtBuf,"\r\n");
-            //strcat(g_nHttpAtBuf,"Content-Length:20\r\n\r\n");
-            strcat(atLenBuf,"AT+QHTTPGET=");
+            Uart_WriteCmd(g_nHttpAtBuf);
             
-            g_nlen = strlen(g_nHttpAtBuf);
-            a_itoa(strlen(g_nHttpAtBuf), g_nAtLen,0,3);
-            
-            strcat(atLenBuf, (char *)g_nAtLen);
-  
-            Uart_WriteCmd(atLenBuf);
-            EC20_WriteCmd(atLenBuf);
-          
-            //memset(g_nHttpAtBuf, 0, EC20_STR_BUFFER_RSP_LEN);
-           // memset(atBuf, 0, EC20_STR_BUFFER_RSP_LEN);
-
+            EC20_WriteCmd(g_nHttpAtBuf);
             break;
         case DEVICE_HTTP_GET_RONSPOND:
 
-            EC20_WriteCmd("AT+QHTTPREAD=714");
+            EC20_WriteCmd("AT+QHTTPREAD=719");
             break;
-            
     }
     pCntOp->tick = sysTick;
 }
@@ -82,30 +59,13 @@ BOOL Device_CommunCheckRsp(DEVICE_SENVER_TXBUFFER *pCntOp, u8 *pRxBuf)
     op = pCntOp->op[pCntOp->index];
     switch(op)
     {
-        case DEVICE_HTTP_URL_LINK:
-            if(strstr((char const *)pRxBuf, "CONNECT") != NULL)
-            {
-                bOK = TRUE;
-                EC20_WriteCmd("https://iot-api.heclouds.com");
-            }
-            break; 
-          break;
-        case DEVICE_HTTP_GET_REQUEST:
-            if(strstr((char const *)pRxBuf, "OK") != NULL)
-            {
-                bOK = TRUE;
-                 // EC20_WriteCmd("+QHTTPGET: 0,200,21472");
-                //EC20_WriteCmd("GET https://www.baidu.com");
-            }
-            break;
         case DEVICE_HTTP_GET_REQUEST_CKECK:
-
-            if(strstr((char const *)pRxBuf, "OK") != NULL)
+            if(strstr((char const *)pRxBuf, "HTTP/1.1 200") != NULL)
             {
-                bOK = TRUE;
-                Uart_WriteCmd(g_nHttpAtBuf);
-                EC20_WriteCmd(g_nHttpAtBuf);
-
+                if(Device_Chk_VersionFrame(pRxBuf, &g_sDeviceUpDataInfo))
+                {
+                    bOK = TRUE;
+                }
             }
             break;
         case DEVICE_HTTP_GET_REQUEST_DOWNLOAD:
@@ -121,7 +81,6 @@ BOOL Device_CommunCheckRsp(DEVICE_SENVER_TXBUFFER *pCntOp, u8 *pRxBuf)
             {
                 
                 bOK = TRUE;
-                Uart_WriteCmd(pRxBuf);
             }
             break;
     }
@@ -167,7 +126,15 @@ BOOL Device_CheckRsp(EC20_RCVBUFFER *pCntOp, u8 *pRxBuf, u16 len)
     {
         bOK = TRUE;
         Device_At_Rsp(EC20_CNT_TIME_1S, EC20_CNT_REPAT_NULL, DEVICE_HTTP_GET_RONSPOND);
-    } 
+    }
+    else if(strstr((char const *)pRxBuf, "+CME ERROR: 703") != NULL)
+    {
+        bOK = TRUE;
+    }
+    else if(strstr((char const *)pRxBuf, "+QHTTPGET: 702") != NULL)
+    {
+        bOK = TRUE;
+    }
     else if(strstr((char const *)pRxBuf, "+QHTTPREAD: 0") != NULL)
     {
         bOK = TRUE;
@@ -211,3 +178,40 @@ void Device_ServerProcessRxInfo(EC20_RCVBUFFER *pRcvBuffer, u32 tick)           
 }
 
 
+
+BOOL Device_Chk_VersionFrame(u8 *pBuffer, DEVICE_UPDATA_INFO *pDataInfo)
+{
+    BOOL bOk = FALSE;
+    
+    memset(pDataInfo, 0, sizeof(DEVICE_UPDATA_INFO));
+     if(strstr((char const *)pBuffer, "\"code\":0") != NULL)
+    {
+        if(strstr((char const *)pBuffer, "SM5001") != NULL)
+        {
+            
+            
+            memcpy(pDataInfo->name, pBuffer + DEVICE_UPDATA_BUFFER_NAME_LEN, DEVICE_SOFTVERSION_NAME_LEN);
+            memcpy(pDataInfo->tid, pBuffer + DEVICE_UPDATA_BUFFER_TID_LEN, DEVICE_SOFTVERSION_TID_LEN);
+            memcpy(pDataInfo->bufferSize, pBuffer + DEVICE_UPDATA_BUFFER_SIZE_LEN, DEVICE_SOFTVERSION_BUFFER_SIZE);
+            memcpy(pDataInfo->md5, pBuffer + DEVICE_UPDATA_BUFFER_MD5_LEN, DEVICE_SOFTVERSION_MD5);
+            
+            pDataInfo->flag = DEVICE_UPDATA_FLAG_DOWN; 
+            bOk = TRUE;
+        } 
+        else if(strstr((char const *)pBuffer, "SM5002") != NULL)
+        {
+
+            
+            memcpy(pDataInfo->name, pBuffer + DEVICE_UPDATA_BUFFER_NAME_LEN, DEVICE_SOFTVERSION_NAME_LEN);
+            memcpy(pDataInfo->tid, pBuffer + DEVICE_UPDATA_BUFFER_TID_LEN, DEVICE_SOFTVERSION_TID_LEN);
+            memcpy(pDataInfo->bufferSize, pBuffer + DEVICE_UPDATA_BUFFER_SIZE_LEN, DEVICE_SOFTVERSION_BUFFER_SIZE);
+            memcpy(pDataInfo->md5, pBuffer + DEVICE_UPDATA_BUFFER_MD5_LEN, DEVICE_SOFTVERSION_MD5);
+            
+            pDataInfo->flag = DEVICE_UPDATA_FLAG_DOWN; 
+            bOk = TRUE;
+        }
+        
+    }   
+    
+    return bOk;
+}

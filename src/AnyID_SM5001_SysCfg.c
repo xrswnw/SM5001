@@ -735,7 +735,7 @@ void Sys_ServerTask(void)
     if(Uart_IsRcvFrame(g_sW232RcvFrame))
     {
       WDG_FeedIWDog();
-       if(a_CheckStateBit(g_nDeviceServerTxBuf.state, DEVICE_SERVER_TXSTAT_RX_AT))
+      if(a_CheckStateBit(g_nDeviceServerTxBuf.state, DEVICE_SERVER_TXSTAT_RX_AT))
         {
             if(Device_CommunCheckRsp(&g_nDeviceServerTxBuf, g_sW232RcvFrame.buffer))   
             {
