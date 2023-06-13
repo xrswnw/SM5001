@@ -146,31 +146,10 @@ void SysTick_Handler(void)
     {
         //a_SetStateBit(g_nSysState, SYS_STAT_HTTP_TEST);
     }
-    
-   // Uart_IncIdleTime(STICK_TIME_MS, g_sUartRcvFrame);  
+
     Uart_IncIdleTime(STICK_TIME_MS, g_sEC20RcvFrame);
 }
-/*
-void Uart_IRQHandler(void)
-{
-    if(USART_GetITStatus(UART_PORT, USART_IT_RXNE) != RESET)
-    {
-        u8 byte = 0;
-        g_nDeviceComType = SYS_COM_UART;
-        USART_ClearITPendingBit(UART_PORT, USART_IT_RXNE);
-        byte = Uart_ReadByte();
-		
-        Uart_ReceiveFrame(byte, &g_sUartRcvFrame);
-    }
-    else if(USART_GetITStatus(UART_PORT, USART_IT_ORE) != RESET)
-    {
-        Uart_ReadByte();
-    }
-    
-    UART_PORT->SR &= (~0x3FF);
-}
 
-*/
 u8 g_nEC20RxByte = 0;
 void EC20_IRQHandler(void)
 {

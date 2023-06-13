@@ -11,6 +11,7 @@ int main(void)
         Sys_UartTask();
         Sys_EC20Task();
         Sys_ServerTask();
+        Sys_UpDataTask();
 
     }
 }

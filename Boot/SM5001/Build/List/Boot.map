@@ -1,21 +1,24 @@
 ###############################################################################
 #
-# IAR ELF Linker V8.40.1.212/W32 for ARM                  12/Jun/2023  18:22:42
+# IAR ELF Linker V8.40.1.212/W32 for ARM                  13/Jun/2023  18:57:01
 # Copyright 2007-2019 IAR Systems AB.
 #
 #    Output file  =  E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Exe\Boot.out
 #    Map file     =  E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\List\Boot.map
 #    Command line =
-#        -f C:\Users\Administrator\AppData\Local\Temp\EWC89.tmp
+#        -f C:\Users\Administrator\AppData\Local\Temp\EW3FB1.tmp
 #        (E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_Device.o
 #        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_EC20.o
 #        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_EC20_HL.o
+#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_Flash_HL.o
+#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_FlashM25.o
 #        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_FRam.o
 #        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_FRam_HL.o
 #        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_SysCfg.o
 #        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_SysTick_HL.o
 #        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_Uart.o
 #        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_Uart_HL.o
+#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\AnyID_FlashM25.o
 #        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\AnyID_FRam.o
 #        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\AnyID_Stdlib.o
 #        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\AnyID_Uart_Receive.o
@@ -27,6 +30,7 @@
 #        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\stm32f10x_it.o
 #        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\stm32f10x_iwdg.o
 #        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\stm32f10x_rcc.o
+#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\stm32f10x_spi.o
 #        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\stm32f10x_usart.o
 #        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\system_stm32f10x.o
 #        --redirect _Printf=_PrintfFull --redirect _Scanf=_ScanfFull
@@ -75,7 +79,7 @@ initialize by copy { rw };
   .intvec            ro code   0x800'0000   0x130  startup_stm32f10x_hd.o [1]
                              - 0x800'0130   0x130
 
-"P1":                                      0x267c
+"P1":                                      0x2a54
   .text              ro code   0x800'0130   0x6c0  AnyID_Boot_EC20.o [1]
   .text              ro code   0x800'07f0   0x170  AnyID_Boot_EC20_HL.o [1]
   .text              ro code   0x800'0960    0x3a  ABImemset48.o [3]
@@ -90,126 +94,132 @@ initialize by copy { rw };
   .text              ro code   0x800'0f20    0x36  strlen.o [3]
   .text              ro code   0x800'0f58    0x16  strchr.o [3]
   .text              ro code   0x800'0f70   0x254  stm32f10x_rcc.o [1]
-  .text              ro code   0x800'11c4   0x5b8  AnyID_Boot_SysCfg.o [1]
-  .text              ro code   0x800'177c    0x28  stm32f10x_flash.o [1]
-  .text              ro code   0x800'17a4   0x1a4  AnyID_Boot_FRam_HL.o [1]
-  .text              ro code   0x800'1948   0x140  AnyID_Boot_FRam.o [1]
-  .text              ro code   0x800'1a88   0x158  AnyID_Boot_Uart_HL.o [1]
-  .text              ro code   0x800'1be0    0x78  AnyID_Boot_SysTick_HL.o [1]
-  .text              ro code   0x800'1c58   0x3ec  AnyID_Boot_Device.o [1]
-  .text              ro code   0x800'2044   0x1aa  AnyID_FRam.o [1]
-  .text              ro code   0x800'21ee    0x1e  strcat.o [2]
-  .rodata            const     0x800'220c   0x100  AnyID_Stdlib.o [1]
-  .text              ro code   0x800'230c    0xec  system_stm32f10x.o [1]
-  .text              ro code   0x800'23f8    0xbe  stm32f10x_it.o [1]
-  .rodata            const     0x800'24b8    0xb4  AnyID_Boot_Device.o [1]
-  .rodata            const     0x800'256c    0x68  AnyID_Boot_EC20.o [1]
-  .text              ro code   0x800'25d4    0x28  data_init.o [3]
-  .iar.init_table    const     0x800'25fc    0x24  - Linker created -
-  .text              ro code   0x800'2620    0x1e  cmain.o [3]
-  .text              ro code   0x800'263e     0x4  low_level_init.o [2]
-  .text              ro code   0x800'2642    0x1c  main.o [1]
-  .text              ro code   0x800'265e     0x4  exit.o [2]
-  .text              ro code   0x800'2664     0xa  cexit.o [3]
-  .text              ro code   0x800'2670    0x14  exit.o [4]
-  Initializer bytes  const     0x800'2684    0x14  <for P2-1>
-  .text              ro code   0x800'2698    0x10  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'26a8     0xc  cstartup_M.o [3]
-  .rodata            const     0x800'26b4     0x8  AnyID_Boot_EC20_HL.o [1]
-  .rodata            const     0x800'26bc     0x8  AnyID_Boot_EC20_HL.o [1]
-  .text              ro code   0x800'26c4     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'26c8     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'26cc     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'26d0     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'26d4     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'26d8     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'26dc     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'26e0     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'26e4     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'26e8     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'26ec     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'26f0     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'26f4     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'26f8     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'26fc     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'2700     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'2704     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'2708     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'270c     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'2710     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'2714     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'2718     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'271c     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'2720     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'2724     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'2728     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'272c     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'2730     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'2734     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'2738     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'273c     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'2740     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'2744     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'2748     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'274c     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'2750     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'2754     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'2758     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'275c     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'2760     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'2764     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'2768     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'276c     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'2770     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'2774     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'2778     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'277c     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'2780     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'2784     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'2788     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'278c     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'2790     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'2794     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'2798     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'279c     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'27a0     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'27a4     0x4  startup_stm32f10x_hd.o [1]
-  .text              ro code   0x800'27a8     0x4  startup_stm32f10x_hd.o [1]
-  .rodata            const     0x800'27ac     0x0  zero_init3.o [3]
-  .rodata            const     0x800'27ac     0x0  copy_init3.o [3]
-                             - 0x800'27ac  0x267c
+  .text              ro code   0x800'11c4   0x654  AnyID_Boot_SysCfg.o [1]
+  .text              ro code   0x800'1818    0x28  stm32f10x_flash.o [1]
+  .text              ro code   0x800'1840   0x1a4  AnyID_Boot_FRam_HL.o [1]
+  .text              ro code   0x800'19e4   0x140  AnyID_Boot_FRam.o [1]
+  .text              ro code   0x800'1b24   0x100  AnyID_Boot_Flash_HL.o [1]
+  .text              ro code   0x800'1c24    0xf8  AnyID_FlashM25.o [1]
+  .text              ro code   0x800'1d1c    0x14  AnyID_Boot_FlashM25.o [1]
+  .text              ro code   0x800'1d30   0x158  AnyID_Boot_Uart_HL.o [1]
+  .text              ro code   0x800'1e88    0x78  AnyID_Boot_SysTick_HL.o [1]
+  .text              ro code   0x800'1f00   0x4a8  AnyID_Boot_Device.o [1]
+  .text              ro code   0x800'23a8   0x1aa  AnyID_FRam.o [1]
+  .text              ro code   0x800'2554    0x68  stm32f10x_spi.o [1]
+  .text              ro code   0x800'25bc    0x1e  strcat.o [2]
+  .rodata            const     0x800'25dc   0x100  AnyID_Stdlib.o [1]
+  .text              ro code   0x800'26dc    0xec  system_stm32f10x.o [1]
+  .text              ro code   0x800'27c8    0xba  stm32f10x_it.o [1]
+  .rodata            const     0x800'2884    0xb4  AnyID_Boot_Device.o [1]
+  .rodata            const     0x800'2938    0x68  AnyID_Boot_EC20.o [1]
+  .text              ro code   0x800'29a0    0x28  data_init.o [3]
+  .iar.init_table    const     0x800'29c8    0x24  - Linker created -
+  .text              ro code   0x800'29ec    0x20  main.o [1]
+  .text              ro code   0x800'2a0c    0x1e  cmain.o [3]
+  .text              ro code   0x800'2a2a     0x4  low_level_init.o [2]
+  .text              ro code   0x800'2a2e     0x4  exit.o [2]
+  .text              ro code   0x800'2a34     0xa  cexit.o [3]
+  .text              ro code   0x800'2a40    0x14  exit.o [4]
+  Initializer bytes  const     0x800'2a54    0x14  <for P2-1>
+  .text              ro code   0x800'2a68    0x10  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2a78     0xc  cstartup_M.o [3]
+  .rodata            const     0x800'2a84     0x8  AnyID_Boot_EC20_HL.o [1]
+  .rodata            const     0x800'2a8c     0x8  AnyID_Boot_EC20_HL.o [1]
+  .rodata            const     0x800'2a94     0x8  AnyID_Boot_Flash_HL.o [1]
+  .text              ro code   0x800'2a9c     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2aa0     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2aa4     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2aa8     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2aac     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2ab0     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2ab4     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2ab8     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2abc     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2ac0     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2ac4     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2ac8     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2acc     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2ad0     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2ad4     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2ad8     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2adc     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2ae0     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2ae4     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2ae8     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2aec     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2af0     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2af4     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2af8     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2afc     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b00     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b04     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b08     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b0c     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b10     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b14     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b18     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b1c     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b20     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b24     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b28     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b2c     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b30     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b34     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b38     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b3c     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b40     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b44     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b48     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b4c     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b50     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b54     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b58     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b5c     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b60     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b64     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b68     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b6c     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b70     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b74     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b78     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b7c     0x4  startup_stm32f10x_hd.o [1]
+  .text              ro code   0x800'2b80     0x4  startup_stm32f10x_hd.o [1]
+  .rodata            const     0x800'2b84     0x0  zero_init3.o [3]
+  .rodata            const     0x800'2b84     0x0  copy_init3.o [3]
+                             - 0x800'2b84  0x2a54
 
 "P2", part 1 of 3:                           0x14
   P2-1                        0x2000'0000    0x14  <Init block>
     .data            inited   0x2000'0000    0x14  stm32f10x_rcc.o [1]
                             - 0x2000'0014    0x14
 
-"P2", part 2 of 3:                         0x11d4
-  .bss               zero     0x2000'0014   0x610  AnyID_Boot_EC20.o [1]
-  .bss               zero     0x2000'0624   0x5e8  AnyID_Boot_EC20.o [1]
-  .bss               zero     0x2000'0c0c   0x200  AnyID_Boot_Device.o [1]
-  .bss               zero     0x2000'0e0c   0x1ec  AnyID_Boot_Device.o [1]
-  .bss               zero     0x2000'0ff8   0x12c  AnyID_Boot_EC20.o [1]
-  .bss               zero     0x2000'1124    0x48  AnyID_Boot_EC20.o [1]
-  .bss               zero     0x2000'116c    0x44  AnyID_Boot_Device.o [1]
-  .bss               zero     0x2000'11b0    0x1c  AnyID_Boot_SysCfg.o [1]
-  .bss               zero     0x2000'11cc     0x8  AnyID_Boot_EC20.o [1]
-  .bss               zero     0x2000'11d4     0x8  AnyID_Boot_FRam.o [1]
-  .bss               zero     0x2000'11dc     0x8  AnyID_Boot_SysTick_HL.o [1]
-  .bss               zero     0x2000'11e4     0x1  stm32f10x_it.o [1]
-                            - 0x2000'11e5  0x11d1
+"P2", part 2 of 3:                         0x2404
+  .bss               zero     0x2000'0014   0xa50  AnyID_Boot_Device.o [1]
+  .bss               zero     0x2000'0a64   0x80c  AnyID_Boot_EC20.o [1]
+  .bss               zero     0x2000'1270   0x800  AnyID_Boot_FlashM25.o [1]
+  .bss               zero     0x2000'1a70   0x610  AnyID_Boot_EC20.o [1]
+  .bss               zero     0x2000'2080   0x1ec  AnyID_Boot_Device.o [1]
+  .bss               zero     0x2000'226c   0x12c  AnyID_Boot_EC20.o [1]
+  .bss               zero     0x2000'2398    0x48  AnyID_Boot_EC20.o [1]
+  .bss               zero     0x2000'23e0    0x1c  AnyID_Boot_SysCfg.o [1]
+  .bss               zero     0x2000'23fc     0x8  AnyID_Boot_EC20.o [1]
+  .bss               zero     0x2000'2404     0x8  AnyID_Boot_FRam.o [1]
+  .bss               zero     0x2000'240c     0x8  AnyID_Boot_SysTick_HL.o [1]
+  .bss               zero     0x2000'2414     0x2  AnyID_FlashM25.o [1]
+  .bss               zero     0x2000'2416     0x1  stm32f10x_it.o [1]
+                            - 0x2000'2417  0x2403
 
 "P2", part 3 of 3:                          0x800
-  CSTACK                      0x2000'11e8   0x800  <Block>
-    CSTACK           uninit   0x2000'11e8   0x800  <Block tail>
-                            - 0x2000'19e8   0x800
+  CSTACK                      0x2000'2418   0x800  <Block>
+    CSTACK           uninit   0x2000'2418   0x800  <Block tail>
+                            - 0x2000'2c18   0x800
 
 Unused ranges:
 
          From           To    Size
          ----           --    ----
-   0x800'27ac   0x800'4000  0x1855
-  0x2000'19e8  0x2000'bfff  0xa618
+   0x800'2b84   0x800'4000  0x147d
+  0x2000'2c18  0x2000'bfff  0x93e8
 
 
 *******************************************************************************
@@ -219,12 +229,12 @@ Unused ranges:
           Address      Size
           -------      ----
 Zero (__iar_zero_init3)
-    1 destination range, total size 0x11d1:
-          0x2000'0014  0x11d1
+    1 destination range, total size 0x2403:
+          0x2000'0014  0x2403
 
 Copy (__iar_copy_init3)
     1 source range, total size 0x14:
-           0x800'2684    0x14
+           0x800'2a54    0x14
     1 destination range, total size 0x14:
           0x2000'0000    0x14
 
@@ -241,27 +251,31 @@ command line/config:
     Total:
 
 E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj: [1]
-    AnyID_Boot_Device.o        1'004      180    1'072
-    AnyID_Boot_EC20.o          1'728      104    3'444
+    AnyID_Boot_Device.o        1'192      180    3'132
+    AnyID_Boot_EC20.o          1'728      104    3'992
     AnyID_Boot_EC20_HL.o         368       16
     AnyID_Boot_FRam.o            320                 8
     AnyID_Boot_FRam_HL.o         420
-    AnyID_Boot_SysCfg.o        1'464                28
+    AnyID_Boot_FlashM25.o         20             2'048
+    AnyID_Boot_Flash_HL.o        256        8
+    AnyID_Boot_SysCfg.o        1'620                28
     AnyID_Boot_SysTick_HL.o      120                 8
     AnyID_Boot_Uart_HL.o         344
     AnyID_FRam.o                 426
+    AnyID_FlashM25.o             248                 2
     AnyID_Stdlib.o               128      256
-    main.o                        28
+    main.o                        32
     misc.o                       172
     startup_stm32f10x_hd.o       552
     stm32f10x_flash.o             40
     stm32f10x_gpio.o             268
-    stm32f10x_it.o               190                 1
+    stm32f10x_it.o               186                 1
     stm32f10x_rcc.o              596       20       20
+    stm32f10x_spi.o              104
     stm32f10x_usart.o            530
     system_stm32f10x.o           236
     --------------------------------------------------
-    Total:                     8'934      576    4'581
+    Total:                     9'906      584    9'239
 
 dl7M_tlf.a: [2]
     exit.o                         4
@@ -290,10 +304,10 @@ shb_l.a: [4]
     --------------------------------------------------
     Total:                        20
 
-    Gaps                          10        2
+    Gaps                          12        4
     Linker created                         36    2'048
 ------------------------------------------------------
-    Grand Total:               9'542      614    6'629
+    Grand Total:              10'516      624   11'287
 
 
 *******************************************************************************
@@ -302,25 +316,25 @@ shb_l.a: [4]
 
 Entry                       Address   Size  Type      Object
 -----                       -------   ----  ----      ------
-.iar.init_table$$Base    0x800'25fc          --   Gb  - Linker created -
-.iar.init_table$$Limit   0x800'2620          --   Gb  - Linker created -
-?main                    0x800'2621         Code  Gb  cmain.o [3]
+.iar.init_table$$Base    0x800'29c8          --   Gb  - Linker created -
+.iar.init_table$$Limit   0x800'29ec          --   Gb  - Linker created -
+?main                    0x800'2a0d         Code  Gb  cmain.o [3]
 ADCPrescTable           0x2000'0010    0x4  Data  Lc  stm32f10x_rcc.o [1]
 APBAHBPrescTable        0x2000'0000   0x10  Data  Lc  stm32f10x_rcc.o [1]
-BusFault_Handler         0x800'23ff    0x2  Code  Gb  stm32f10x_it.o [1]
-CSTACK$$Base            0x2000'11e8          --   Gb  - Linker created -
-CSTACK$$Limit           0x2000'19e8          --   Gb  - Linker created -
+BusFault_Handler         0x800'27cf    0x2  Code  Gb  stm32f10x_it.o [1]
+CSTACK$$Base            0x2000'2418          --   Gb  - Linker created -
+CSTACK$$Limit           0x2000'2c18          --   Gb  - Linker created -
 DMA1_Channel1_IRQHandler
-                         0x800'24b5    0x2  Code  Gb  stm32f10x_it.o [1]
-DebugMon_Handler         0x800'2405    0x2  Code  Gb  stm32f10x_it.o [1]
-Device_CheckRsp          0x800'1db1   0xc4  Code  Gb  AnyID_Boot_Device.o [1]
+                         0x800'2881    0x2  Code  Gb  stm32f10x_it.o [1]
+DebugMon_Handler         0x800'27d5    0x2  Code  Gb  stm32f10x_it.o [1]
+Device_CheckRsp          0x800'20ed   0xc4  Code  Gb  AnyID_Boot_Device.o [1]
 Device_Chk_VersionFrame
-                         0x800'1e9d   0xb8  Code  Gb  AnyID_Boot_Device.o [1]
-Device_CommunCheckRsp    0x800'1d35   0x5a  Code  Gb  AnyID_Boot_Device.o [1]
-Device_CommunStep        0x800'1d8f   0x22  Code  Gb  AnyID_Boot_Device.o [1]
-Device_CommunTxCmd       0x800'1c59   0xda  Code  Gb  AnyID_Boot_Device.o [1]
+                         0x800'21d9   0xba  Code  Gb  AnyID_Boot_Device.o [1]
+Device_CommunCheckRsp    0x800'2071   0x5a  Code  Gb  AnyID_Boot_Device.o [1]
+Device_CommunStep        0x800'20cb   0x22  Code  Gb  AnyID_Boot_Device.o [1]
+Device_CommunTxCmd       0x800'1f01  0x16e  Code  Gb  AnyID_Boot_Device.o [1]
 Device_ServerProcessRxInfo
-                         0x800'1e99    0x2  Code  Gb  AnyID_Boot_Device.o [1]
+                         0x800'21d5    0x2  Code  Gb  AnyID_Boot_Device.o [1]
 EC20_ConfigInt           0x800'089b   0x22  Code  Gb  AnyID_Boot_EC20_HL.o [1]
 EC20_ConnectCheckClose   0x800'060d   0x24  Code  Gb  AnyID_Boot_EC20.o [1]
 EC20_ConnectCheckRsp     0x800'0415  0x172  Code  Gb  AnyID_Boot_EC20.o [1]
@@ -331,45 +345,54 @@ EC20_Delayms             0x800'08f7   0x12  Code  Gb  AnyID_Boot_EC20_HL.o [1]
 EC20_EnableInt           0x800'08bd   0x2e  Code  Gb  AnyID_Boot_EC20_HL.o [1]
 EC20_Init                0x800'0131   0x1a  Code  Gb  AnyID_Boot_EC20.o [1]
 EC20_InitInterface       0x800'07f1   0xaa  Code  Gb  AnyID_Boot_EC20_HL.o [1]
-EC20_PORT_CTRL           0x800'26bc    0x8  Data  Gb  AnyID_Boot_EC20_HL.o [1]
-EC20_PORT_KEY            0x800'26b4    0x8  Data  Gb  AnyID_Boot_EC20_HL.o [1]
+EC20_PORT_CTRL           0x800'2a8c    0x8  Data  Gb  AnyID_Boot_EC20_HL.o [1]
+EC20_PORT_KEY            0x800'2a84    0x8  Data  Gb  AnyID_Boot_EC20_HL.o [1]
 EC20_WriteBuffer         0x800'0909   0x26  Code  Gb  AnyID_Boot_EC20_HL.o [1]
 EC20_WriteByte           0x800'08eb    0xc  Code  Gb  AnyID_Boot_EC20_HL.o [1]
 EC20_WriteCmd            0x800'0941   0x20  Code  Gb  AnyID_Boot_EC20_HL.o [1]
+FLASH_CS_COM             0x800'2a94    0x8  Data  Gb  AnyID_Boot_Flash_HL.o [1]
 FLASH_PrefetchBufferCmd
-                         0x800'178d   0x14  Code  Gb  stm32f10x_flash.o [1]
-FLASH_SetLatency         0x800'177d   0x10  Code  Gb  stm32f10x_flash.o [1]
-FRam_Delayms             0x800'17df   0x12  Code  Gb  AnyID_Boot_FRam_HL.o [1]
-FRam_I2CAck              0x800'1847   0x26  Code  Gb  AnyID_Boot_FRam_HL.o [1]
-FRam_I2CDelay            0x800'17d3    0xc  Code  Gb  AnyID_Boot_FRam_HL.o [1]
-FRam_I2CNoAck            0x800'186d   0x26  Code  Gb  AnyID_Boot_FRam_HL.o [1]
-FRam_I2CReceiveByte      0x800'18ff   0x3e  Code  Gb  AnyID_Boot_FRam_HL.o [1]
-FRam_I2CSendByte         0x800'18c5   0x3a  Code  Gb  AnyID_Boot_FRam_HL.o [1]
-FRam_I2CStart            0x800'17f1   0x30  Code  Gb  AnyID_Boot_FRam_HL.o [1]
-FRam_I2CStop             0x800'1821   0x26  Code  Gb  AnyID_Boot_FRam_HL.o [1]
-FRam_I2CWaitAck          0x800'1893   0x32  Code  Gb  AnyID_Boot_FRam_HL.o [1]
-FRam_InitInterface       0x800'17a5   0x2e  Code  Gb  AnyID_Boot_FRam_HL.o [1]
-FRam_ReadBuffer          0x800'2045   0xb4  Code  Gb  AnyID_FRam.o [1]
-FRam_WriteBuffer         0x800'2181   0x6e  Code  Gb  AnyID_FRam.o [1]
-FRam_WritePage           0x800'20f9   0x88  Code  Gb  AnyID_FRam.o [1]
+                         0x800'1829   0x14  Code  Gb  stm32f10x_flash.o [1]
+FLASH_SetLatency         0x800'1819   0x10  Code  Gb  stm32f10x_flash.o [1]
+FRam_Delayms             0x800'187b   0x12  Code  Gb  AnyID_Boot_FRam_HL.o [1]
+FRam_I2CAck              0x800'18e3   0x26  Code  Gb  AnyID_Boot_FRam_HL.o [1]
+FRam_I2CDelay            0x800'186f    0xc  Code  Gb  AnyID_Boot_FRam_HL.o [1]
+FRam_I2CNoAck            0x800'1909   0x26  Code  Gb  AnyID_Boot_FRam_HL.o [1]
+FRam_I2CReceiveByte      0x800'199b   0x3e  Code  Gb  AnyID_Boot_FRam_HL.o [1]
+FRam_I2CSendByte         0x800'1961   0x3a  Code  Gb  AnyID_Boot_FRam_HL.o [1]
+FRam_I2CStart            0x800'188d   0x30  Code  Gb  AnyID_Boot_FRam_HL.o [1]
+FRam_I2CStop             0x800'18bd   0x26  Code  Gb  AnyID_Boot_FRam_HL.o [1]
+FRam_I2CWaitAck          0x800'192f   0x32  Code  Gb  AnyID_Boot_FRam_HL.o [1]
+FRam_InitInterface       0x800'1841   0x2e  Code  Gb  AnyID_Boot_FRam_HL.o [1]
+FRam_ReadBuffer          0x800'23a9   0xb4  Code  Gb  AnyID_FRam.o [1]
+FRam_WriteBuffer         0x800'24e5   0x6e  Code  Gb  AnyID_FRam.o [1]
+FRam_WritePage           0x800'245d   0x88  Code  Gb  AnyID_FRam.o [1]
+Flash_Delay16us          0x800'1c0d   0x18  Code  Gb  AnyID_Boot_Flash_HL.o [1]
+Flash_Demo               0x800'1d1d   0x14  Code  Gb  AnyID_Boot_FlashM25.o [1]
+Flash_Init               0x800'1c25   0x14  Code  Gb  AnyID_FlashM25.o [1]
+Flash_InitInterface      0x800'1b25   0x9e  Code  Gb  AnyID_Boot_Flash_HL.o [1]
+Flash_ReadBuffer         0x800'1c39   0x98  Code  Gb  AnyID_FlashM25.o [1]
+Flash_ReadId             0x800'1cd1   0x44  Code  Gb  AnyID_FlashM25.o [1]
+Flash_ReadId::id        0x2000'2414    0x2  Data  Lc  AnyID_FlashM25.o [1]
+Flash_WriteByte          0x800'1bc3   0x42  Code  Gb  AnyID_Boot_Flash_HL.o [1]
 Fram_ReadBootParamenter
-                         0x800'1949   0xb8  Code  Gb  AnyID_Boot_FRam.o [1]
+                         0x800'19e5   0xb8  Code  Gb  AnyID_Boot_FRam.o [1]
 Fram_WriteBackupBootParamenter
-                         0x800'1a4b   0x38  Code  Gb  AnyID_Boot_FRam.o [1]
+                         0x800'1ae7   0x38  Code  Gb  AnyID_Boot_FRam.o [1]
 Fram_WriteBootParamenter
-                         0x800'1a01   0x4a  Code  Gb  AnyID_Boot_FRam.o [1]
+                         0x800'1a9d   0x4a  Code  Gb  AnyID_Boot_FRam.o [1]
 GPIO_Init                0x800'0b55   0x9c  Code  Gb  stm32f10x_gpio.o [1]
 GPIO_PinRemapConfig      0x800'0bf1   0x6a  Code  Gb  stm32f10x_gpio.o [1]
-HardFault_Handler        0x800'23fb    0x2  Code  Gb  stm32f10x_it.o [1]
-JumpAddress             0x2000'11c8    0x4  Data  Gb  AnyID_Boot_SysCfg.o [1]
-Jump_To_Application     0x2000'11c4    0x4  Data  Gb  AnyID_Boot_SysCfg.o [1]
-MemManage_Handler        0x800'23fd    0x2  Code  Gb  stm32f10x_it.o [1]
-NMI_Handler              0x800'23f9    0x2  Code  Gb  stm32f10x_it.o [1]
+HardFault_Handler        0x800'27cb    0x2  Code  Gb  stm32f10x_it.o [1]
+JumpAddress             0x2000'23f8    0x4  Data  Gb  AnyID_Boot_SysCfg.o [1]
+Jump_To_Application     0x2000'23f4    0x4  Data  Gb  AnyID_Boot_SysCfg.o [1]
+MemManage_Handler        0x800'27cd    0x2  Code  Gb  stm32f10x_it.o [1]
+NMI_Handler              0x800'27c9    0x2  Code  Gb  stm32f10x_it.o [1]
 NVIC_Init                0x800'0e7f   0x5a  Code  Gb  misc.o [1]
 NVIC_PriorityGroupConfig
                          0x800'0e75    0xa  Code  Gb  misc.o [1]
 NVIC_SetVectorTable      0x800'0ed9    0xc  Code  Gb  misc.o [1]
-PendSV_Handler           0x800'2407    0x2  Code  Gb  stm32f10x_it.o [1]
+PendSV_Handler           0x800'27d7    0x2  Code  Gb  stm32f10x_it.o [1]
 RCC_ADCCLKConfig         0x800'1069    0xe  Code  Gb  stm32f10x_rcc.o [1]
 RCC_APB1PeriphClockCmd   0x800'1123   0x16  Code  Gb  stm32f10x_rcc.o [1]
 RCC_APB1PeriphResetCmd   0x800'114f   0x16  Code  Gb  stm32f10x_rcc.o [1]
@@ -388,33 +411,39 @@ RCC_PLLConfig            0x800'1009   0x10  Code  Gb  stm32f10x_rcc.o [1]
 RCC_SYSCLKConfig         0x800'101f    0xe  Code  Gb  stm32f10x_rcc.o [1]
 RCC_USBCLKConfig         0x800'1063    0x6  Code  Gb  stm32f10x_rcc.o [1]
 RCC_WaitForHSEStartUp    0x800'0fd7   0x32  Code  Gb  stm32f10x_rcc.o [1]
-Region$$Table$$Base      0x800'25fc          --   Gb  - Linker created -
-Region$$Table$$Limit     0x800'2620          --   Gb  - Linker created -
-STick_InitSysTick        0x800'1c23   0x22  Code  Gb  AnyID_Boot_SysTick_HL.o [1]
-SVC_Handler              0x800'2403    0x2  Code  Gb  stm32f10x_it.o [1]
-SetSysClock              0x800'2341    0x2  Code  Lc  system_stm32f10x.o [1]
-SetSysClockTo72          0x800'2343   0xa6  Code  Lc  system_stm32f10x.o [1]
+Region$$Table$$Base      0x800'29c8          --   Gb  - Linker created -
+Region$$Table$$Limit     0x800'29ec          --   Gb  - Linker created -
+SPI_Cmd                  0x800'258d   0x1a  Code  Gb  stm32f10x_spi.o [1]
+SPI_I2S_GetFlagStatus    0x800'25af    0xe  Code  Gb  stm32f10x_spi.o [1]
+SPI_I2S_ReceiveData      0x800'25ab    0x4  Code  Gb  stm32f10x_spi.o [1]
+SPI_I2S_SendData         0x800'25a7    0x4  Code  Gb  stm32f10x_spi.o [1]
+SPI_Init                 0x800'2555   0x38  Code  Gb  stm32f10x_spi.o [1]
+STick_InitSysTick        0x800'1ecb   0x22  Code  Gb  AnyID_Boot_SysTick_HL.o [1]
+SVC_Handler              0x800'27d3    0x2  Code  Gb  stm32f10x_it.o [1]
+SetSysClock              0x800'2711    0x2  Code  Lc  system_stm32f10x.o [1]
+SetSysClockTo72          0x800'2713   0xa6  Code  Lc  system_stm32f10x.o [1]
 SysTick_CLKSourceConfig
                          0x800'0ee5   0x18  Code  Gb  misc.o [1]
-SysTick_Config           0x800'1bfb   0x28  Code  Lc  AnyID_Boot_SysTick_HL.o [1]
-SysTick_Handler          0x800'2409   0x42  Code  Gb  stm32f10x_it.o [1]
-Sys_BootTask             0x800'13a7   0x3e  Code  Gb  AnyID_Boot_SysCfg.o [1]
+SysTick_Config           0x800'1ea3   0x28  Code  Lc  AnyID_Boot_SysTick_HL.o [1]
+SysTick_Handler          0x800'27d9   0x42  Code  Gb  stm32f10x_it.o [1]
+Sys_BootTask             0x800'13b7   0x3e  Code  Gb  AnyID_Boot_SysCfg.o [1]
 Sys_CfgClock             0x800'11d7   0x70  Code  Gb  AnyID_Boot_SysCfg.o [1]
 Sys_CfgNVIC              0x800'1261   0x18  Code  Gb  AnyID_Boot_SysCfg.o [1]
 Sys_CfgPeriphClk         0x800'1247   0x1a  Code  Gb  AnyID_Boot_SysCfg.o [1]
 Sys_CtrlIOInit           0x800'1279   0x2a  Code  Gb  AnyID_Boot_SysCfg.o [1]
 Sys_Delayms              0x800'11c5   0x12  Code  Gb  AnyID_Boot_SysCfg.o [1]
-Sys_EC20Task             0x800'1419  0x17e  Code  Gb  AnyID_Boot_SysCfg.o [1]
-Sys_Init                 0x800'12a3   0x9e  Code  Gb  AnyID_Boot_SysCfg.o [1]
-Sys_Jump                 0x800'136b   0x3c  Code  Gb  AnyID_Boot_SysCfg.o [1]
-Sys_LedTask              0x800'1341   0x2a  Code  Gb  AnyID_Boot_SysCfg.o [1]
+Sys_EC20Task             0x800'1429  0x17e  Code  Gb  AnyID_Boot_SysCfg.o [1]
+Sys_Init                 0x800'12a3   0xae  Code  Gb  AnyID_Boot_SysCfg.o [1]
+Sys_Jump                 0x800'137b   0x3c  Code  Gb  AnyID_Boot_SysCfg.o [1]
+Sys_LedTask              0x800'1351   0x2a  Code  Gb  AnyID_Boot_SysCfg.o [1]
 Sys_LedTask{1}{2}::ledTimes
-                        0x2000'11c0    0x4  Data  Lc  AnyID_Boot_SysCfg.o [1]
-Sys_ServerTask           0x800'1597  0x194  Code  Gb  AnyID_Boot_SysCfg.o [1]
-Sys_UartTask             0x800'13e5   0x34  Code  Gb  AnyID_Boot_SysCfg.o [1]
-Sys_UpDataTask::upTime  0x2000'11b0    0x1  Data  Lc  AnyID_Boot_SysCfg.o [1]
-SystemInit               0x800'230d   0x32  Code  Gb  system_stm32f10x.o [1]
-UART5_IRQHandler         0x800'244b   0x54  Code  Gb  stm32f10x_it.o [1]
+                        0x2000'23f0    0x4  Data  Lc  AnyID_Boot_SysCfg.o [1]
+Sys_ServerTask           0x800'15a7  0x18c  Code  Gb  AnyID_Boot_SysCfg.o [1]
+Sys_UartTask             0x800'13f5   0x34  Code  Gb  AnyID_Boot_SysCfg.o [1]
+Sys_UpDataTask           0x800'1733   0x94  Code  Gb  AnyID_Boot_SysCfg.o [1]
+Sys_UpDataTask::upTime  0x2000'23e0    0x1  Data  Lc  AnyID_Boot_SysCfg.o [1]
+SystemInit               0x800'26dd   0x32  Code  Gb  system_stm32f10x.o [1]
+UART5_IRQHandler         0x800'281b   0x52  Code  Gb  stm32f10x_it.o [1]
 USART_ClearFlag          0x800'0e17    0x6  Code  Gb  stm32f10x_usart.o [1]
 USART_ClearITPendingBit
                          0x800'0e63   0x10  Code  Gb  stm32f10x_usart.o [1]
@@ -424,61 +453,62 @@ USART_GetFlagStatus      0x800'0e09    0xe  Code  Gb  stm32f10x_usart.o [1]
 USART_GetITStatus        0x800'0e1d   0x46  Code  Gb  stm32f10x_usart.o [1]
 USART_ITConfig           0x800'0dcf   0x3a  Code  Gb  stm32f10x_usart.o [1]
 USART_Init               0x800'0cfb   0xa4  Code  Gb  stm32f10x_usart.o [1]
-Uart_ConfigInt           0x800'1b2b   0x22  Code  Gb  AnyID_Boot_Uart_HL.o [1]
-Uart_EnableInt           0x800'1b4d   0x2e  Code  Gb  AnyID_Boot_Uart_HL.o [1]
-Uart_InitInterface       0x800'1a89   0xa2  Code  Gb  AnyID_Boot_Uart_HL.o [1]
-Uart_WriteBuffer         0x800'1b87   0x2c  Code  Gb  AnyID_Boot_Uart_HL.o [1]
-Uart_WriteByte           0x800'1b7b    0xc  Code  Gb  AnyID_Boot_Uart_HL.o [1]
-Uart_WriteCmd            0x800'1bc1   0x20  Code  Gb  AnyID_Boot_Uart_HL.o [1]
-UsageFault_Handler       0x800'2401    0x2  Code  Gb  stm32f10x_it.o [1]
+Uart_ConfigInt           0x800'1dd3   0x22  Code  Gb  AnyID_Boot_Uart_HL.o [1]
+Uart_EnableInt           0x800'1df5   0x2e  Code  Gb  AnyID_Boot_Uart_HL.o [1]
+Uart_InitInterface       0x800'1d31   0xa2  Code  Gb  AnyID_Boot_Uart_HL.o [1]
+Uart_WriteBuffer         0x800'1e2f   0x2c  Code  Gb  AnyID_Boot_Uart_HL.o [1]
+Uart_WriteByte           0x800'1e23    0xc  Code  Gb  AnyID_Boot_Uart_HL.o [1]
+Uart_WriteCmd            0x800'1e69   0x20  Code  Gb  AnyID_Boot_Uart_HL.o [1]
+UsageFault_Handler       0x800'27d1    0x2  Code  Gb  stm32f10x_it.o [1]
 __ICFEDIT_region_RAM_end__ {Abs}
                         0x2000'bfff         Data  Gb  <internal module>
 __ICFEDIT_region_RAM_start__ {Abs}
                         0x2000'0000         Data  Gb  <internal module>
-__NVIC_SetPriority       0x800'1be1   0x1a  Code  Lc  AnyID_Boot_SysTick_HL.o [1]
+__NVIC_SetPriority       0x800'1e89   0x1a  Code  Lc  AnyID_Boot_SysTick_HL.o [1]
 __aeabi_memcpy           0x800'09d5         Code  Gb  ABImemcpy.o [3]
 __aeabi_memcpy4          0x800'09f5         Code  Gb  ABImemcpy.o [3]
 __aeabi_memcpy8          0x800'09f5         Code  Gb  ABImemcpy.o [3]
 __aeabi_memset4          0x800'0961         Code  Gb  ABImemset48.o [3]
 __aeabi_memset8          0x800'0961         Code  Gb  ABImemset48.o [3]
-__cmain                  0x800'2621         Code  Gb  cmain.o [3]
-__exit                   0x800'2671   0x14  Code  Gb  exit.o [4]
+__cmain                  0x800'2a0d         Code  Gb  cmain.o [3]
+__exit                   0x800'2a41   0x14  Code  Gb  exit.o [4]
 __iar_Memset4_word       0x800'0969         Code  Gb  ABImemset48.o [3]
 __iar_Memset8_word       0x800'0969         Code  Gb  ABImemset48.o [3]
 __iar_Strchr             0x800'0f59         Code  Gb  strchr.o [3]
 __iar_copy_init3         0x800'0aa7   0x2e  Code  Gb  copy_init3.o [3]
-__iar_data_init3         0x800'25d5   0x28  Code  Gb  data_init.o [3]
-__iar_program_start      0x800'26a9         Code  Gb  cstartup_M.o [3]
+__iar_data_init3         0x800'29a1   0x28  Code  Gb  data_init.o [3]
+__iar_program_start      0x800'2a79         Code  Gb  cstartup_M.o [3]
 __iar_zero_init3         0x800'099b   0x3a  Code  Gb  zero_init3.o [3]
-__low_level_init         0x800'263f    0x4  Code  Gb  low_level_init.o [2]
+__low_level_init         0x800'2a2b    0x4  Code  Gb  low_level_init.o [2]
 __vector_table           0x800'0000         Data  Gb  startup_stm32f10x_hd.o [1]
-_call_main               0x800'262d         Code  Gb  cmain.o [3]
-_exit                    0x800'2665         Code  Gb  cexit.o [3]
-_main                    0x800'263b         Code  Gb  cmain.o [3]
+_call_main               0x800'2a19         Code  Gb  cmain.o [3]
+_exit                    0x800'2a35         Code  Gb  cexit.o [3]
+_main                    0x800'2a27         Code  Gb  cmain.o [3]
 a_GetCrc                 0x800'0ad5   0x40  Code  Gb  AnyID_Stdlib.o [1]
 a_Str2Hex                0x800'0b15   0x3c  Code  Gb  AnyID_Stdlib.o [1]
-exit                     0x800'265f    0x4  Code  Gb  exit.o [2]
-g_aAsicto                0x800'220c  0x100  Data  Gb  AnyID_Stdlib.o [1]
+exit                     0x800'2a2f    0x4  Code  Gb  exit.o [2]
+g_aAsicto                0x800'25dc  0x100  Data  Gb  AnyID_Stdlib.o [1]
 g_nDeviceNxtDownloadAddr
-                        0x2000'11bc    0x4  Data  Gb  AnyID_Boot_SysCfg.o [1]
-g_nDeviceNxtEraseAddr   0x2000'11b8    0x4  Data  Gb  AnyID_Boot_SysCfg.o [1]
-g_nEC20RxByte           0x2000'11e4    0x1  Data  Gb  stm32f10x_it.o [1]
-g_nHttpAtBuf            0x2000'0c0c  0x200  Data  Gb  AnyID_Boot_Device.o [1]
-g_nImei                 0x2000'0604   0x10  Data  Gb  AnyID_Boot_EC20.o [1]
-g_nImsiStr              0x2000'0614   0x10  Data  Gb  AnyID_Boot_EC20.o [1]
-g_nSoftWare             0x2000'11cc    0x8  Data  Gb  AnyID_Boot_EC20.o [1]
-g_nSysDelay             0x2000'11e0    0x4  Data  Gb  AnyID_Boot_SysTick_HL.o [1]
-g_nSysState             0x2000'11b4    0x4  Data  Gb  AnyID_Boot_SysCfg.o [1]
-g_nSysTick              0x2000'11dc    0x4  Data  Gb  AnyID_Boot_SysTick_HL.o [1]
-g_sDeviceServerTxBuf    0x2000'0e0c  0x1ec  Data  Gb  AnyID_Boot_Device.o [1]
-g_sDeviceUpDataInfo     0x2000'116c   0x44  Data  Gb  AnyID_Boot_Device.o [1]
-g_sEC20Connect          0x2000'0ff8  0x12c  Data  Gb  AnyID_Boot_EC20.o [1]
-g_sEC20Params           0x2000'1124   0x48  Data  Gb  AnyID_Boot_EC20.o [1]
-g_sEC20RcvBuffer        0x2000'0014  0x5f0  Data  Gb  AnyID_Boot_EC20.o [1]
-g_sEC20RcvFrame         0x2000'0624  0x5e8  Data  Gb  AnyID_Boot_EC20.o [1]
-g_sFramBootParamenter   0x2000'11d4    0x8  Data  Gb  AnyID_Boot_FRam.o [1]
-main                     0x800'2643   0x1c  Code  Gb  main.o [1]
-strcat                   0x800'21ef   0x1e  Code  Gb  strcat.o [2]
+                        0x2000'23ec    0x4  Data  Gb  AnyID_Boot_SysCfg.o [1]
+g_nDeviceNxtEraseAddr   0x2000'23e8    0x4  Data  Gb  AnyID_Boot_SysCfg.o [1]
+g_nEC20RxByte           0x2000'2416    0x1  Data  Gb  stm32f10x_it.o [1]
+g_nFlashUpData          0x2000'1270  0x800  Data  Gb  AnyID_Boot_FlashM25.o [1]
+g_nHttpAtBuf            0x2000'0864  0x200  Data  Gb  AnyID_Boot_Device.o [1]
+g_nImei                 0x2000'2060   0x10  Data  Gb  AnyID_Boot_EC20.o [1]
+g_nImsiStr              0x2000'2070   0x10  Data  Gb  AnyID_Boot_EC20.o [1]
+g_nSoftWare             0x2000'23fc    0x8  Data  Gb  AnyID_Boot_EC20.o [1]
+g_nSysDelay             0x2000'2410    0x4  Data  Gb  AnyID_Boot_SysTick_HL.o [1]
+g_nSysState             0x2000'23e4    0x4  Data  Gb  AnyID_Boot_SysCfg.o [1]
+g_nSysTick              0x2000'240c    0x4  Data  Gb  AnyID_Boot_SysTick_HL.o [1]
+g_sDeviceServerTxBuf    0x2000'2080  0x1ec  Data  Gb  AnyID_Boot_Device.o [1]
+g_sDeviceUpDataInfo     0x2000'0014  0x850  Data  Gb  AnyID_Boot_Device.o [1]
+g_sEC20Connect          0x2000'226c  0x12c  Data  Gb  AnyID_Boot_EC20.o [1]
+g_sEC20Params           0x2000'2398   0x48  Data  Gb  AnyID_Boot_EC20.o [1]
+g_sEC20RcvBuffer        0x2000'1a70  0x5f0  Data  Gb  AnyID_Boot_EC20.o [1]
+g_sEC20RcvFrame         0x2000'0a64  0x80c  Data  Gb  AnyID_Boot_EC20.o [1]
+g_sFramBootParamenter   0x2000'2404    0x8  Data  Gb  AnyID_Boot_FRam.o [1]
+main                     0x800'29ed   0x20  Code  Gb  main.o [1]
+strcat                   0x800'25bd   0x1e  Code  Gb  strcat.o [2]
 strchr                   0x800'0f59         Code  Gb  strchr.o [3]
 strlen                   0x800'0f21         Code  Gb  strlen.o [3]
 strstr                   0x800'0a7b   0x2c  Code  Gb  strstr.o [2]
@@ -489,9 +519,9 @@ strstr                   0x800'0a7b   0x2c  Code  Gb  strstr.o [2]
 [3] = rt7M_tl.a
 [4] = shb_l.a
 
-  9'542 bytes of readonly  code memory
-    614 bytes of readonly  data memory
-  6'629 bytes of readwrite data memory
+  10'516 bytes of readonly  code memory
+     624 bytes of readonly  data memory
+  11'287 bytes of readwrite data memory
 
 Errors: none
 Warnings: none

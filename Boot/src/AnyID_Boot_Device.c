@@ -41,9 +41,25 @@ void Device_CommunTxCmd(DEVICE_SENVER_TXBUFFER *pCntOp, u32 sysTick)
             
             EC20_WriteCmd(g_nHttpAtBuf);
             break;
-        case DEVICE_HTTP_GET_RONSPOND:
-
-            EC20_WriteCmd("AT+QHTTPREAD=719");
+        case DEVICE_HTTP_GET_REQUEST_DOWNLOAD:
+            memset(g_nHttpAtBuf, 0, EC20_STR_BUFFER_RSP_LEN);
+            memset(atBuf, 0, EC20_STR_BUFFER_RSP_LEN);
+            
+            strcat(g_nHttpAtBuf,"GET http://iot-api.heclouds.com/fuse-ota/");
+            strcat(g_nHttpAtBuf,*(&EC20_PRDOCT_ID));
+            strcat(g_nHttpAtBuf,"/");
+            strcat(g_nHttpAtBuf, (const char *)(&g_nImsiStr));
+            strcat(g_nHttpAtBuf,"/");
+            strcat(g_nHttpAtBuf, g_sDeviceUpDataInfo.tid);
+            strcat(g_nHttpAtBuf, "/download HTTP/1.1\r\n");
+            strcat(g_nHttpAtBuf,"Content-Type: application/json\r\n");
+            strcat(g_nHttpAtBuf,"authorization: ");
+            strcat(g_nHttpAtBuf,*(&HTTPTOKEN));
+            strcat(g_nHttpAtBuf,"\r\n");
+            strcat(g_nHttpAtBuf,"Range: -1000\r\n");
+            strcat(g_nHttpAtBuf,"host:iot-api.heclouds.com\r\n");
+            Uart_WriteCmd(g_nHttpAtBuf);
+            EC20_WriteCmd(g_nHttpAtBuf);
             break;
     }
     pCntOp->tick = sysTick;
@@ -69,7 +85,6 @@ BOOL Device_CommunCheckRsp(DEVICE_SENVER_TXBUFFER *pCntOp, u8 *pRxBuf)
             }
             break;
         case DEVICE_HTTP_GET_REQUEST_DOWNLOAD:
-
             if(strstr((char const *)pRxBuf, "OK") != NULL)
             {
                 bOK = TRUE;
@@ -214,4 +229,25 @@ BOOL Device_Chk_VersionFrame(u8 *pBuffer, DEVICE_UPDATA_INFO *pDataInfo)
     }   
     
     return bOk;
+}
+
+
+BOOL Device_GetData(u8 *pBuffer)
+{
+    BOOL tF = FALSE;
+    
+    
+    
+
+    return tF;
+}
+
+BOOL Device_ChkData(u8 *pBuffer)
+{
+    BOOL tF = FALSE;
+    
+    
+    
+
+    return tF;
 }

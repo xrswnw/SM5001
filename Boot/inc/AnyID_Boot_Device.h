@@ -3,6 +3,7 @@
 
 #include "AnyID_Boot_EC20.h"
 #include "AnyID_Boot_Uart.h"
+#include "AnyID_Boot_FlashM25.h"
 
 #define DEVICE_SERVER_TXSTAT_IDLE       0
 #define DEVICE_SERVER_TXSTAT_WAIT       1
@@ -61,15 +62,22 @@ typedef struct deviceSenverTxBuff{
 #define DEVICE_SOFTVERSION_TID_LEN              6
 #define DEVICE_SOFTVERSION_BUFFER_SIZE          6
 #define DEVICE_SOFTVERSION_MD5                  32
+#define DEVICE_SOFTVERSION_DATA_LEN             2048
 typedef struct deviceUpDataInfo{
     u8 state;
     u8 flag;
-    char name[DEVICE_SOFTVERSION_NAME_LEN];
-    char tid[DEVICE_SOFTVERSION_TID_LEN];
-    char bufferSize[DEVICE_SOFTVERSION_BUFFER_SIZE];
-    char md5[DEVICE_SOFTVERSION_MD5];
+    u8 step;
+    u8 num;
+    u8 data[DEVICE_SOFTVERSION_DATA_LEN+ 2];
+    char name[DEVICE_SOFTVERSION_NAME_LEN + 2];
+    char tid[DEVICE_SOFTVERSION_TID_LEN + 2];
+    char bufferSize[DEVICE_SOFTVERSION_BUFFER_SIZE + 2];
+    char md5[DEVICE_SOFTVERSION_MD5 + 2];
     u32 tick;
 }DEVICE_UPDATA_INFO;
+
+
+
 
 extern DEVICE_UPDATA_INFO g_sDeviceUpDataInfo;
 extern DEVICE_SENVER_TXBUFFER g_sDeviceServerTxBuf;

@@ -22,15 +22,17 @@ stm32f10x_it.pbi: E:\AnyID\Git\FY\SM5001\Boot\stm32f10x_it.c \
   E:\AnyID\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\inc\stm32f10x_gpio.h \
   E:\AnyID\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\inc\stm32f10x_iwdg.h \
   E:\AnyID\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\inc\stm32f10x_rcc.h \
+  E:\AnyID\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\inc\stm32f10x_spi.h \
   E:\AnyID\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\inc\stm32f10x_usart.h \
   E:\AnyID\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\inc\misc.h \
   E:\AnyID\Git\FY\SM5001\Boot\SM5001\..\inc\AnyID_Boot_SysCfg.h \
+  E:\AnyID\Git\FY\SM5001\Boot\SM5001\..\inc/AnyID_Boot_Uart.h \
+  E:\AnyID\Git\FY\SM5001\Boot\SM5001\..\inc/AnyID_Boot_Uart_HL.h \
   E:\AnyID\Git\FY\SM5001\Boot\AnyID_Boot_Config.h \
   E:\AnyID\AnyID_Embedded\V1.1.0\AnyID_lib_V1.1.0\inc\AnyID_Stdlib.h \
   E:\AnyID\AnyID_Embedded\V1.1.0\AnyID_lib_V1.1.0\inc/AnyID_Type.h \
+  E:\AnyID\Git\FY\SM5001\Boot/stm32f10x_conf.h \
   C:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\stdio.h \
-  E:\AnyID\Git\FY\SM5001\Boot\SM5001\..\inc/AnyID_Boot_Uart.h \
-  E:\AnyID\Git\FY\SM5001\Boot\SM5001\..\inc/AnyID_Boot_Uart_HL.h \
   E:\AnyID\Git\FY\SM5001\Boot\SM5001\..\inc/AnyID_Uart_Receive.h \
   E:\AnyID\Git\FY\SM5001\Boot\SM5001\..\inc/AnyID_Boot_Tcp232_HL.h \
   E:\AnyID\Git\FY\SM5001\Boot\SM5001\..\inc/AnyID_Boot_R485_HL.h \
@@ -41,5 +43,8 @@ stm32f10x_it.pbi: E:\AnyID\Git\FY\SM5001\Boot\stm32f10x_it.c \
   E:\AnyID\Git\FY\SM5001\Boot\SM5001\..\inc/AnyID_Boot_Device.h \
   E:\AnyID\Git\FY\SM5001\Boot\SM5001\..\inc/AnyID_Boot_EC20.h \
   E:\AnyID\Git\FY\SM5001\Boot\SM5001\..\inc/AnyID_Boot_EC20_HL.h \
+  E:\AnyID\Git\FY\SM5001\Boot\SM5001\..\inc/AnyID_Boot_FlashM25.h \
+  E:\AnyID\Git\FY\SM5001\Boot\SM5001\..\inc/AnyID_FlashM25.h \
+  E:\AnyID\Git\FY\SM5001\Boot\SM5001\..\inc/AnyID_Boot_FLASH_HL.h \
   E:\AnyID\AnyID_Embedded\V1.1.0\AnyID_lib_V1.1.0\inc\AnyID_SysTick.h \
   E:\AnyID\Git\FY\SM5001\Boot\SM5001\..\inc\AnyID_Boot_SysTick_HL.h

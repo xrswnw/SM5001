@@ -78,7 +78,8 @@ void Sys_CfgPeriphClk(FunctionalState state)
                           RCC_APB2Periph_GPIOD |
                           RCC_APB2Periph_AFIO, state);
     
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3 |
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2 | 
+                           RCC_APB1Periph_USART3 |
                            RCC_APB1Periph_UART5  , state);
 
 }
@@ -139,7 +140,12 @@ void Sys_Init(void)
     FRam_InitInterface();
     Fram_ReadBootParamenter();
     
+    Flash_InitInterface();
+    Flash_Init();
     
+    Flash_ReadId();
+    Flash_Demo();
+
     
     g_sFramBootParamenter.appState = FRAM_BOOT_APP_FAIL;//测试
     
@@ -182,6 +188,10 @@ void Sys_Init(void)
     a_SetState(g_sEC20Connect.state, EC20_CNT_OP_STAT_TX);
 
     
+    
+    
+    //
+
     //使能中断
     Sys_EnableInt();
 }
@@ -597,7 +607,7 @@ void Sys_ServerTask(void)
             }
             g_sDeviceServerTxBuf.index++;   
         }
-        Uart_WriteBuffer(g_sEC20RcvFrame.buffer, g_sEC20RcvFrame.index);
+        //Uart_WriteBuffer(g_sEC20RcvFrame.buffer, g_sEC20RcvFrame.index);
 
         if(Device_CheckRsp(&g_sEC20RcvBuffer, g_sEC20RcvFrame.buffer, g_sEC20RcvFrame.index))
         {
@@ -672,6 +682,11 @@ void Sys_ServerTask(void)
 
 void Sys_UpDataTask()
 {
+
+    if(!a_CheckStateBit(g_nSysState, SYS_STAT_LTEDTU))  //只有透传了，才需要进入该任务
+    {
+        return;
+    }
     static u8 upTime = 0, upTick = 0; 
     
     if(a_CheckStateBit(g_nSysState, SYS_STAT_UPDATA))
@@ -684,6 +699,11 @@ void Sys_UpDataTask()
             if(g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_FLAG_RQ)
             {
                 Device_At_Rsp(EC20_CNT_TIME_1S, EC20_CNT_REPAT_NULL, DEVICE_HTTP_GET_REQUEST_CKECK);
+            }
+            else if(g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_FLAG_DOWN)
+            {   
+                //if(g_sDeviceUpDataInfo.step <)
+                Device_At_Rsp(EC20_CNT_TIME_1S, EC20_CNT_REPAT_NULL, DEVICE_HTTP_GET_REQUEST_DOWNLOAD);
             }
         
         }
