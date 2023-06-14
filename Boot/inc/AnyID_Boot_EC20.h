@@ -125,6 +125,9 @@ typedef struct EC20Par{
 #define EC20_CNT_OP_STAT_TX_AT                  0x0100
 #define EC20_CNT_OP_STAT_RX_AT                  0x0200
 
+
+
+
 #define EC20_CNT_TIME_1S                        200
 #define EC20_CNT_TIME_500MS                     100
 #define EC20_CNT_TIME_100MS                     20

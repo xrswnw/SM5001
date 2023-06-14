@@ -16,7 +16,7 @@ u8 Flash_ReadByte(void);
 void Flash_Delayms(u32 n);
 void Flash_Delay16us(u32 us);
 
-#define FLASH_PAGE_SIZE         512
+#define FLASH_PAGE_SIZE         256
 #define FLASH_PAGE_MASK         0x1FF
 #define FLASH_SECTOR_MASK       0x3FFFF
 

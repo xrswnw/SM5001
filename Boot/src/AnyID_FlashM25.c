@@ -17,6 +17,7 @@ BOOL Flash_WritePage(u32 addr, u32 len, u8 *pBuffer)
     //等待上次的操作完成，一般页编程只要15ms
     //sector擦除使用特殊方法判断
     delay = 0;
+
     //等待WEL未变为0，最多15ms
     Flash_CsLow();
     Flash_WriteByte(FLASH_CMD_RDSR);
@@ -33,9 +34,11 @@ BOOL Flash_WritePage(u32 addr, u32 len, u8 *pBuffer)
     {
         //写使能
         Flash_CsLow();
-        Flash_WriteByte(FLASH_CMD_WREN);
-        Flash_CsHigh();
 
+        Flash_WriteByte(FLASH_CMD_WREN);
+
+        Flash_CsHigh();
+        Flash_Delay16us(10);            //添加10us延时，猜测芯片原因
         delay = 0;
         //等待WEL未变为1，最多15ms
         Flash_CsLow();
@@ -142,6 +145,7 @@ BOOL Flash_EraseSector(u32 addr)
         Flash_CsLow();
         Flash_WriteByte(FLASH_CMD_WREN);
         Flash_CsHigh();
+        Flash_Delay16us(10);            //添加10us延时，猜测芯片原因
 
         delay = 0;
         //等待WEL未变为1，最多15ms

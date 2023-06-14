@@ -57,7 +57,8 @@ void Sys_UartTask(void);
 void Sys_BootTask(void);
 void Sys_ProcessBootFrame(UART_RCVFRAME *pRcvFrame, u8 com);
 void Sys_ServerTask(void);
-void Sys_UpDataTask();
+void Sys_DownDataTask();
+void Sys_ReplaceDeviceTask();
 
 void Sys_EC20Task(void);
 

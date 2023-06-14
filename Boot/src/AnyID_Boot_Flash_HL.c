@@ -13,6 +13,8 @@ void Flash_InitInterface(void)
     GPIO_InitStructure.GPIO_Pin = FLASH_CS_COM.Pin;
     GPIO_Init(FLASH_CS_COM.Port, &GPIO_InitStructure);
     Flash_CsHigh();
+    Flash_CsLow();
+    Flash_CsHigh();
 
     //SPI
     GPIO_InitStructure.GPIO_Pin = FLASH_PORT_SPI.Pin;

@@ -136,7 +136,7 @@ void Sys_Init(void)
     Sys_DisableInt();
     Sys_CtrlIOInit();
     Sys_RunLedOn();
-    Sys_Delayms(10);        //一般是10ms
+
     FRam_InitInterface();
     Fram_ReadBootParamenter();
     
@@ -144,11 +144,13 @@ void Sys_Init(void)
     Flash_Init();
     
     Flash_ReadId();
+   
+ 
+    
     Flash_Demo();
 
-    
     g_sFramBootParamenter.appState = FRAM_BOOT_APP_FAIL;//测试
-    
+  
     
     
     //如果appState状态正常，但是版本信息校验错误，恢复默认状态
@@ -186,11 +188,6 @@ void Sys_Init(void)
 
     EC20_ConnectInit(&g_sEC20Connect, EC20_CNT_CMD_PWRON, &g_sEC20Params);
     a_SetState(g_sEC20Connect.state, EC20_CNT_OP_STAT_TX);
-
-    
-    
-    
-    //
 
     //使能中断
     Sys_EnableInt();
@@ -588,30 +585,23 @@ void Sys_ServerTask(void)
         EC20_EnableInt(ENABLE, DISABLE);
     }
     
-    if(Uart_IsRcvFrame(g_sEC20RcvFrame))
+     if(Uart_IsRcvFrame(g_sEC20RcvFrame))
     {
         
-       if(a_CheckStateBit(g_sDeviceServerTxBuf.state, EC20_CNT_OP_STAT_RX_AT))
+       if(a_CheckStateBit(g_sDeviceServerTxBuf.state, EC20_CNT_OP_STAT_RX))
         {
-          
             if(Device_CommunCheckRsp(&g_sDeviceServerTxBuf, g_sEC20RcvFrame.buffer))   
             {
-                //g_sDeviceServerTxBuf.index++;                                           //AT
-                a_SetState(g_sDeviceServerTxBuf.state, DEVICE_SERVER_TXSTAT_WAIT);
-                //EC20_ClearRxBuffer();
+                g_sDeviceServerTxBuf.result = EC20_CNT_RESULT_OK;
+                a_SetState(g_sDeviceServerTxBuf.state, EC20_CNT_OP_STAT_STEP);
             }
             else
             {
+                g_sDeviceServerTxBuf.result = EC20_CNT_RESULT_FAIL;
                 g_sEC20RcvFrame.state = UART_FLAG_RCV;                          //继续接收
                 g_sEC20RcvFrame.idleTime = 0;
             }
             g_sDeviceServerTxBuf.index++;   
-        }
-        //Uart_WriteBuffer(g_sEC20RcvFrame.buffer, g_sEC20RcvFrame.index);
-
-        if(Device_CheckRsp(&g_sEC20RcvBuffer, g_sEC20RcvFrame.buffer, g_sEC20RcvFrame.index))
-        {
-            Device_ServerProcessRxInfo(&g_sEC20RcvBuffer, g_nSysTick);
         }
         if(EC20_ConnectCheckClose(g_sEC20RcvFrame.buffer))
         {
@@ -619,20 +609,18 @@ void Sys_ServerTask(void)
             a_SetState(g_sEC20Connect.state, EC20_CNT_OP_STAT_TX);
             a_ClearStateBit(g_nSysState, SYS_STAT_LTEDTU);
         }
-
-
         EC20_ClearRxBuffer();
     }
      
-    if(a_CheckStateBit(g_sDeviceServerTxBuf.state, EC20_CNT_OP_STAT_TX_AT))      
+    if(a_CheckStateBit(g_sDeviceServerTxBuf.state, EC20_CNT_OP_STAT_TX))      
     {
-        a_ClearStateBit(g_sDeviceServerTxBuf.state, EC20_CNT_OP_STAT_TX_AT);
+        a_ClearStateBit(g_sDeviceServerTxBuf.state, EC20_CNT_OP_STAT_TX);
 
         if(g_sDeviceServerTxBuf.index < g_sDeviceServerTxBuf.num)
         {
             EC20_ClearRxBuffer();
             Device_CommunTxCmd(&g_sDeviceServerTxBuf, g_nSysTick);
-            a_SetState(g_sDeviceServerTxBuf.state, EC20_CNT_OP_STAT_RX_AT | DEVICE_SERVER_TXSTAT_WAIT);
+            a_SetState(g_sDeviceServerTxBuf.state, EC20_CNT_OP_STAT_RX | DEVICE_SERVER_TXSTAT_WAIT);
         }
     }
     
@@ -649,7 +637,7 @@ void Sys_ServerTask(void)
             }
             else
             {
-                g_sDeviceServerTxBuf.state = EC20_CNT_OP_STAT_TX_AT;             
+                g_sDeviceServerTxBuf.state = EC20_CNT_OP_STAT_TX;             
             }
         }
     }
@@ -658,7 +646,33 @@ void Sys_ServerTask(void)
      if(a_CheckStateBit(g_sDeviceServerTxBuf.state, EC20_CNT_OP_STAT_STEP))    //下一步逻辑处理
     {
         a_ClearStateBit(g_sDeviceServerTxBuf.state, EC20_CNT_OP_STAT_STEP);
-        Device_CommunStep(&g_sDeviceServerTxBuf);                              //操作步骤处理
+        Device_CommunStep(&g_sDeviceServerTxBuf); 
+        if(g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_FLAG_DOWNING)
+        {
+            if(g_sDeviceServerTxBuf.result == EC20_CNT_RESULT_OK)
+            {
+                if(Device_WeiteData(&g_sDeviceUpDataInfo))
+                {
+                    if(g_sDeviceUpDataInfo.step == g_sDeviceUpDataInfo.num)
+                    {
+                        g_sDeviceUpDataInfo.flag = DEVICE_UPDATA_FLAG_OVER;
+                    }
+                    else
+                    {
+                        g_sDeviceUpDataInfo.flag = DEVICE_UPDATA_FLAG_DOWN;
+                        g_sDeviceUpDataInfo.step ++;
+                    }
+                }
+                else
+                {
+                    g_sDeviceUpDataInfo.flag = DEVICE_UPDATA_FLAG_FAIL;
+                    
+                    //下载中途失败、、
+                }
+                
+            }
+        }
+
         if(g_sDeviceServerTxBuf.index >= g_sDeviceServerTxBuf.num)
         {
             g_sDeviceServerTxBuf.num = 0;   
@@ -667,27 +681,16 @@ void Sys_ServerTask(void)
         }
     }
 
-    if(a_CheckStateBit(g_nSysState, SYS_STAT_HTTP_TEST))
-    {
-        a_ClearStateBit(g_nSysState, SYS_STAT_HTTP_TEST);
-        
-       // if(g_nLinkFlag)
-        {
-            //Device_At_Rsp(EC20_CNT_TIME_1S, EC20_CNT_REPAT_NULL, DEVICE_HTTP_URL_LINK);
-            Device_At_Rsp(EC20_CNT_TIME_1S, EC20_CNT_REPAT_NULL, DEVICE_HTTP_GET_REQUEST_CKECK);
-        }
-    }
 
 }
 
-void Sys_UpDataTask()
+void Sys_DownDataTask()
 {
-
-    if(!a_CheckStateBit(g_nSysState, SYS_STAT_LTEDTU))  //只有透传了，才需要进入该任务
+    if(!a_CheckStateBit(g_nSysState, SYS_STAT_LTEDTU) && g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_FLAG_OVER)  //只有透传了，才需要进入该任务
     {
         return;
     }
-    static u8 upTime = 0, upTick = 0; 
+    static u8 upTime = 0; 
     
     if(a_CheckStateBit(g_nSysState, SYS_STAT_UPDATA))
     {
@@ -702,14 +705,62 @@ void Sys_UpDataTask()
             }
             else if(g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_FLAG_DOWN)
             {   
-                //if(g_sDeviceUpDataInfo.step <)
-                Device_At_Rsp(EC20_CNT_TIME_1S, EC20_CNT_REPAT_NULL, DEVICE_HTTP_GET_REQUEST_DOWNLOAD);
+                g_sDeviceUpDataInfo.flag = DEVICE_UPDATA_FLAG_DOWNING;
+                Device_At_Rsp(EC20_CNT_TIME_1S * 2, EC20_CNT_REPAT_NULL, DEVICE_HTTP_GET_REQUEST_DOWNLOAD);
+            }
+            else if(g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_FLAG_FAIL)
+            {   
+                
+            }
+            else if(g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_FLAG_OVER)
+            {   
+                g_sDeviceUpDataInfo.flag = DEVICE_UPDATA_START;
             }
         
         }
         a_ClearStateBit(g_nSysState, SYS_STAT_UPDATA);
     }
 
+}
+
+void Sys_ReplaceDeviceTask()
+{
+    if(g_sDeviceUpDataInfo.flag != DEVICE_UPDATA_FLAG_OVER)  //固件下载完成，进入更新流程
+    {
+        return;
+    }
+
+    if(g_sDeviceUpDataInfo.type == DEVICE_TYPE_SM5001)
+    {
+        if(a_CheckStateBit(g_nSysState, SYS_STAT_DOWNLOAD))
+        {
+        BOOL bOk = FALSE;
+        u32 addr = 0;
+        u8 sector = 0;
+                    
+        sector = g_sUartTempRcvFrame.buffer[UART_FRAME_POS_PAR];
+        addr = SYS_APP_START_ADDR + (sector << 10);         //每个扇区1K
+                    
+            if(addr >= SYS_APP_START_ADDR)
+            {
+                if(g_nDeviceNxtEraseAddr == addr)               //擦除地址必须是连续的，否则会有区域未擦除
+                {
+                    g_nDeviceNxtEraseAddr = addr + (1 << 10);   //每个扇区1K
+                                    
+                    bOk = Uart_EraseFlash(addr); 
+                }
+            }
+        }                                  
+      
+    }
+    else if(g_sDeviceUpDataInfo.type == DEVICE_TYPE_SM5002)
+    {
+    
+    }
+    else if(g_sDeviceUpDataInfo.type == DEVICE_TYPE_SM5003)
+    {
+    
+    }
 
 
 

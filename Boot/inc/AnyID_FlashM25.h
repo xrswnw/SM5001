@@ -24,7 +24,6 @@
 #define FLASH_STAT_WEL          0x02
 #define FLASH_STAT_WIP          0x01
 
-#define FLASE_PAGE_SIZE         256
 
 void Flash_Init(void);
 BOOL Flash_WriteBuffer(u32 addr, u16 len, u8 *pBuffer);

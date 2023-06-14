@@ -21,11 +21,23 @@
 #define DEVICE_SERVERRSP_NUM            20
 
 
+#define DEVICE_TYPE_SM5001              1
+#define DEVICE_TYPE_SM5002              2
+#define DEVICE_TYPE_SM5003              3
+
+
+
 #define DEVICE_UPDATA_FLAG_RQ           1
 #define DEVICE_UPDATA_FLAG_DOWN         2
+#define DEVICE_UPDATA_FLAG_DOWNING      3
+#define DEVICE_UPDATA_FLAG_FAIL         4
+#define DEVICE_UPDATA_FLAG_OVER         5
+#define DEVICE_UPDATA_START             6
 
+#define DEVICE_DATA_MASK_R              0x0D
+#define DEVICE_DATA_MASK_N              0x0A
 
-#define DEVICE_UPDATA_CHK_TIME          100
+#define DEVICE_UPDATA_CHK_TIME          50
 
 #define DEVICE_UPDATA_SM5001            1
 #define DEVICE_UPDATA_SM5002            2
@@ -41,7 +53,13 @@
 #define DEVICE_HTTP_GET_REQUEST_DOWNLOAD         4
 #define DEVICE_HTTP_GET_RONSPOND                 5
 
-#define Device_At_Rsp(opt,repat,cmd)      do{g_sDeviceServerTxBuf.to[g_sDeviceServerTxBuf.num] = opt;g_sDeviceServerTxBuf.repeat[g_sDeviceServerTxBuf.num] = repat;g_sDeviceServerTxBuf.op[g_sDeviceServerTxBuf.num++] = cmd;g_sDeviceServerTxBuf.state = EC20_CNT_OP_STAT_TX_AT;}while(0)
+#define Device_Erase_Flash()                    do{\
+                                                    Flash_EraseSector(0);\
+                                                    Device_Delayms(1000); \
+                                                    Flash_EraseSector(64 * 1024);\
+                                                    Device_Delayms(1000);\
+                                                   }while(0)
+#define Device_At_Rsp(opt,repat,cmd)      do{g_sDeviceServerTxBuf.to[g_sDeviceServerTxBuf.num] = opt;g_sDeviceServerTxBuf.repeat[g_sDeviceServerTxBuf.num] = repat;g_sDeviceServerTxBuf.op[g_sDeviceServerTxBuf.num++] = cmd;g_sDeviceServerTxBuf.state = EC20_CNT_OP_STAT_TX;}while(0)
 
 
 typedef struct deviceSenverTxBuff{
@@ -64,6 +82,7 @@ typedef struct deviceSenverTxBuff{
 #define DEVICE_SOFTVERSION_MD5                  32
 #define DEVICE_SOFTVERSION_DATA_LEN             2048
 typedef struct deviceUpDataInfo{
+    u8 type;
     u8 state;
     u8 flag;
     u8 step;
@@ -76,18 +95,21 @@ typedef struct deviceUpDataInfo{
     u32 tick;
 }DEVICE_UPDATA_INFO;
 
-
-
-
 extern DEVICE_UPDATA_INFO g_sDeviceUpDataInfo;
 extern DEVICE_SENVER_TXBUFFER g_sDeviceServerTxBuf;
 
+u32 Device_Search_Data(u8 *pBuffer);
+
+BOOL Device_WeiteData(DEVICE_UPDATA_INFO *pDataInfo);
 BOOL Device_CommunCheckRsp(DEVICE_SENVER_TXBUFFER *pCntOp, u8 *pRxBuf);
-BOOL Device_CheckRsp(EC20_RCVBUFFER *pCntOp, u8 *pRxBuf, u16 len);
 BOOL Device_Chk_VersionFrame(u8 *pBuffer, DEVICE_UPDATA_INFO *pDataInfo);
+BOOL Device_Erase_McuFlash(u32 addr);
+
+void Device_Delayms(u32 n);
 void Device_CommunStep(DEVICE_SENVER_TXBUFFER *pCntOp);
 void Device_CommunTxCmd(DEVICE_SENVER_TXBUFFER *pCntOp, u32 sysTick);
-void Device_ServerProcessRxInfo(EC20_RCVBUFFER *pRcvBuffer, u32 tick); 
-
+void Device_Analys_Data(DEVICE_UPDATA_INFO *pDataInfo);
 void Device_Format_LinkToken();
+
+char *Device_Analys_Data_Len(char *lenBuffer, u8 step);
 #endif
