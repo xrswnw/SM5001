@@ -143,52 +143,28 @@ void Sys_Init(void)
     Flash_InitInterface();
     Flash_Init();
     
+    //
     Flash_ReadId();
-   
- 
-    
     Flash_Demo();
 
-    g_sFramBootParamenter.appState = FRAM_BOOT_APP_FAIL;//测试
-  
+    g_sFramBootParamenter.appState = FRAM_BOOT_APP_DATA_DOWN_OVER;//测试
     
-    
-    //如果appState状态正常，但是版本信息校验错误，恢复默认状态
-    if(g_sFramBootParamenter.appState == FRAM_BOOT_APP_OK)
-    {
-        if(Sys_CheckVersion() == FALSE)
-        {
-            g_sFramBootParamenter.appState = FRAM_BOOT_APP_FAIL;
-        }
-    }
 
     Uart_InitInterface(UART_BAUDRARE);
     Uart_ConfigInt();
     Uart_EnableInt(ENABLE, DISABLE);
     
-    
     EC20_Init();
-    memcpy(g_nSoftWare, (u8 *)(SYS_BOOT_VER_ADDR + 8), EC20_SOFTVERSON_LEN);
+    Sys_Delayms(5);
+    memcpy(g_nSoftWare, (u8 *)(SYS_BOOT_VER_ADDR ), EC20_SOFTVERSON_LEN);
+    
     //SysTick 初始化 5ms
     STick_InitSysTick();
     Sys_RunLedOff();
 
-    //系统空闲状态
-    
-    if(g_sFramBootParamenter.appState == FRAM_BOOT_APP_OK)
-    {
-        a_SetState(g_nSysState, SYS_STAT_IDLE);
-    }
-    else
-    {
-        a_SetState(g_nSysState, SYS_STAT_DOWNLOAD);
-        g_sDeviceUpDataInfo.flag = DEVICE_UPDATA_FLAG_RQ;
-    }
-    
-
     EC20_ConnectInit(&g_sEC20Connect, EC20_CNT_CMD_PWRON, &g_sEC20Params);
     a_SetState(g_sEC20Connect.state, EC20_CNT_OP_STAT_TX);
-
+ 
     //使能中断
     Sys_EnableInt();
 }
@@ -253,9 +229,35 @@ void Sys_Jump(u32 address)
 
 void Sys_BootTask(void)
 {
-    if(!a_CheckStateBit(g_nSysState, SYS_STAT_DOWNLOAD))
+    static u32 bootState =0;
+    
+    if(bootState != g_sFramBootParamenter.appState)
     {
-        if(g_nSysTick > 40 && g_sFramBootParamenter.appState == FRAM_BOOT_APP_OK)                //TICK = STICK_TIME_MS = 5MS, 延时200ms等待boot选择
+        if(g_sFramBootParamenter.appState == FRAM_BOOT_APP_OK || g_sFramBootParamenter.appState == FRAM_BOOT_APP_REPLACE_OVER || g_sFramBootParamenter.appState == FRAM_BOOT_APP_NULL_REPLACE)
+        {
+            a_SetState(g_nSysState, SYS_STAT_IDLE);
+        }
+        else if(g_sFramBootParamenter.appState == FRAM_BOOT_APP_DATA_DOWD || g_sFramBootParamenter.appState == FRAM_BOOT_APP_FAIL)
+        {
+            a_SetStateBit(g_nSysState, SYS_STAT_DOWNLOAD);
+            g_sDeviceUpDataInfo.flag = DEVICE_UPDATA_FLAG_RQ;
+        }
+        else if(g_sFramBootParamenter.appState == FRAM_BOOT_APP_DATA_DOWN_OVER)
+        {
+            a_SetStateBit(g_nSysState, SYS_STAT_CHK_VERSION);
+        }
+        else if(g_sFramBootParamenter.appState == FRAM_BOOT_APP_REPLACE || g_sFramBootParamenter.appState == FRAM_BOOT_APP_REPLACEING)
+        {
+            a_SetStateBit(g_nSysState, SYS_STAT_REPLACE_DATA);
+        }
+        
+        bootState = g_sFramBootParamenter.appState;
+        Fram_WriteBootParamenter();
+    }
+    
+    if(a_CheckStateBit(g_nSysState, SYS_STAT_IDLE))
+    {
+        if(g_nSysTick > 40)               
         {
             a_SetStateBit(g_nSysState, SYS_STAT_JMP);
         }
@@ -264,7 +266,29 @@ void Sys_BootTask(void)
     if(a_CheckStateBit(g_nSysState, SYS_STAT_JMP))
     {
        Sys_RunLedOff();
-       Sys_Jump(SYS_APP_START_ADDR);
+       a_ClearStateBit(g_nSysState, SYS_STAT_JMP);
+       if(Sys_CheckVersion())
+       {
+            Sys_Jump(SYS_APP_START_ADDR);
+       }
+       else
+       {
+            g_sFramBootParamenter.appState = FRAM_BOOT_APP_FAIL;
+       }
+    }
+    
+    if(a_CheckStateBit(g_nSysState, SYS_STAT_CHK_VERSION))
+    {
+       a_ClearStateBit(g_nSysState, SYS_STAT_CHK_VERSION);
+       
+       if(Device_Chk_Version())                                            //检查是否需要更新
+       {
+            g_sFramBootParamenter.appState = FRAM_BOOT_APP_REPLACE;
+       }
+       else
+       {
+            g_sFramBootParamenter.appState = FRAM_BOOT_APP_NULL_REPLACE;
+       }
     }
 }
 
@@ -686,37 +710,49 @@ void Sys_ServerTask(void)
 
 void Sys_DownDataTask()
 {
-    if(!a_CheckStateBit(g_nSysState, SYS_STAT_LTEDTU) && g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_FLAG_OVER)  //只有透传了，才需要进入该任务
+    if(!a_CheckStateBit(g_nSysState, SYS_STAT_LTEDTU) || !a_SetStateBit(g_nSysState, SYS_STAT_DOWNLOAD)) 
     {
         return;
     }
-    static u8 upTime = 0; 
+
+    static u8 upTime = 0, upTick = 0; 
     
     if(a_CheckStateBit(g_nSysState, SYS_STAT_UPDATA))
     {
-        upTime ++;
-        
         if(upTime == DEVICE_UPDATA_CHK_TIME)
         {
             upTime = 0;
             if(g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_FLAG_RQ)
             {
+                upTick ++;
                 Device_At_Rsp(EC20_CNT_TIME_1S, EC20_CNT_REPAT_NULL, DEVICE_HTTP_GET_REQUEST_CKECK);
             }
             else if(g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_FLAG_DOWN)
             {   
                 g_sDeviceUpDataInfo.flag = DEVICE_UPDATA_FLAG_DOWNING;
+                
                 Device_At_Rsp(EC20_CNT_TIME_1S * 2, EC20_CNT_REPAT_NULL, DEVICE_HTTP_GET_REQUEST_DOWNLOAD);
             }
             else if(g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_FLAG_FAIL)
             {   
-                
+                g_sFramBootParamenter.appState = FRAM_BOOT_APP_DATA_DOWD;
             }
             else if(g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_FLAG_OVER)
             {   
                 g_sDeviceUpDataInfo.flag = DEVICE_UPDATA_START;
+                g_sFramBootParamenter.appState = FRAM_BOOT_APP_DATA_DOWN_OVER;
             }
         
+        }
+        else
+        {
+            upTime ++;
+        }
+        
+        if(upTime == DEVICE_UPDATA_CHK_TIME)
+        {
+            upTime = 0;
+            g_sFramBootParamenter.appState = FRAM_BOOT_APP_NULL_REPLACE;
         }
         a_ClearStateBit(g_nSysState, SYS_STAT_UPDATA);
     }
@@ -725,39 +761,49 @@ void Sys_DownDataTask()
 
 void Sys_ReplaceDeviceTask()
 {
-    if(g_sDeviceUpDataInfo.flag != DEVICE_UPDATA_FLAG_OVER)  //固件下载完成，进入更新流程
+    if(!a_SetStateBit(g_nSysState, SYS_STAT_REPLACE_DATA))  //固件下载完成，进入更新流程
     {
         return;
     }
-
-    if(g_sDeviceUpDataInfo.type == DEVICE_TYPE_SM5001)
+    
+    static u8 flashTime = 0, sector = 0; 
+    u32 addr = 0;
+    
+    if(g_sFramBootParamenter.flag == DEVICE_TYPE_SM5001)
     {
-        if(a_CheckStateBit(g_nSysState, SYS_STAT_DOWNLOAD))
+        if(a_CheckStateBit(g_nSysState, SYS_STAT_WR_RE_FLASH))
         {
-        BOOL bOk = FALSE;
-        u32 addr = 0;
-        u8 sector = 0;
-                    
-        sector = g_sUartTempRcvFrame.buffer[UART_FRAME_POS_PAR];
-        addr = SYS_APP_START_ADDR + (sector << 10);         //每个扇区1K
-                    
-            if(addr >= SYS_APP_START_ADDR)
-            {
-                if(g_nDeviceNxtEraseAddr == addr)               //擦除地址必须是连续的，否则会有区域未擦除
+           a_ClearStateBit(g_nSysState, SYS_STAT_WR_RE_FLASH);
+           
+           if(0)//flashTime == 5)
+           {
+                flashTime = 0;
+                addr = SYS_APP_START_ADDR + (sector << 10);
+                if(addr >= SYS_APP_START_ADDR)
                 {
-                    g_nDeviceNxtEraseAddr = addr + (1 << 10);   //每个扇区1K
-                                    
-                    bOk = Uart_EraseFlash(addr); 
+                    if(g_nDeviceNxtEraseAddr == addr)               //擦除地址必须是连续的，否则会有区域未擦除
+                    {
+                        g_nDeviceNxtEraseAddr = addr + (1 << 10);   //每个扇区1K
+                                        
+                         if(Uart_EraseFlash(addr))
+                         {
+                            sector++;
+                         }
+                    }
                 }
-            }
+           }else
+           {
+                flashTime++;
+           }
+            a_ClearStateBit(g_nSysState, SYS_STAT_WR_RE_FLASH);
         }                                  
       
     }
-    else if(g_sDeviceUpDataInfo.type == DEVICE_TYPE_SM5002)
+    else if(g_sFramBootParamenter.flag == DEVICE_TYPE_SM5002)
     {
     
     }
-    else if(g_sDeviceUpDataInfo.type == DEVICE_TYPE_SM5003)
+    else if(g_sFramBootParamenter.flag == DEVICE_TYPE_SM5003)
     {
     
     }

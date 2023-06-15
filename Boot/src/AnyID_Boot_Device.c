@@ -32,10 +32,10 @@ void Device_CommunTxCmd(DEVICE_SENVER_TXBUFFER *pCntOp, u32 sysTick)
             strcat(atBuf,*(&EC20_PRDOCT_ID));
             strcat(atBuf,"/");
             strcat(atBuf, (const char *)(&g_nImsiStr));
-            strcat(atBuf,"/");
-            strcat(atBuf,"check?type=1&version=");
-            strcat(atBuf, (const char *)(&g_nSoftWare));
-            memcpy(g_nHttpAtBuf, atBuf, strlen(atBuf) - 2);
+            //strcat(atBuf, (char *)&g_sFramBootParamenter.verSion);
+            strcat(atBuf,"/check?type=1&version=");
+            strcat(atBuf, (char *)&g_sFramBootParamenter.verSion);
+            memcpy(g_nHttpAtBuf, atBuf, strlen(atBuf) - 3);
             strcat(g_nHttpAtBuf," HTTP/1.1\r\n");
             strcat(g_nHttpAtBuf,"Content-Type: application/json\r\n");
             strcat(g_nHttpAtBuf,"authorization:");
@@ -156,6 +156,8 @@ BOOL Device_Chk_VersionFrame(u8 *pBuffer, DEVICE_UPDATA_INFO *pDataInfo)
             memcpy(pDataInfo->md5, pBuffer + DEVICE_UPDATA_BUFFER_MD5_LEN, DEVICE_SOFTVERSION_MD5);
             Device_Analys_Data(pDataInfo);
             Device_Erase_Flash();  
+
+            g_sFramBootParamenter.flag = DEVICE_TYPE_SM5001;
             pDataInfo->type = DEVICE_TYPE_SM5001;
             pDataInfo->flag = DEVICE_UPDATA_FLAG_DOWN; 
             bOk = TRUE;
@@ -168,6 +170,8 @@ BOOL Device_Chk_VersionFrame(u8 *pBuffer, DEVICE_UPDATA_INFO *pDataInfo)
             memcpy(pDataInfo->md5, pBuffer + DEVICE_UPDATA_BUFFER_MD5_LEN, DEVICE_SOFTVERSION_MD5);
             Device_Analys_Data(pDataInfo);
             Device_Erase_Flash(); 
+
+            g_sFramBootParamenter.flag = DEVICE_TYPE_SM5002;
             pDataInfo->type = DEVICE_TYPE_SM5002;
             pDataInfo->flag = DEVICE_UPDATA_FLAG_DOWN; 
             bOk = TRUE;
@@ -180,6 +184,8 @@ BOOL Device_Chk_VersionFrame(u8 *pBuffer, DEVICE_UPDATA_INFO *pDataInfo)
             memcpy(pDataInfo->md5, pBuffer + DEVICE_UPDATA_BUFFER_MD5_LEN, DEVICE_SOFTVERSION_MD5);
             Device_Analys_Data(pDataInfo);
             Device_Erase_Flash(); 
+
+            g_sFramBootParamenter.flag = DEVICE_TYPE_SM5003;
             pDataInfo->type = DEVICE_TYPE_SM5003;
             pDataInfo->flag = DEVICE_UPDATA_FLAG_DOWN; 
             bOk = TRUE;
@@ -273,6 +279,39 @@ u32 Device_Search_Data(u8 *pBuffer)
     
     return i;
 }
+
+
+BOOL Device_Chk_Version()
+{
+    BOOL tf = FALSE;
+
+    if(Flash_ReadBuffer(FLASH_DATA_OPEN_ADDR + 2 * FLASH_UPDATA_LEN, FLASH_UPDATA_LEN, g_nFlashUpData))
+    {
+        if(g_sFramBootParamenter.flag == DEVICE_TYPE_SM5001)
+        {     
+           if(!memcmp(g_nFlashUpData, g_sFramBootParamenter.verSion, 8))
+            { 
+                if(memcmp(g_nFlashUpData, g_sFramBootParamenter.verSion, DEVICE_SOFTVERSION_NAME_LEN))
+                {       
+                    tf = TRUE;
+                }
+            }
+        }
+        else if(g_sFramBootParamenter.flag == DEVICE_TYPE_SM5002 || g_sFramBootParamenter.flag == DEVICE_TYPE_SM5003)
+        {
+            tf = TRUE;
+        }
+    }
+    
+    return tf;
+}
+
+
+
+
+
+
+
 
 BOOL Device_Erase_McuFlash(u32 addr)
 {

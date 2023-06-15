@@ -40,4 +40,7 @@ AnyID_Boot_Device.pbi: \
   E:\AnyID\Git\FY\SM5001\Boot\SM5001\..\inc/AnyID_Boot_R485_HL.h \
   E:\AnyID\Git\FY\SM5001\Boot\SM5001\..\inc/AnyID_Boot_FlashM25.h \
   E:\AnyID\Git\FY\SM5001\Boot\SM5001\..\inc/AnyID_FlashM25.h \
-  E:\AnyID\Git\FY\SM5001\Boot\SM5001\..\inc/AnyID_Boot_FLASH_HL.h
+  E:\AnyID\Git\FY\SM5001\Boot\SM5001\..\inc/AnyID_Boot_FLASH_HL.h \
+  E:\AnyID\Git\FY\SM5001\Boot\SM5001\..\inc/AnyID_Boot_FRam.h \
+  E:\AnyID\Git\FY\SM5001\Boot\SM5001\..\inc/AnyID_FRam.h \
+  E:\AnyID\Git\FY\SM5001\Boot\SM5001\..\inc/AnyID_Boot_FRam_HL.h

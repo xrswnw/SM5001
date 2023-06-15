@@ -337,7 +337,7 @@ BOOL Device_Set_Cfg(u8 *pBuffer);
 BOOL Device_WriteMqttKey();
 BOOL Device_GateProceRspFrame(u8 *pFrame, GATE_OPINFO *pOpInfo, u32 tick);
 BOOL Device_CommunCheckRsp(DEVICE_SENVER_TXBUFFER *pCntOp, u8 *pRxBuf);
-
+BOOL Device_Chk_Version();
 
 u8 Device_UrlEncode(char *sign);
 u8 Device_Chk_Door();

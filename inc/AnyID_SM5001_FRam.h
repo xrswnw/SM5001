@@ -6,13 +6,19 @@
 #define FRAM_BOOT_APP_OK                    0x5555
 #define FRAM_BOOT_APP_FAIL                  0xAAAA
 
+
+#define FRAM_VERSION_SIZE                       17
+
 typedef struct framBootDevicePar{
     u16 appState;
-    u16 rfu;
     u16 addr;
+    u8 version[FRAM_VERSION_SIZE];
     u16 crc;
 }FRAM_BOOTPARAMS;
 extern FRAM_BOOTPARAMS g_sFramBootParamenter;
+
+
+
 
 
 
@@ -23,8 +29,9 @@ extern FRAM_BOOTPARAMS g_sFramBootParamenter;
 #define REAM_IMEI_LEN                           15
 
 #define FRAME_MQTT_KEY_KEY                      150
+
 #define FRAME_BOOT_INFO_BACKUP_ADDR         (FRAME_MEM_SIZE - 512) 
-#define FRAME_BOOT_INFO_ADDR                (FRAME_MEM_SIZE - sizeof(FRAM_BOOTPARAMS))      //固件升级从480字节开始写，共512字节
+#define FRAME_BOOT_INFO_ADDR                (FRAME_MEM_SIZE - sizeof(FRAM_BOOTPARAMS)) 
 
 #define FRAME_KEY_ADDR                      0x1200          //key
 #define FRAME_KEY_BACKUP_ADDR               0x1280          //key

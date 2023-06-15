@@ -65,7 +65,6 @@ void Fram_ReadBootParamenter(void)
     if(bBackUp == FALSE && b == FALSE)
     {
         g_sFramBootParamenter.appState = FRAM_BOOT_APP_FAIL;
-        g_sFramBootParamenter.br = FRAM_BR_115200;
         
         Fram_WriteBootParamenter();
         Fram_WriteBackupBootParamenter();
@@ -134,16 +133,7 @@ BOOL Fram_WriteBackupBootParamenter(void)
 
 u32 Fram_GetUartBaudrate(void)
 {
-    if(g_sFramBootParamenter.br == FRAM_BR_9600)
-    {
-        return 9600;
-    }
-    else if(g_sFramBootParamenter.br == FRAM_BR_115200)
-    {
-        return 115200;
-    }
-    else
-    {
-        return 38400;
-    }
+
+    return 115200;
+
 }

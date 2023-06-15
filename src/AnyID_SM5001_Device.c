@@ -1,9 +1,9 @@
 #include "AnyID_SM5001_Device.h"
 
-const u8 DEVICE_VERSION[DEVICE_VERSION_SIZE]@0x08005000 = " SM5001 230601200 G230200";
+const u8 DEVICE_VERSION[DEVICE_VERSION_SIZE]@0x08005000 = "SM500100_23061502 GD322302";
 
 #define READER_HARDWARE_VERSION    "SM500100"
-#define READER_SOFTWARE_VERSION    "230601200"
+#define READER_SOFTWARE_VERSION    "23061500"
 
 READER_RSPFRAME g_sDeviceRspFrame = {0};
 DEVICE_PARAMS g_sDeviceParams = {0};
@@ -13,6 +13,7 @@ DEVICE_IMPRSP_INFO g_nDeviceImpRspInfo = {0};
 
 void Device_Init()
 {
+
     Device_ReadDeviceParamenter();
    /*
     memcpy(g_sMqttKey.keyBuffer, TESTTOKEN, W232_TOKEN_LEN);
@@ -82,7 +83,6 @@ void Device_ReadDeviceParamenter(void)                                         /
     {
         memset(&g_sDeviceParams, 0, sizeof(g_sDeviceParams));
         
-        //g_sDeviceParams.mode =  DEVICE_MODE_SFG;
         g_sDeviceParams.gateTick = GATE_OP_DLY_TIM;
         g_sDeviceParams.gateTxTick =  GATE_OP_TX_TIM;             
         g_sDeviceParams.gateNum = GATE_SLAVER_NUM;
@@ -112,8 +112,10 @@ void Device_ReadDeviceParamenter(void)                                         /
     }
     
     Fram_ReadBootParamenter();
-    if((g_sFramBootParamenter.appState != FRAM_BOOT_APP_OK))
+
+    if(Device_Chk_Version())
     {
+        memcpy(g_sFramBootParamenter.version, DEVICE_VERSION, FRAM_VERSION_SIZE);
         g_sFramBootParamenter.appState = FRAM_BOOT_APP_OK;
         Fram_WriteBootParamenter();
     }  
@@ -121,7 +123,17 @@ void Device_ReadDeviceParamenter(void)                                         /
 }
 
 
+BOOL Device_Chk_Version()
+{
+    BOOL tf = FALSE;
+    
+    if(memcmp(g_sFramBootParamenter.version, DEVICE_VERSION, FRAM_VERSION_SIZE) || g_sFramBootParamenter.appState != FRAM_BOOT_APP_OK)
+    {
+        tf = TRUE;
+    }
 
+    return tf;
+}
 
 void Device_ReadMqttKey()                                         //OK
 {
@@ -1352,9 +1364,9 @@ u16 Device_HeartFormat(u8 *pBuffer, u32 tick)
     pBuffer[pos++] = g_nImei[6];
     pBuffer[pos++] = (g_nImei[7] & 0xF0);
          
-    memcpy(pBuffer + pos, READER_SOFTWARE_VERSION, DEVICE_VERSION_LEN);
+    memcpy(pBuffer + pos, (&DEVICE_VERSION + 9), DEVICE_VERSION_LEN);
     pos += DEVICE_VERSION_LEN;
-    memcpy(pBuffer + pos, READER_HARDWARE_VERSION, DEVICE_VERSION_LEN);
+    memcpy(pBuffer + pos, (&DEVICE_VERSION + 0), DEVICE_VERSION_LEN);
     pos += DEVICE_VERSION_LEN;
       
     pBuffer[pos++] = (g_sElectInfo.electValue >> 24) & 0xFF;
@@ -1442,7 +1454,7 @@ void Device_IO_Ctr(u8 flag)
      if(a_CheckStateBit(g_sIoInfo.flag, IO_FLAG_TEMPR_UP) || a_CheckStateBit(g_sIoInfo.flag, IO_FLAG_FIRE) || a_CheckStateBit(g_sIoInfo.state, IO_STAT_WATER))//////smoke 
      {
        
-        if((a_CheckStateBit(g_sIoInfo.flag, IO_FLAG_TEMPR_UP) || a_CheckStateBit(g_sIoInfo.flag, IO_FLAG_FIRE)) && !a_CheckStateBit(g_sIoInfo.state, IO_STAT_FAN))//////smoke 
+        if((a_CheckStateBit(g_sIoInfo.flag, IO_FLAG_TEMPR_UP) || a_CheckStateBit(g_sIoInfo.flag, IO_FLAG_FIRE)) && !a_CheckStateBit(g_sIoInfo.state, IO_STAT_FAN) && !a_CheckStateBit(g_sIoInfo.state, IO_STAT_WATER))//////smoke 
          {
               IO_Fan_Open();
               a_SetStateBit(g_sIoInfo.state,IO_STAT_FAN);

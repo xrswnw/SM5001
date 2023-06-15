@@ -4,6 +4,7 @@
 #include "AnyID_Boot_EC20.h"
 #include "AnyID_Boot_Uart.h"
 #include "AnyID_Boot_FlashM25.h"
+#include "AnyID_Boot_FRam.h"
 
 #define DEVICE_SERVER_TXSTAT_IDLE       0
 #define DEVICE_SERVER_TXSTAT_WAIT       1
@@ -37,7 +38,7 @@
 #define DEVICE_DATA_MASK_R              0x0D
 #define DEVICE_DATA_MASK_N              0x0A
 
-#define DEVICE_UPDATA_CHK_TIME          50
+#define DEVICE_UPDATA_CHK_TIME          30
 
 #define DEVICE_UPDATA_SM5001            1
 #define DEVICE_UPDATA_SM5002            2
@@ -104,6 +105,7 @@ BOOL Device_WeiteData(DEVICE_UPDATA_INFO *pDataInfo);
 BOOL Device_CommunCheckRsp(DEVICE_SENVER_TXBUFFER *pCntOp, u8 *pRxBuf);
 BOOL Device_Chk_VersionFrame(u8 *pBuffer, DEVICE_UPDATA_INFO *pDataInfo);
 BOOL Device_Erase_McuFlash(u32 addr);
+BOOL Device_Chk_Version();
 
 void Device_Delayms(u32 n);
 void Device_CommunStep(DEVICE_SENVER_TXBUFFER *pCntOp);

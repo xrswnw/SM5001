@@ -5,7 +5,7 @@
 
 #include "AnyID_Boot_Uart.h"
 #include "AnyID_Boot_SysTick_HL.h"
-#include "AnyID_Boot_FRam.h"
+
 #include "AnyID_Boot_Device.h"
 
 
@@ -20,7 +20,9 @@ extern u8  g_nDeviceComType;
 #define SYS_STAT_ALARMLED       0x00000200
 #define SYS_STAT_LTEDTU         0x00000400
 #define SYS_STAT_UPDATA         0x00000800
-
+#define SYS_STAT_CHK_VERSION    0x00001000
+#define SYS_STAT_REPLACE_DATA   0x00002000
+#define SYS_STAT_WR_RE_FLASH    0x00004000
 
 #define SYS_STAT_HTTP_TEST      0x10000000
 
@@ -62,9 +64,9 @@ void Sys_ReplaceDeviceTask();
 
 void Sys_EC20Task(void);
 
-#define SYS_VER_HEAD                            " SM5001 "
+#define SYS_VER_HEAD                            "SM500100"
 #define SYS_VER_HEAD_SIZE                       8
-#define SYS_VER_HARD_TYPE                       "G230200"
+#define SYS_VER_HARD_TYPE                       "GD322302"
     
 
 #define SYS_VERSION_SIZE                        50  

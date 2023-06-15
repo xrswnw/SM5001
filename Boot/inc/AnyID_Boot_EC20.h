@@ -168,7 +168,7 @@ typedef struct EC20Par{
 #define EC20_SERVER_TX_TO_TIME                  100
 #define EC20_SERVER_RSP_LEN                     1500
 
-#define EC20_SOFTVERSON_LEN                   8
+#define EC20_SOFTVERSON_LEN                   17
 typedef struct EC20Connect{
     EC20_PARAMS params;
     u8 imsi[EC20_IMSI_LEN + 2];

@@ -16,7 +16,7 @@
         <LeaveTargetRunning>_ 0</LeaveTargetRunning>
     </JLinkDriver>
     <DebugChecksum>
-        <Checksum>2482061481</Checksum>
+        <Checksum>2504592298</Checksum>
     </DebugChecksum>
     <Trace1>
         <Enabled>0</Enabled>
@@ -58,14 +58,20 @@
     </SWOTraceHWSettings>
     <struct_types>
         <Fmt0>ELECT_INFO-electValue	4	0</Fmt0>
-        <Fmt1>GATE_SENSORINFO-tmpr	3	0</Fmt1>
-        <Fmt2>IO_INFO-state	1	0</Fmt2>
-        <Fmt3>IO_INFO-tempState	1	0</Fmt3>
-        <Fmt4>MQTT_FRAM_KEY-len	3	0</Fmt4>
-        <Fmt5>WINAVG_INFO-t	3	0</Fmt5>
+        <Fmt1>FRAM_BOOTPARAMS-appState	4	0</Fmt1>
+        <Fmt2>FRAM_BOOTPARAMS-crc	4	0</Fmt2>
+        <Fmt3>GATE_SENSORINFO-tmpr	3	0</Fmt3>
+        <Fmt4>IO_INFO-state	1	0</Fmt4>
+        <Fmt5>IO_INFO-tempState	1	0</Fmt5>
+        <Fmt6>MQTT_FRAM_KEY-len	3	0</Fmt6>
+        <Fmt7>WINAVG_INFO-t	3	0</Fmt7>
     </struct_types>
+    <array_types>
+        <Fmt0>u16[50]	5	0</Fmt0>
+    </array_types>
     <watch_formats>
-        <Fmt0>{W}1:index	3	0</Fmt0>
+        <Fmt0>{W}1:addr	4	0</Fmt0>
+        <Fmt1>{W}1:index	3	0</Fmt1>
     </watch_formats>
     <Trace2>
         <Enabled>0</Enabled>
@@ -152,7 +158,19 @@
     </DisassembleMode>
     <Breakpoints2>
         <Bp0>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_Device.c}.0.1" 0 0 1 "" 0 "" 0</Bp0>
-        <Count>1</Count>
+        <Bp1>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_FRam_HL.c}.94.9" 0 0 1 "" 0 "" 0</Bp1>
+        <Bp2>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_Device.c}.152.13" 0 0 1 "" 0 "" 0</Bp2>
+        <Bp3>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_Device.c}.166.13" 0 0 1 "" 0 "" 0</Bp3>
+        <Bp4>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_Device.c}.172.9" 0 0 1 "" 0 "" 0</Bp4>
+        <Bp5>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_Device.c}.180.9" 0 0 1 "" 0 "" 0</Bp5>
+        <Bp6>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_Device.c}.185.9" 0 0 1 "" 0 "" 0</Bp6>
+        <Bp7>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_Device.c}.132.9" 0 0 1 "" 0 "" 0</Bp7>
+        <Bp8>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_Device.c}.971.21" 0 0 1 "" 0 "" 0</Bp8>
+        <Bp9>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_Device.c}.1239.11" 0 0 1 "" 0 "" 0</Bp9>
+        <Bp10>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_Device.c}.1237.9" 0 0 1 "" 0 "" 0</Bp10>
+        <Bp11>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_SysCfg.c}.771.29" 0 0 1 "" 0 "" 0</Bp11>
+        <Bp12>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_Device.c}.1233.5" 0 0 1 "" 0 "" 0</Bp12>
+        <Count>13</Count>
     </Breakpoints2>
     <Aliases>
         <Count>0</Count>
