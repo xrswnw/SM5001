@@ -30,6 +30,7 @@
 #define SOUND_FRAME_CMD_APPOINT_FOLDER  0x0F
 #define SOUND_FRAME_CMD_VOL_HIGH        0x04
 #define SOUND_FRAME_CMD_VOL_LOW         0x05
+#define SOUND_FRAME_CMD_VOL_STR_AOP     0x06
 #define SOUND_FRAME_CMD_ROUND_STAR      0x11
 #define SOUND_FRAME_CMD_ROUND_STOP      0x16
 #define SOUND_FRAME_CMD_GET_VOL         0x43
@@ -79,6 +80,9 @@
 #define SOUND_VOC_OPEN_DEVICE           12
 
 
+
+#define SOUND_VOC_FRAME_NULL             0
+
 #define SOUND_VOICE_RTU_BAT             1
 #define SOUND_VOICE_BRW_BAT             2
 #define SOUND_VOICE_NO_BAT              3
@@ -92,28 +96,38 @@
 #define SOUND_VOICE_BAT_SN_FAIL         11
 #define SOUND_VOICE_PAKEAGE_DIE         12
 #define SOUND_VOICE_FIRE_WRAN           13
+#define SOUND_VOICE_CTR_STRENGH         14
+#define SOUND_VOICE_GET_STRENGH         15
 
 
-#define SOUND_REPAT_THREE                    3
-#define SOUND_OP_NUM                         32
-#define SOUND_RESULT_OK                      0
-#define SOUND_RESULT_FAIL                    1
-#define SOUND_RESULT_TO                      2
+
+#define SOUND_VOCIE_STR_UP              0x04
+#define SOUND_VOCIE_STR_DOWN            0x05
 
 
+#define SOUND_REPAT_THREE               3
+#define SOUND_OP_NUM                    32
+#define SOUND_RESULT_OK                 0
+#define SOUND_RESULT_FAIL               1
+#define SOUND_RESULT_TO                 2
+
+
+#define SOUND_VOCIE_MAX                 0x1E
 
 #define SOUND_OP_TIM                    800
 
 #define SOUND_VOICE_NUM                 100
-#define SOUND_REPAT_TIME                    3
-#define SOUND_REPAT_NULL                    1
+#define SOUND_REPAT_TIME                3
+#define SOUND_REPAT_NULL                1
 
-#define SOUND_CNT_TIME_1S                        200
-#define SOUND_CNT_TIME_500MS                     100
-#define SOUND_CNT_TIME_100MS                     20
+#define SOUND_CNT_TIME_1S               200
+#define SOUND_CNT_TIME_500MS            100
+#define SOUND_CNT_TIME_100MS            20
 
-#define SOUNE_VOICE_IDLE                  0
-#define SOUNE_VOICE_LOADING               1
+#define SOUNE_VOICE_IDLE                0
+#define SOUNE_VOICE_LOADING             1
+
+#define SOUND_VOICE_TEST_FLAG           1
 
 #define Sound_IsRcvFrame(rcvFrame)               ((rcvFrame).state == SOUND_STAT_RCV || (rcvFrame).state == SOUND_STAT_OVR)
 #define Sound_ResetFrame(rcvFrame)               do{(rcvFrame).state = SOUND_STAT_IDLE ; (rcvFrame).repeat =0;}while(0)
@@ -156,6 +170,7 @@ typedef struct soundRxBuffer{
 
 
 typedef struct soundInfo{
+    u8 test;
     u8 state;
     u8 flag;
     u8 index;

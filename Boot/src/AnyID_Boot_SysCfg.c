@@ -249,6 +249,7 @@ void Sys_BootTask(void)
         else if(g_sFramBootParamenter.appState == FRAM_BOOT_APP_REPLACE || g_sFramBootParamenter.appState == FRAM_BOOT_APP_REPLACEING)
         {
             a_SetStateBit(g_nSysState, SYS_STAT_REPLACE_DATA);
+            g_nDeviceNxtEraseAddr = SYS_APP_START_ADDR;
         }
         
         bootState = g_sFramBootParamenter.appState;
@@ -666,7 +667,7 @@ void Sys_ServerTask(void)
         }
     }
    
-   
+  
      if(a_CheckStateBit(g_sDeviceServerTxBuf.state, EC20_CNT_OP_STAT_STEP))    //下一步逻辑处理
     {
         a_ClearStateBit(g_sDeviceServerTxBuf.state, EC20_CNT_OP_STAT_STEP);
@@ -775,20 +776,36 @@ void Sys_ReplaceDeviceTask()
         {
            a_ClearStateBit(g_nSysState, SYS_STAT_WR_RE_FLASH);
            
-           if(0)//flashTime == 5)
+           if(flashTime == 5)
            {
                 flashTime = 0;
-                addr = SYS_APP_START_ADDR + (sector << 10);
-                if(addr >= SYS_APP_START_ADDR)
+                if(g_sDeviceUpDataInfo.state == DEVICE_UPDATA_ERASE_FLASH)
                 {
-                    if(g_nDeviceNxtEraseAddr == addr)               //擦除地址必须是连续的，否则会有区域未擦除
+                    addr = SYS_APP_START_ADDR + (sector << 10);
+                    if(addr >= SYS_APP_START_ADDR)
                     {
-                        g_nDeviceNxtEraseAddr = addr + (1 << 10);   //每个扇区1K
-                                        
-                         if(Uart_EraseFlash(addr))
-                         {
-                            sector++;
-                         }
+                        if(g_nDeviceNxtEraseAddr == addr)               //擦除地址必须是连续的，否则会有区域未擦除
+                        {
+                            g_nDeviceNxtEraseAddr = addr + (1 << 10);   //每个扇区1K
+                            if(addr <= 0x0804000)
+                            {
+                                if(Uart_EraseFlash(addr))
+                                {
+                                    sector++;
+                                }
+                            }
+                            else
+                            {
+                                sector = 0;
+                                g_nDeviceNxtEraseAddr = 0;
+                                g_sDeviceUpDataInfo.state = DEVICE_UPDATA_WRITE_FLASH;
+                            }
+                        }
+                    }
+                    else if(g_sDeviceUpDataInfo.state == DEVICE_UPDATA_WRITE_FLASH)
+                    {
+                    
+                    
                     }
                 }
            }else

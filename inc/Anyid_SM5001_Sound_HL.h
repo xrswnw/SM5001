@@ -10,6 +10,13 @@
 
 #define Sound_ChkTxOver()                 while(((SOUND_PORT)->SR & USART_FLAG_TC) == (u16)RESET)
 
+
+
+extern const PORT_INF SOUND_PORT_CTL;
+#define Sounde_Close()                  SOUND_PORT_CTL.Port->BRR = SOUND_PORT_CTL.Pin
+#define Sounde_Open()                   SOUND_PORT_CTL.Port->BSRR = SOUND_PORT_CTL.Pin
+
+
 #define Sound_ReadByte()                  ((u16)(SOUND_PORT->DR & (u16)0x01FF))
 void Sound_InitInterface(u32 baudrate);
 void Sound_ConfigInt(void);

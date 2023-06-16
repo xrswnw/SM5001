@@ -5,16 +5,17 @@
 
 #define FRAM_BOOT_APP_OK                    0x5555
 #define FRAM_BOOT_APP_FAIL                  0xAAAA
-
-
-#define FRAM_VERSION_SIZE                       17
+#define FRAM_BOOT_APP_DATA_DOWD             0x1111
+#define FRAM_VERSION_SIZE                   17
 
 typedef struct framBootDevicePar{
+    u8 flag;
     u16 appState;
     u16 addr;
-    u8 version[FRAM_VERSION_SIZE];
+    u8 verSion[FRAM_VERSION_SIZE];
     u16 crc;
 }FRAM_BOOTPARAMS;
+
 extern FRAM_BOOTPARAMS g_sFramBootParamenter;
 
 

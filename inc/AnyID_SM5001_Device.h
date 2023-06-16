@@ -46,6 +46,7 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define DEVICE_CMD_GET_VERSION              0xF7
 #define DEVICE_CMD_GATE_DISENABLE           0x23
 #define DEVICE_CMD_GATE_KEY_CTR             0x24
+#define DEVICE_CMD_GATE_VOICE_CTR           0x25
 #define DEVICE_CMD_MQTT_KEY_WRITE           0x52
 #define DEVICE_CMD_MQTT_GET_IMEI            0x53
 
@@ -61,7 +62,7 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define DEVICE_SERVER_SATA_TX               2
 #define DEVICE_SERVER_SATA_RX               3
 
-#define DEVICE_TEMPR_HIGH                       60
+#define DEVICE_TEMPR_HIGH                       32
 
 #define DEVICE_HEART_MIN                     570
 
@@ -210,7 +211,7 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define Device_Gate_PlBat(add,v)                do{g_sGateOpInfo.add = add - 1;g_sGateOpInfo.state = GATE_OP_STAT_WAIT;g_sGateOpInfo.mode = GATE_MODE_CMD;g_sGateOpInfo.cmd = GATE_FRAME_CMD_PLANE_BAT;g_sGateOpInfo.slvIndex = (add -1)>> 1;g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;g_sGateOpInfo.slvCmd.params[1]= v;g_sGateOpInfo.slvCmd.paramsLen = DEVICE_BAT_SN_LEN + 1 + 1;}while(0)
 
 #define Device_Voice_Apo(opt,repat,cmd,vn)     do{g_sSoundInfo.txBuf.index = 0;g_sSoundInfo.txBuf.num = 0;/**/g_sSoundInfo.txBuf.cd[g_sSoundInfo.txBuf.num] = SOUND_FRAME_CMD_APPOINT_FOLDER; g_sSoundInfo.txBuf.to[g_sSoundInfo.txBuf.num] = opt;g_sSoundInfo.txBuf.id[g_sSoundInfo.txBuf.num] = vn;g_sSoundInfo.txBuf.repeat[g_sSoundInfo.txBuf.num] = repat;g_sSoundInfo.txBuf.op[g_sSoundInfo.txBuf.num++] = cmd;g_sSoundInfo.state = SOUND_STAT_TX;}while(0)
-//#define Device_Voice_Apo(opt,repat,cmd,vn)     do{g_sSoundInfo.txBuf.index = 0;g_sSoundInfo.txBuf.num = 0;g_sSoundInfo.txBuf.to[g_sSoundInfo.txBuf.num] = 20;g_sSoundInfo.txBuf.id[g_sSoundInfo.txBuf.num] = SOUND_VOICE_STOP;g_sSoundInfo.txBuf.repeat[g_sSoundInfo.txBuf.num] = 3;g_sSoundInfo.txBuf.cd[g_sSoundInfo.txBuf.num] = SOUND_FRAME_CMD_ROUND_STOP;g_sSoundInfo.txBuf.op[g_sSoundInfo.txBuf.num++] = cmd;/**/g_sSoundInfo.txBuf.cd[g_sSoundInfo.txBuf.num] = SOUND_FRAME_CMD_APPOINT_FOLDER; g_sSoundInfo.txBuf.to[g_sSoundInfo.txBuf.num] = opt;g_sSoundInfo.txBuf.id[g_sSoundInfo.txBuf.num] = vn;g_sSoundInfo.txBuf.repeat[g_sSoundInfo.txBuf.num] = repat;g_sSoundInfo.txBuf.op[g_sSoundInfo.txBuf.num++] = cmd;g_sSoundInfo.state = SOUND_STAT_TX;}while(0)
+#define Device_Voice_Ctr(opt,repat,cmd,vn)     do{g_sSoundInfo.txBuf.index = 0;g_sSoundInfo.txBuf.num = 0;g_sSoundInfo.txBuf.to[g_sSoundInfo.txBuf.num] = opt;g_sSoundInfo.txBuf.id[g_sSoundInfo.txBuf.num] = vn;g_sSoundInfo.txBuf.repeat[g_sSoundInfo.txBuf.num] = repat;g_sSoundInfo.txBuf.cd[g_sSoundInfo.txBuf.num] = SOUND_FRAME_CMD_VOL_STR_AOP;g_sSoundInfo.txBuf.op[g_sSoundInfo.txBuf.num++] = cmd;g_sSoundInfo.state = SOUND_STAT_TX;}while(0)
 #define Device_At_Rsp(opt,repat,cmd)      do{g_nDeviceServerTxBuf.to[g_nDeviceServerTxBuf.num] = opt;g_nDeviceServerTxBuf.repeat[g_nDeviceServerTxBuf.num] = repat;g_nDeviceServerTxBuf.op[g_nDeviceServerTxBuf.num++] = cmd;g_nDeviceServerTxBuf.state |= DEVICE_SERVER_TXST_AT;}while(0)
 
 

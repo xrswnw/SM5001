@@ -151,7 +151,7 @@ void Sys_Init(void)
     
     IO_Realy_Open();  //²âÊÔ´ò¿ª
     
-    Device_Init();
+    
     W232_Init();
     
     Sound_Init();
@@ -162,7 +162,7 @@ void Sys_Init(void)
     Water_Init();
     Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();  Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();
     Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();  Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();
-
+    Device_Init();
 #if SYS_ENABLE_WDT
     WDG_FeedIWDog();
 #endif
@@ -174,11 +174,6 @@ void Sys_Init(void)
     a_SetStateBit(g_nSysState, SYS_STAT_KEY_CHK); 
     Sys_LedOff();
     
-
-
-    W232_ConnectInit(&g_sW232Connect, W232_CNT_CMD_PWRON, &g_sDeviceParams.serverParams);
-    a_SetState(g_sW232Connect.state, W232_CNT_OP_STAT_TX);
-    Device_Voice_Apo(SOUND_CNT_TIME_1S * 2, SOUND_REPAT_NULL, SOUND_VOICE_DI, SOUND_VOC_OPEN_DEVICE);
     Sys_EnableInt();
     
 }
@@ -207,7 +202,6 @@ void Sys_LedTask(void)
         
         if(a_CheckStateBit(g_nSysState, SYS_STAT_MQTT_ACCESS))
         {
-            
             if(g_nLedDelayTime & 0x0A)
             {
                 
@@ -219,12 +213,6 @@ void Sys_LedTask(void)
             }
             
         }
-
-        if(a_CheckStateBit(g_nSysState, SYS_STAT_FIRE_TEST))
-        {
-     
-        }
-           
     }
   
 }
@@ -366,9 +354,15 @@ void Sys_SoundTask()
             {
                 g_sSoundInfo.txBuf.result = SOUND_RESULT_OK;
                 g_sSoundInfo.txBuf.flag = SOUNE_VOICE_IDLE;
-                //a_ClearStateBit(g_sSoundInfo.state, SOUND_STAT_WAIT);
                 a_SetState(g_sSoundInfo.state, SOUND_STAT_STEP);
                 Sound_ClearRxBuffer();
+                Sounde_Close();
+                
+                if(g_sSoundInfo.test == SOUND_VOICE_TEST_FLAG)
+                {
+                    a_SetState(g_sSoundInfo.test , SYS_NULL_TICK);
+                    Device_Voice_Apo(SOUND_CNT_TIME_1S , SOUND_REPAT_NULL, SOUND_VOICE_DI, SOUND_VOC_DI);
+                }
             }
             else
             {
@@ -391,6 +385,7 @@ void Sys_SoundTask()
                 g_sSoundInfo.txBuf.flag = SOUNE_VOICE_LOADING;
                 a_SetState(g_sSoundInfo.state, SOUND_STAT_RCV | SOUND_STAT_WAIT);
             }
+            Sounde_Open();
     }
     
     if(a_CheckStateBit(g_sSoundInfo.state, SOUND_STAT_WAIT))    

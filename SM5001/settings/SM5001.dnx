@@ -16,7 +16,7 @@
         <LeaveTargetRunning>_ 0</LeaveTargetRunning>
     </JLinkDriver>
     <DebugChecksum>
-        <Checksum>2504592298</Checksum>
+        <Checksum>4020341001</Checksum>
     </DebugChecksum>
     <Trace1>
         <Enabled>0</Enabled>
@@ -159,18 +159,10 @@
     <Breakpoints2>
         <Bp0>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_Device.c}.0.1" 0 0 1 "" 0 "" 0</Bp0>
         <Bp1>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_FRam_HL.c}.94.9" 0 0 1 "" 0 "" 0</Bp1>
-        <Bp2>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_Device.c}.152.13" 0 0 1 "" 0 "" 0</Bp2>
-        <Bp3>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_Device.c}.166.13" 0 0 1 "" 0 "" 0</Bp3>
-        <Bp4>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_Device.c}.172.9" 0 0 1 "" 0 "" 0</Bp4>
-        <Bp5>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_Device.c}.180.9" 0 0 1 "" 0 "" 0</Bp5>
-        <Bp6>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_Device.c}.185.9" 0 0 1 "" 0 "" 0</Bp6>
-        <Bp7>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_Device.c}.132.9" 0 0 1 "" 0 "" 0</Bp7>
-        <Bp8>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_Device.c}.971.21" 0 0 1 "" 0 "" 0</Bp8>
-        <Bp9>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_Device.c}.1239.11" 0 0 1 "" 0 "" 0</Bp9>
-        <Bp10>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_Device.c}.1237.9" 0 0 1 "" 0 "" 0</Bp10>
-        <Bp11>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_SysCfg.c}.771.29" 0 0 1 "" 0 "" 0</Bp11>
-        <Bp12>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_Device.c}.1233.5" 0 0 1 "" 0 "" 0</Bp12>
-        <Count>13</Count>
+        <Bp2>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_Device.c}.1000.25" 0 0 1 "" 0 "" 0</Bp2>
+        <Bp3>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_Device.c}.1000.25" 0 0 1 "" 0 "" 0</Bp3>
+        <Bp4>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_Device.c}.995.25" 0 0 1 "" 0 "" 0</Bp4>
+        <Count>5</Count>
     </Breakpoints2>
     <Aliases>
         <Count>0</Count>

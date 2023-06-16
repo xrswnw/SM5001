@@ -172,17 +172,9 @@ void Sound_CtrTxCmd(SOUND_TX_BUF *pCntOp, u32 sysTick)
     {
         case SOUND_VOICE_RTU_BAT:
           
-           /* if(pCntOp->id[pCntOp->index] == SOUND_VOICE_STOP)
-            {
-                Sound_Voice_Appoint(g_nSysTick, SOUND_VOICE_STOP, pCntOp->id[pCntOp->index], pCntOp->cd[pCntOp->index]);
-                Sound_TransmitCmd(SOOUND_FEEDBACK_NEED);
-            }
-            else    */
-            {
                 Sound_Voice_Appoint(g_nSysTick, SOUND_FOLDER_RETUEN_BAT, pCntOp->id[pCntOp->index], pCntOp->cd[pCntOp->index]);
                 Sound_TransmitCmd(SOOUND_FEEDBACK_NO);
-            }
-            //Sound_TransmitCmd(SOOUND_FEEDBACK_NO);
+
             break;
         case SOUND_VOICE_BRW_BAT:
           
@@ -234,6 +226,16 @@ void Sound_CtrTxCmd(SOUND_TX_BUF *pCntOp, u32 sysTick)
             Sound_Voice_Appoint(g_nSysTick, SOUND_FOLDER_PROMPT, pCntOp->id[pCntOp->index], pCntOp->cd[pCntOp->index]);
             Sound_TransmitCmd(SOOUND_FEEDBACK_NO);
             break;
+        case SOUND_VOICE_CTR_STRENGH:
+          
+            Sound_Voice_Appoint(g_nSysTick, SOUND_VOC_FRAME_NULL, pCntOp->id[pCntOp->index], pCntOp->cd[pCntOp->index]);
+            Sound_TransmitCmd(SOOUND_FEEDBACK_NEED);
+          break;
+        case SOUND_VOICE_GET_STRENGH:
+          
+            Sound_Voice_Appoint(g_nSysTick, SOUND_VOC_FRAME_NULL, SOUND_VOC_FRAME_NULL, SOUND_FRAME_CMD_GET_VOL);
+            Sound_TransmitCmd(SOOUND_FEEDBACK_NO);
+          break;
     }
     pCntOp->tick = sysTick;
 }
@@ -259,6 +261,8 @@ void Sound_ConnectStep(SOUND_TX_BUF *pCntOp)
         case SOUND_VOICE_BAT_SN_FAIL:
         case SOUND_VOICE_PAKEAGE_DIE:
         case SOUND_VOICE_FIRE_WRAN:
+        case SOUND_VOICE_CTR_STRENGH:
+        case SOUND_VOICE_GET_STRENGH:
             if(pCntOp->result == SOUND_RESULT_OK)
             {
                 pCntOp->repeat[pCntOp->index] = 0;

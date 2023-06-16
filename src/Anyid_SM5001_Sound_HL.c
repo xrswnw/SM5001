@@ -4,6 +4,7 @@
 #define SOUND_INT_CHANNEL           USART1_IRQn
 const PORT_INF SOUND_PORT_TX      = {GPIOA, GPIO_Pin_9};
 const PORT_INF SOUND_PORT_RX      = {GPIOA, GPIO_Pin_10};
+const PORT_INF SOUND_PORT_CTL     = {GPIOC, GPIO_Pin_2};
 
 /*
 #define SOUND_INT_CHANNEL           UART4_IRQn
@@ -20,7 +21,13 @@ void Sound_InitInterface(u32 baudrate)
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
     GPIO_Init(SOUND_PORT_TX.Port, &GPIO_InitStructure);
-
+    
+    GPIO_InitStructure.GPIO_Pin = SOUND_PORT_CTL.Pin;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+    GPIO_Init(SOUND_PORT_CTL.Port, &GPIO_InitStructure);
+    
+    //Sounde_Open();
     GPIO_InitStructure.GPIO_Pin = SOUND_PORT_RX.Pin;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
     GPIO_Init(SOUND_PORT_RX.Port, &GPIO_InitStructure);    
