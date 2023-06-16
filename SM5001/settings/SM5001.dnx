@@ -16,7 +16,7 @@
         <LeaveTargetRunning>_ 0</LeaveTargetRunning>
     </JLinkDriver>
     <DebugChecksum>
-        <Checksum>2020626081</Checksum>
+        <Checksum>3298520135</Checksum>
     </DebugChecksum>
     <Trace1>
         <Enabled>0</Enabled>
@@ -159,7 +159,8 @@
     <Breakpoints2>
         <Bp0>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_Device.c}.0.1" 0 0 1 "" 0 "" 0</Bp0>
         <Bp1>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_FRam_HL.c}.94.9" 0 0 1 "" 0 "" 0</Bp1>
-        <Count>2</Count>
+        <Bp2>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_FRam.c}.46.9" 0 0 1 "" 0 "" 0</Bp2>
+        <Count>3</Count>
     </Breakpoints2>
     <Aliases>
         <Count>0</Count>
