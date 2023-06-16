@@ -170,6 +170,7 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define DEVICE_TMPR_ALARM_DFT           30
 #define DEVICE_LED_LOWVOL_DFT           80
 
+
 #define DEVICE_CRC32_LEN                4
 
 #define DEVICE_STAT_CHK_TIM             5

@@ -99,7 +99,7 @@
 #define SOUND_VOICE_CTR_STRENGH         14
 #define SOUND_VOICE_GET_STRENGH         15
 
-
+#define SOUND_VOCIE_STR_NORMAL          15
 
 #define SOUND_VOCIE_STR_UP              0x04
 #define SOUND_VOCIE_STR_DOWN            0x05

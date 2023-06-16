@@ -969,7 +969,7 @@
                     <item>g_nFlashUpData</item>
                     <item>g_sFramBootParamenter</item>
                     <item>g_nSysState</item>
-                    <item></item>
+                    <item />
                 </expressions>
                 <col-names>
                     <item>Expression</item>
