@@ -250,6 +250,7 @@ typedef struct deviceParams{
     u16 rfu2;
     u8 addr;
     u8 offLineTime;
+    u8 voiceStreng;
     u16 heartTick;
     GATE_PARAMS gateParams;
     u16 gateTick;                       //仓控交互数据时间间隔

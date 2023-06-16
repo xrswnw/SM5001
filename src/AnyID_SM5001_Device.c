@@ -1,6 +1,6 @@
 #include "AnyID_SM5001_Device.h"
 
-const u8 DEVICE_VERSION[DEVICE_VERSION_SIZE]@0x08005000 = "SM500100_23061504 GD322302";
+const u8 DEVICE_VERSION[DEVICE_VERSION_SIZE]@0x08005000 = "SM500100_23061505 GD322302";
 
 
 READER_RSPFRAME g_sDeviceRspFrame = {0};
@@ -20,7 +20,7 @@ void Device_Init()
     a_SetState(g_sW232Connect.state, W232_CNT_OP_STAT_TX);
     //Device_Voice_Apo(SOUND_CNT_TIME_1S * 2, SOUND_REPAT_NULL, SOUND_VOICE_DI, SOUND_VOC_OPEN_DEVICE);
     
-    Device_Voice_Ctr(SOUND_CNT_TIME_1S * 2 , SOUND_REPAT_NULL, SOUND_VOICE_CTR_STRENGH, SOUND_VOCIE_STR_NORMAL);
+    Device_Voice_Ctr(SOUND_CNT_TIME_1S * 2 , SOUND_REPAT_NULL, SOUND_VOICE_CTR_STRENGH, g_sDeviceParams.voiceStreng);
     g_sSoundInfo.test = SOUND_VOICE_TEST_FLAG;
     
    /*
@@ -88,6 +88,7 @@ void Device_ReadDeviceParamenter(void)                                         /
     {
         memset(&g_sDeviceParams, 0, sizeof(g_sDeviceParams));
         
+        g_sDeviceParams.voiceStreng = SOUND_VOCIE_STR_NORMAL;
         g_sDeviceParams.gateTick = GATE_OP_DLY_TIM;
         g_sDeviceParams.gateTxTick =  GATE_OP_TX_TIM;             
         g_sDeviceParams.gateNum = GATE_SLAVER_NUM;
@@ -126,6 +127,8 @@ void Device_ReadDeviceParamenter(void)                                         /
     }  
 
 }
+
+
 
 
 BOOL Device_Chk_Version()
@@ -924,7 +927,9 @@ u16 Reader_ProcessUartFrame(u8 *pFrame, u8 add, u16 len, u32 tick)
                   {
                         if(*(pFrame + 0) <= SOUND_VOCIE_MAX)
                         {
-                           Device_Voice_Ctr(SOUND_CNT_TIME_1S * 2 , SOUND_REPAT_NULL, SOUND_VOICE_CTR_STRENGH, *(pFrame + 0));
+                           g_sDeviceParams.voiceStreng = *(pFrame + 0);
+                           Device_WriteDeviceParamenter();
+                           Device_Voice_Ctr(SOUND_CNT_TIME_1S * 2 , SOUND_REPAT_NULL, SOUND_VOICE_CTR_STRENGH, g_sDeviceParams.voiceStreng);
                            g_sSoundInfo.test = SOUND_VOICE_TEST_FLAG;
                         }
                         else
@@ -978,6 +983,7 @@ u16 Reader_ProcessUartFrame(u8 *pFrame, u8 add, u16 len, u32 tick)
                     if(add == DEVICE_SM5001_ID)
                     {
                         Device_Set_Cfg(pFrame);
+                        Device_WriteDeviceParamenter();
                         
                     }
                     else
