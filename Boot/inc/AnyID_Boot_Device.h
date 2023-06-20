@@ -41,7 +41,7 @@
 #define DEVICE_UPDATA_ERASE_FLASH       0x00
 #define DEVICE_UPDATA_WRITE_FLASH       0x01
 
-#define DEVICE_UPDATA_CHK_TIME          30
+#define DEVICE_UPDATA_CHK_TIME          10
 
 #define DEVICE_UPDATA_SM5001            1
 #define DEVICE_UPDATA_SM5002            2

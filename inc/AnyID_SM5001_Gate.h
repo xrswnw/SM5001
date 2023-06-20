@@ -163,6 +163,8 @@ typedef struct gateRxFrame{
 #define GATE_OP_TO_TIM          200
 #define GATE_OP_TX_TIM          0x05
 
+#define GATE_OP_BR_BAT_TIM      12000
+
 #define CHAG_STEP_NUM           3
 #define CHAG_STEP_IDX0          0
 #define CHAG_STEP_IDX1          1
@@ -221,6 +223,7 @@ typedef struct gateParams{
 
 #define GATE_OP_BAT_STAT_OVER                       0x01
 #define GATE_OP_BAT_STAT_ING                        0x02
+#define GATE_OP_BAT_STAT_OPEN                       0x04
 
 
 #define GATE_FLAG_DOOR_TEST             1

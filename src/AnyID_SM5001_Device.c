@@ -1,6 +1,6 @@
 #include "AnyID_SM5001_Device.h"
 
-const u8 DEVICE_VERSION[DEVICE_VERSION_SIZE]@0x08005000 = "SM500100_23061505 GD322302";
+const u8 DEVICE_VERSION[DEVICE_VERSION_SIZE]@0x08005000 = "SM500100_23061901 GD322302";
 
 
 READER_RSPFRAME g_sDeviceRspFrame = {0};
@@ -18,10 +18,9 @@ void Device_Init()
     Device_ReadMqttKey();
     W232_ConnectInit(&g_sW232Connect, W232_CNT_CMD_PWRON, &g_sDeviceParams.serverParams);
     a_SetState(g_sW232Connect.state, W232_CNT_OP_STAT_TX);
-    //Device_Voice_Apo(SOUND_CNT_TIME_1S * 2, SOUND_REPAT_NULL, SOUND_VOICE_DI, SOUND_VOC_OPEN_DEVICE);
+    Device_Voice_Apo(SOUND_CNT_TIME_1S * 2, SOUND_REPAT_NULL, SOUND_VOICE_DI, SOUND_VOC_OPEN_DEVICE);
     
-    Device_Voice_Ctr(SOUND_CNT_TIME_1S * 2 , SOUND_REPAT_NULL, SOUND_VOICE_CTR_STRENGH, g_sDeviceParams.voiceStreng);
-    g_sSoundInfo.test = SOUND_VOICE_TEST_FLAG;
+    //Device_Voice_Ctr(SOUND_CNT_TIME_1S * 2 , SOUND_REPAT_NULL, SOUND_VOICE_CTR_STRENGH, 15);
     
    /*
     memcpy(g_sMqttKey.keyBuffer, TESTTOKEN, W232_TOKEN_LEN);
@@ -88,7 +87,6 @@ void Device_ReadDeviceParamenter(void)                                         /
     {
         memset(&g_sDeviceParams, 0, sizeof(g_sDeviceParams));
         
-        g_sDeviceParams.voiceStreng = SOUND_VOCIE_STR_NORMAL;
         g_sDeviceParams.gateTick = GATE_OP_DLY_TIM;
         g_sDeviceParams.gateTxTick =  GATE_OP_TX_TIM;             
         g_sDeviceParams.gateNum = GATE_SLAVER_NUM;
@@ -127,8 +125,6 @@ void Device_ReadDeviceParamenter(void)                                         /
     }  
 
 }
-
-
 
 
 BOOL Device_Chk_Version()
@@ -927,9 +923,7 @@ u16 Reader_ProcessUartFrame(u8 *pFrame, u8 add, u16 len, u32 tick)
                   {
                         if(*(pFrame + 0) <= SOUND_VOCIE_MAX)
                         {
-                           g_sDeviceParams.voiceStreng = *(pFrame + 0);
-                           Device_WriteDeviceParamenter();
-                           Device_Voice_Ctr(SOUND_CNT_TIME_1S * 2 , SOUND_REPAT_NULL, SOUND_VOICE_CTR_STRENGH, g_sDeviceParams.voiceStreng);
+                           Device_Voice_Ctr(SOUND_CNT_TIME_1S * 2 , SOUND_REPAT_NULL, SOUND_VOICE_CTR_STRENGH, *(pFrame + 0));
                            g_sSoundInfo.test = SOUND_VOICE_TEST_FLAG;
                         }
                         else
@@ -983,7 +977,6 @@ u16 Reader_ProcessUartFrame(u8 *pFrame, u8 add, u16 len, u32 tick)
                     if(add == DEVICE_SM5001_ID)
                     {
                         Device_Set_Cfg(pFrame);
-                        Device_WriteDeviceParamenter();
                         
                     }
                     else
@@ -1273,17 +1266,6 @@ void Device_ServerProcessRxInfo(W232_RCVBUFFER *pRcvBuffer, u32 tick)           
           if(!a_CheckStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_GATE) && !a_CheckStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_BWBAT) && !a_CheckStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_REBAT))
           {
             Device_At_Rsp(W232_CNT_TIME_500MS, W232_CNT_REPAT_NULL, W232_MQTT_TOPIC_CMD);     
-            if(g_sDeviceRspFrame.cmd == DEVICE_CMD_RESET && g_sDeviceRspFrame.flag == DEVICE_RESPONSE_FLAG_RESET)
-            {
-                g_sFramBootParamenter.flag = FRAM_BOOT_APP_DATA_DOWD;
-                if(Fram_WriteBootParamenter())
-                {
-                    Reader_Delayms(5);
-                    Sys_SoftReset();
-                }
-                
-                
-            }
           }
         }
     }
@@ -1400,9 +1382,9 @@ u16 Device_HeartFormat(u8 *pBuffer, u32 tick)
     pBuffer[pos++] = g_nImei[6];
     pBuffer[pos++] = (g_nImei[7] & 0xF0);
          
-    memcpy(pBuffer + pos, (&DEVICE_VERSION + 9), DEVICE_VERSION_LEN);
+    memcpy(pBuffer + pos, (u8 *)&DEVICE_VERSION[DEVICE_VERSION_LEN + 1], DEVICE_VERSION_LEN);
     pos += DEVICE_VERSION_LEN;
-    memcpy(pBuffer + pos, (&DEVICE_VERSION + 0), DEVICE_VERSION_LEN);
+    memcpy(pBuffer + pos, (u8 *)&DEVICE_VERSION, DEVICE_VERSION_LEN);
     pos += DEVICE_VERSION_LEN;
       
     pBuffer[pos++] = (g_sElectInfo.electValue >> 24) & 0xFF;
@@ -1436,6 +1418,7 @@ u16 Device_HeartFormat(u8 *pBuffer, u32 tick)
                            (g_aGateSlvInfo[index].sensorInfo.sensorState.smoke << 2) | 
                             (g_aGateSlvInfo[index].sensorInfo.sensorState.rfid << 1) | 
                              (g_aGateSlvInfo[index].sensorInfo.sensorState.door << 0);
+            
             pBuffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.state;
             pBuffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.status.volLev;
             pBuffer[pos++] = g_aGateSlvInfo[index].sensorInfo.chagInfo.state;
@@ -1471,7 +1454,7 @@ void Device_ChkTempr()
     Win_CalAvg(&g_sDeviceParams.temprDown, AD_GetTemper2Value());
     AD_GetTmpr(&g_sDeviceParams.temprDown);
 
-    if((g_sDeviceParams.temprUp.t >= DEVICE_TEMPR_HIGH) || (g_sDeviceParams.temprDown.t >=  DEVICE_TEMPR_HIGH))
+    if((g_sDeviceParams.temprUp.t >= g_sDeviceParams.gateParams.alarmTmpr) || (g_sDeviceParams.temprDown.t >=  g_sDeviceParams.gateParams.alarmTmpr))
     {
         g_sIoInfo.flag |= IO_FLAG_TEMPR_UP;
     }
@@ -1492,7 +1475,7 @@ void Device_IO_Ctr(u8 flag)
          if(a_CheckStateBit(g_sIoInfo.flag, IO_FLAG_TEMPR_UP) || a_CheckStateBit(g_sIoInfo.flag, IO_FLAG_FIRE) || a_CheckStateBit(g_sIoInfo.state, IO_STAT_WATER))//////smoke 
          {
            
-            if((a_CheckStateBit(g_sIoInfo.flag, IO_FLAG_TEMPR_UP) || a_CheckStateBit(g_sIoInfo.flag, IO_FLAG_FIRE)) && !a_CheckStateBit(g_sIoInfo.state, IO_STAT_FAN) )//////smoke 
+            if((a_CheckStateBit(g_sIoInfo.flag, IO_FLAG_TEMPR_UP) || a_CheckStateBit(g_sIoInfo.flag, IO_FLAG_FIRE)))// && !a_CheckStateBit(g_sIoInfo.state, IO_STAT_FAN) )//////smoke 
              {
                   IO_Fan_Open();
                   a_SetStateBit(g_sIoInfo.state,IO_STAT_FAN);
@@ -1775,6 +1758,7 @@ void Device_CommunTxCmd(DEVICE_SENVER_TXBUFFER *pCntOp, u32 sysTick)
           
             Device_PostRsp(&g_sW232Connect,g_sDeviceRspFrame.buffer, g_nMqttAtBuf, g_nMqttBuf, g_sDeviceRspFrame.len);
             W232_WriteCmd(g_nMqttAtBuf);
+            
             break;
             
     }
@@ -1841,7 +1825,18 @@ BOOL Device_CommunCheckRsp(DEVICE_SENVER_TXBUFFER *pCntOp, u8 *pRxBuf)
             {
                 bOK = TRUE;
                 W232_WriteCmd(g_nMqttBuf);
-            }
+                if(g_sDeviceRspFrame.cmd == DEVICE_CMD_RESET && g_sDeviceRspFrame.flag == DEVICE_RESPONSE_FLAG_RESET)
+                {
+                    g_sFramBootParamenter.appState = FRAM_BOOT_APP_DATA_DOWD;
+                    if(Fram_WriteBootParamenter())
+                    {
+                        Reader_Delayms(5);
+                        Sys_SoftReset();
+                    }
+                    
+                    
+                }
+                }
             break;
     }
     memset(g_nMqttBuf, 0, W232_STR_BUFFER_HEART_LEN);

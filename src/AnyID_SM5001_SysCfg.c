@@ -149,7 +149,7 @@ void Sys_Init(void)
     FRam_InitInterface();
     IO_Init();
     
-    IO_Realy_Open();  //测试打开
+    
     
     
     W232_Init();
@@ -160,7 +160,9 @@ void Sys_Init(void)
     Device_InitInSensor();
     Gate_Init(&g_sDeviceParams.gateParams, g_nSysTick);
     Water_Init();
-    Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();  Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();
+    Sys_Delayms(500);WDG_FeedIWDog();
+     IO_Realy_Open();                       //继电器开启问题
+    Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();
     Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();  Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();
     Device_Init();
 #if SYS_ENABLE_WDT
@@ -224,6 +226,7 @@ void Sys_LedTask(void)
 
 void Sys_GateTask(void)
 {
+   static u8 bratIngTick = 0;
     if(Gate_UartCheckErr())
     {
         Gate_Stop();
@@ -285,8 +288,23 @@ void Sys_GateTask(void)
       
         if(g_sGateOpInfo.batOpState == GATE_OP_BAT_STAT_ING)
         {
+             bratIngTick = g_nSysTick  ;
+            //g_sGateOpInfo.batOpState = GATE_OP_BAT_STAT_ING ;
             g_sGateOpInfo.tick = g_nSysTick;
         }
+        /*
+        else
+        {
+            g_sGateOpInfo.tick = g_nSysTick;
+            if(bratIngTick + GATE_OP_BR_BAT_TIM < g_nSysTick)
+            {
+                bratIngTick =   g_nSysTick;
+                g_sGateOpInfo.batOpState = GATE_OP_BAT_STAT_OVER ;
+                
+            }
+        
+        }
+*/
         if(g_sGateOpInfo.tick + GATE_OP_TO_TIM < g_nSysTick)
         {
             g_sGateOpInfo.comErr[g_sGateOpInfo.slvIndex]++;
@@ -598,7 +616,7 @@ void Sys_W232Task(void)
     {
         a_ClearStateBit(g_nSysState, SYS_STAT_MQTT_OFFLINE);
         Sys_LedOff();
-        
+        g_sDeviceParams.offLineTime = 0;
         W232_ConnectInit(&g_sW232Connect, W232_CNT_CMD_PWRON, &g_sDeviceParams.serverParams);
         a_ClearStateBit(g_nSysState, SYS_STAT_MQTT_ACCESS);
         a_SetState(g_sW232Connect.state, W232_CNT_OP_STAT_TX);
@@ -953,7 +971,7 @@ void Sys_AdTask()
 
 void Sys_HeratTask()
 { 
-    if(!a_CheckStateBit(g_nSysState, SYS_STAT_LTEDTU)) 
+    if(!a_CheckStateBit(g_nSysState, SYS_STAT_LTEDTU) && g_sGateOpInfo.batOpState != GATE_OP_BAT_STAT_ING) 
     {
         return;
     }
@@ -972,7 +990,7 @@ void Sys_HeratTask()
         }
     }
     
-    if(g_sDeviceParams.offLineTime & (W232_HEART_OFFLINE_TIME ) )
+    if(g_sDeviceParams.offLineTime & (W232_HEART_OFFLINE_TIME ))
     {
         a_ClearStateBit(g_nSysState, SYS_STAT_LTEDTU);                                  //離綫，等待重連
         Water_WriteStr("twice link") ;                                                //離綫處理

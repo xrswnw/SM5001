@@ -14,14 +14,14 @@ extern u32 g_nSysState;
 extern u8  g_nDeviceComType;
 #define SYS_STAT_IDLE           0x00000001	    //系统初始化后处于空闲状态
 #define SYS_STAT_RUNLED         0x00000002
-#define SYS_STAT_DOWNLOAD       0x00000040
+#define SYS_STAT_DOWNLOAD       0x40000000
 #define SYS_STAT_JMP            0x00000080
 #define SYS_STAT_RESET          0x00000100
 #define SYS_STAT_ALARMLED       0x00000200
 #define SYS_STAT_LTEDTU         0x00000400
 #define SYS_STAT_UPDATA         0x00000800
 #define SYS_STAT_CHK_VERSION    0x00001000
-#define SYS_STAT_REPLACE_DATA   0x00002000
+#define SYS_STAT_REPLACE_DATA   0x80000000
 #define SYS_STAT_WR_RE_FLASH    0x00004000
 
 #define SYS_STAT_HTTP_TEST      0x10000000
@@ -74,6 +74,8 @@ void Sys_EC20Task(void);
 #define SYS_BOOT_HARDTYPE_ADDR                  0x08005080          //硬件信息，同一个硬件信息可以下载类似的固件
 #define SYS_APP_START_ADDR                      0x08004000
 BOOL Sys_CheckVersion(void);
+
+#define SYS_APP_FLASH_ADDREND                   0x08040000   
 
 #define SYS_FRAME_BROADCAST_ADDR                0xFFFF
 

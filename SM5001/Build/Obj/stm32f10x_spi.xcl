@@ -1,18 +1,18 @@
-"E:\AnyID\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\src\stm32f10x_spi.c"
+"E:\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\src\stm32f10x_spi.c"
 -std=c11
 -ferror-limit=0
 -fbracket-depth=512
 -MD
 -MF
-E:\AnyID\Git\FY\SM5001\SM5001\Build\Obj\stm32f10x_spi.pbi.dep
+E:\Git\FY\SM5001\SM5001\Build\Obj\stm32f10x_spi.pbi.dep
 -o
 stm32f10x_spi.pbi
 -I
-E:\AnyID\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\src
+E:\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\src
 -I
-E:\AnyID\Git\FY\SM5001\SM5001\..
+E:\Git\FY\SM5001\SM5001\..
 -I
-E:\AnyID\Git\FY\SM5001\SM5001\..\inc
+E:\Git\FY\SM5001\SM5001\..\inc
 -I
 E:\AnyID\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\startup
 -I
@@ -28,9 +28,9 @@ C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.3\arm\inc
 -I
 C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.3\arm\inc\c
 -I
-E:\AnyID\Git\FY\SM5001
+E:\Git\FY\SM5001
 -I
-E:\AnyID\Git\FY\SM5001\inc
+E:\Git\FY\SM5001\inc
 -I
 E:\AnyID\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\startup
 -I

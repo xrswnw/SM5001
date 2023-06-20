@@ -16,7 +16,7 @@
 #include "AnyID_SM5001_Water.h"
 
 
-#include "hmac_sha1.h"
+#include "hmac_sha1.h"                                                                     
 #include "base64.h"
 #include "md5.h"
 
@@ -170,7 +170,6 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define DEVICE_TMPR_ALARM_DFT           30
 #define DEVICE_LED_LOWVOL_DFT           80
 
-
 #define DEVICE_CRC32_LEN                4
 
 #define DEVICE_STAT_CHK_TIM             5
@@ -250,7 +249,6 @@ typedef struct deviceParams{
     u16 rfu2;
     u8 addr;
     u8 offLineTime;
-    u8 voiceStreng;
     u16 heartTick;
     GATE_PARAMS gateParams;
     u16 gateTick;                       //仓控交互数据时间间隔

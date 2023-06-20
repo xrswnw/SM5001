@@ -16,7 +16,7 @@
         <LeaveTargetRunning>_ 0</LeaveTargetRunning>
     </JLinkDriver>
     <DebugChecksum>
-        <Checksum>1803386368</Checksum>
+        <Checksum>2562520096</Checksum>
     </DebugChecksum>
     <Exceptions>
         <StopOnUncaught>_ 0</StopOnUncaught>
@@ -27,8 +27,8 @@
         <ShowSource>1</ShowSource>
     </Trace1>
     <Disassembly>
-        <InstrCount>0</InstrCount>
         <MixedMode>1</MixedMode>
+        <InstrCount>0</InstrCount>
     </Disassembly>
     <CodeCoverage>
         <Enabled>0</Enabled>
@@ -61,10 +61,15 @@
         <Fmt1>DEVICE_UPDATA_INFO-step	3	0</Fmt1>
         <Fmt2>FRAM_BOOTPARAMS-appState	4	0</Fmt2>
         <Fmt3>FRAM_BOOTPARAMS-crc	4	0</Fmt3>
+        <Fmt4>FRAM_BOOTPARAMS-size	3	0</Fmt4>
     </struct_types>
     <watch_formats>
-        <Fmt0>{W}42:g_nSysState	4	0</Fmt0>
-        <Fmt1>{W}42:id	4	0</Fmt1>
+        <Fmt0>{W}1:addr	4	0</Fmt0>
+        <Fmt1>{W}1:sector	3	0</Fmt1>
+        <Fmt2>{W}42:g_nDeviceNxtDownloadAddr	4	0</Fmt2>
+        <Fmt3>{W}42:g_nSysState	1	0</Fmt3>
+        <Fmt4>{W}42:id	4	0</Fmt4>
+        <Fmt5>{W}42:sector	3	0</Fmt5>
     </watch_formats>
     <Trace2>
         <Enabled>0</Enabled>
@@ -150,26 +155,35 @@
         <mode>0</mode>
     </DisassembleMode>
     <Breakpoints2>
-        <Bp0>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_FlashM25.c}.0.1" 0 0 1 "" 0 "" 0</Bp0>
-        <Bp1>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_FlashM25.c}.0.1" 0 0 1 "" 0 "" 0</Bp1>
-        <Bp2>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_FlashM25.c}.0.1" 0 0 1 "" 0 "" 0</Bp2>
-        <Bp3>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.0.1" 0 0 1 "" 0 "" 0</Bp3>
+        <Bp0>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_FlashM25.c}.10.1" 0 0 1 "" 0 "" 0</Bp0>
+        <Bp1>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_FlashM25.c}.10.1" 0 0 1 "" 0 "" 0</Bp1>
+        <Bp2>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_FlashM25.c}.10.1" 0 0 1 "" 0 "" 0</Bp2>
+        <Bp3>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.874.1" 0 0 1 "" 0 "" 0</Bp3>
         <Bp4>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.238.13" 0 0 1 "" 0 "" 0</Bp4>
         <Bp5>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.251.13" 0 0 1 "" 0 "" 0</Bp5>
-        <Bp6>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.263.13" 0 0 1 "" 0 "" 0</Bp6>
-        <Bp7>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.277.13" 0 0 1 "" 0 "" 0</Bp7>
-        <Bp8>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.287.13" 0 0 1 "" 0 "" 0</Bp8>
-        <Bp9>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.291.13" 0 0 1 "" 0 "" 0</Bp9>
-        <Bp10>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.242.13" 0 0 1 "" 0 "" 0</Bp10>
-        <Bp11>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.283.8" 0 0 1 "" 0 "" 0</Bp11>
-        <Bp12>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.270.8" 0 0 1 "" 0 "" 0</Bp12>
-        <Bp13>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.729.17" 0 0 1 "" 0 "" 0</Bp13>
-        <Bp14>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.739.17" 0 0 1 "" 0 "" 0</Bp14>
-        <Bp15>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.743.17" 0 0 1 "" 0 "" 0</Bp15>
-        <Bp16>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.247.13" 0 0 1 "" 0 "" 0</Bp16>
-        <Bp17>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.756.13" 0 0 1 "" 0 "" 0</Bp17>
-        <Bp18>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.273.13" 0 0 1 "" 0 "" 0</Bp18>
-        <Count>19</Count>
+        <Bp6>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.282.13" 0 0 1 "" 0 "" 0</Bp6>
+        <Bp7>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.300.13" 0 0 1 "" 0 "" 0</Bp7>
+        <Bp8>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.242.13" 0 0 1 "" 0 "" 0</Bp8>
+        <Bp9>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.748.21" 0 0 1 "" 0 "" 0</Bp9>
+        <Bp10>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.247.13" 0 0 1 "" 0 "" 0</Bp10>
+        <Bp11>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_Device.c}.176.13" 0 0 1 "" 0 "" 0</Bp11>
+        <Bp12>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.702.21" 0 0 1 "" 0 "" 0</Bp12>
+        <Bp13>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.292.13" 0 0 1 "" 0 "" 0</Bp13>
+        <Bp14>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.815.37" 0 0 1 "" 0 "" 0</Bp14>
+        <Bp15>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_Uart.c}.228.13" 0 0 1 "" 0 "" 0</Bp15>
+        <Bp16>_ 0 "EMUL_CODE" "" 0 0 1 "" 0 "" 0</Bp16>
+        <Bp17>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.153.5" 0 0 1 "" 0 "" 0</Bp17>
+        <Bp18>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.276.15" 0 0 1 "" 0 "" 0</Bp18>
+        <Bp19>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.278.11" 0 0 1 "" 0 "" 0</Bp19>
+        <Bp20>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.295.15" 0 0 1 "" 0 "" 0</Bp20>
+        <Bp21>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.752.20" 0 0 1 "" 0 "" 0</Bp21>
+        <Bp22>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.738.21" 0 0 1 "" 0 "" 0</Bp22>
+        <Bp23>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_Device.c}.163.13" 0 0 1 "" 0 "" 0</Bp23>
+        <Bp24>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.758.17" 0 0 1 "" 0 "" 0</Bp24>
+        <Bp25>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.692.25" 0 0 1 "" 0 "" 0</Bp25>
+        <Bp26>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.730.17" 0 0 1 "" 0 "" 0</Bp26>
+        <Bp27>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.847.33" 0 0 1 "" 0 "" 0</Bp27>
+        <Count>28</Count>
     </Breakpoints2>
     <Aliases>
         <Count>0</Count>

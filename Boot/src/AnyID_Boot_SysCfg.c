@@ -147,7 +147,7 @@ void Sys_Init(void)
     Flash_ReadId();
     Flash_Demo();
 
-    g_sFramBootParamenter.appState = FRAM_BOOT_APP_DATA_DOWN_OVER;//测试
+   //g_sFramBootParamenter.appState = FRAM_BOOT_APP_DATA_DOWD;//测试
     
 
     Uart_InitInterface(UART_BAUDRARE);
@@ -246,10 +246,11 @@ void Sys_BootTask(void)
         {
             a_SetStateBit(g_nSysState, SYS_STAT_CHK_VERSION);
         }
-        else if(g_sFramBootParamenter.appState == FRAM_BOOT_APP_REPLACE || g_sFramBootParamenter.appState == FRAM_BOOT_APP_REPLACEING)
+        else if(g_sFramBootParamenter.appState == FRAM_BOOT_APP_REPLACE )
         {
             a_SetStateBit(g_nSysState, SYS_STAT_REPLACE_DATA);
             g_nDeviceNxtEraseAddr = SYS_APP_START_ADDR;
+            FLASH_Unlock();
         }
         
         bootState = g_sFramBootParamenter.appState;
@@ -270,11 +271,15 @@ void Sys_BootTask(void)
        a_ClearStateBit(g_nSysState, SYS_STAT_JMP);
        if(Sys_CheckVersion())
        {
-            Sys_Jump(SYS_APP_START_ADDR);
+          if(a_CheckStateBit(g_nSysState, SYS_STAT_LTEDTU))
+          {
+              Device_At_Rsp(EC20_CNT_TIME_1S, EC20_CNT_REPAT_NULL, DEVICE_HTTP_GET_REQUEST_CKECK);
+          }
+          Sys_Jump(SYS_APP_START_ADDR);
        }
        else
        {
-            g_sFramBootParamenter.appState = FRAM_BOOT_APP_FAIL;
+          g_sFramBootParamenter.appState = FRAM_BOOT_APP_FAIL;
        }
     }
     
@@ -285,6 +290,10 @@ void Sys_BootTask(void)
        if(Device_Chk_Version())                                            //检查是否需要更新
        {
             g_sFramBootParamenter.appState = FRAM_BOOT_APP_REPLACE;
+            if(g_sFramBootParamenter.flag == DEVICE_TYPE_SM5002 || g_sFramBootParamenter.flag == DEVICE_TYPE_SM5003)
+            {
+              g_sFramBootParamenter.appState = FRAM_BOOT_APP_OK;
+            }
        }
        else
        {
@@ -710,122 +719,154 @@ void Sys_ServerTask(void)
 }
 
 void Sys_DownDataTask()
-{
-    if(!a_CheckStateBit(g_nSysState, SYS_STAT_LTEDTU) || !a_SetStateBit(g_nSysState, SYS_STAT_DOWNLOAD)) 
-    {
-        return;
-    }
-
+{   
     static u8 upTime = 0, upTick = 0; 
-    
-    if(a_CheckStateBit(g_nSysState, SYS_STAT_UPDATA))
+    if(a_CheckStateBit(g_nSysState, SYS_STAT_LTEDTU) && a_CheckStateBit(g_nSysState, SYS_STAT_DOWNLOAD)) 
     {
-        if(upTime == DEVICE_UPDATA_CHK_TIME)
+        if(a_CheckStateBit(g_nSysState, SYS_STAT_UPDATA))
         {
-            upTime = 0;
-            if(g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_FLAG_RQ)
+            if(upTime == DEVICE_UPDATA_CHK_TIME)
             {
-                upTick ++;
-                Device_At_Rsp(EC20_CNT_TIME_1S, EC20_CNT_REPAT_NULL, DEVICE_HTTP_GET_REQUEST_CKECK);
+                upTime = 0;
+                if(g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_FLAG_RQ)
+                {
+                    upTick ++;
+                    Device_At_Rsp(EC20_CNT_TIME_1S, EC20_CNT_REPAT_NULL, DEVICE_HTTP_GET_REQUEST_CKECK);
+                }
+                else if(g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_FLAG_DOWN)
+                {   
+                    g_sDeviceUpDataInfo.flag = DEVICE_UPDATA_FLAG_DOWNING;
+                    
+                    Device_At_Rsp(EC20_CNT_TIME_1S * 2, EC20_CNT_REPAT_NULL, DEVICE_HTTP_GET_REQUEST_DOWNLOAD);
+                }
+                else if(g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_FLAG_FAIL)
+                {   
+                    g_sFramBootParamenter.appState = FRAM_BOOT_APP_DATA_DOWD;
+                }
+                else if(g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_FLAG_OVER)
+                {   
+                    g_sFramBootParamenter.appState = FRAM_BOOT_APP_DATA_DOWN_OVER;
+                }
+                else
+                {
+                   g_sDeviceUpDataInfo.flag = DEVICE_UPDATA_FLAG_RQ;
+                }
+            
             }
-            else if(g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_FLAG_DOWN)
-            {   
-                g_sDeviceUpDataInfo.flag = DEVICE_UPDATA_FLAG_DOWNING;
-                
-                Device_At_Rsp(EC20_CNT_TIME_1S * 2, EC20_CNT_REPAT_NULL, DEVICE_HTTP_GET_REQUEST_DOWNLOAD);
+            else
+            {
+                upTime ++;
             }
-            else if(g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_FLAG_FAIL)
-            {   
-                g_sFramBootParamenter.appState = FRAM_BOOT_APP_DATA_DOWD;
+            
+            if(upTick == DEVICE_UPDATA_CHK_TIME)
+            {
+                upTick = 0;
+                g_sFramBootParamenter.appState = FRAM_BOOT_APP_NULL_REPLACE;
             }
-            else if(g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_FLAG_OVER)
-            {   
-                g_sDeviceUpDataInfo.flag = DEVICE_UPDATA_START;
-                g_sFramBootParamenter.appState = FRAM_BOOT_APP_DATA_DOWN_OVER;
-            }
-        
+            a_ClearStateBit(g_nSysState, SYS_STAT_UPDATA);
         }
-        else
-        {
-            upTime ++;
-        }
-        
-        if(upTime == DEVICE_UPDATA_CHK_TIME)
-        {
-            upTime = 0;
-            g_sFramBootParamenter.appState = FRAM_BOOT_APP_NULL_REPLACE;
-        }
-        a_ClearStateBit(g_nSysState, SYS_STAT_UPDATA);
     }
 
 }
 
 void Sys_ReplaceDeviceTask()
 {
-    if(!a_SetStateBit(g_nSysState, SYS_STAT_REPLACE_DATA))  //固件下载完成，进入更新流程
-    {
-        return;
-    }
-    
     static u8 flashTime = 0, sector = 0; 
     u32 addr = 0;
-    
-    if(g_sFramBootParamenter.flag == DEVICE_TYPE_SM5001)
+    if(a_CheckStateBit(g_nSysState, SYS_STAT_REPLACE_DATA))  //固件下载完成，进入更新流程
     {
-        if(a_CheckStateBit(g_nSysState, SYS_STAT_WR_RE_FLASH))
+        if(g_sFramBootParamenter.flag == DEVICE_TYPE_SM5001)
         {
-           a_ClearStateBit(g_nSysState, SYS_STAT_WR_RE_FLASH);
-           
-           if(flashTime == 5)
-           {
-                flashTime = 0;
-                if(g_sDeviceUpDataInfo.state == DEVICE_UPDATA_ERASE_FLASH)
-                {
-                    addr = SYS_APP_START_ADDR + (sector << 10);
-                    if(addr >= SYS_APP_START_ADDR)
+            if(a_CheckStateBit(g_nSysState, SYS_STAT_WR_RE_FLASH))
+            {
+               a_ClearStateBit(g_nSysState, SYS_STAT_WR_RE_FLASH);
+               
+               if(flashTime == 2)
+               {
+                    flashTime = 0;
+                    if(g_sDeviceUpDataInfo.state == DEVICE_UPDATA_ERASE_FLASH)
                     {
-                        if(g_nDeviceNxtEraseAddr == addr)               //擦除地址必须是连续的，否则会有区域未擦除
+                        addr = SYS_APP_START_ADDR + (sector << 10);
+                        if(addr >= SYS_APP_START_ADDR)
                         {
-                            g_nDeviceNxtEraseAddr = addr + (1 << 10);   //每个扇区1K
-                            if(addr <= 0x0804000)
+                            if(g_nDeviceNxtEraseAddr == addr)               //擦除地址必须是连续的，否则会有区域未擦除
                             {
-                                if(Uart_EraseFlash(addr))
+                                g_nDeviceNxtEraseAddr = addr + (1 << 10);   //每个扇区1K
+                                if(addr <= SYS_APP_START_ADDR + (g_sFramBootParamenter.size + 1) *  (1 << 10))
                                 {
-                                    sector++;
+                                    if(Uart_EraseFlash(addr))
+                                    {
+                                        sector++;
+                                    }
+                                    else
+                                    {
+                                        addr = 0;
+                                        sector = 0;
+                                        g_nDeviceNxtEraseAddr = 0;
+                                        Sys_RunLedOn();   //擦除失败
+                                        g_sFramBootParamenter.appState = FRAM_BOOT_APP_FAIL;
+                                    }
                                 }
-                            }
-                            else
-                            {
-                                sector = 0;
-                                g_nDeviceNxtEraseAddr = 0;
-                                g_sDeviceUpDataInfo.state = DEVICE_UPDATA_WRITE_FLASH;
+                                else
+                                {
+                                    addr = 0;
+                                    sector = 0;
+                                    g_nDeviceNxtEraseAddr = 0;
+                                    g_sDeviceUpDataInfo.state = DEVICE_UPDATA_WRITE_FLASH;
+                                }
                             }
                         }
                     }
                     else if(g_sDeviceUpDataInfo.state == DEVICE_UPDATA_WRITE_FLASH)
                     {
-                    
-                    
+                        addr = SYS_APP_START_ADDR + sector * FLASH_UPDATA_LEN;
+                        if(addr >= SYS_APP_START_ADDR)
+                        {
+                            if(sector <= g_sFramBootParamenter.size + 1)
+                            {
+                                if(Flash_ReadBuffer(FLASH_DATA_OPEN_ADDR + sector * FLASH_UPDATA_LEN, FLASH_UPDATA_LEN, g_nFlashUpData))
+                                {
+                                    if(BL_WriteImagePage(addr, g_nFlashUpData, FLASH_UPDATA_LEN))
+                                    {
+                                      sector ++;
+                                    }
+                                    else
+                                    {
+                                        sector = 0;
+                                        Sys_RunLedOn();
+                                        g_sFramBootParamenter.appState = FRAM_BOOT_APP_FAIL;
+                                        //写入失败
+                                    }
+                                }
+                                            
+                                Sys_RunLedOff();
+                            }
+                            else
+                            {
+                                FLASH_Lock();
+                                g_sFramBootParamenter.appState = FRAM_BOOT_APP_REPLACE_OVER;
+                            }
+                        }
+                        
                     }
-                }
-           }else
-           {
-                flashTime++;
-           }
-            a_ClearStateBit(g_nSysState, SYS_STAT_WR_RE_FLASH);
-        }                                  
-      
+               }
+               else
+               {
+                    flashTime++;
+               }
+                a_ClearStateBit(g_nSysState, SYS_STAT_WR_RE_FLASH);
+            }                                  
+          
+        }
+        else if(g_sFramBootParamenter.flag == DEVICE_TYPE_SM5002)
+        {
+        
+        }
+        else if(g_sFramBootParamenter.flag == DEVICE_TYPE_SM5003)
+        {
+        
+        }
     }
-    else if(g_sFramBootParamenter.flag == DEVICE_TYPE_SM5002)
-    {
-    
-    }
-    else if(g_sFramBootParamenter.flag == DEVICE_TYPE_SM5003)
-    {
-    
-    }
-
-
 
 }
 

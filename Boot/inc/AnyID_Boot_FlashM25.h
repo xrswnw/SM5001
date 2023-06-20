@@ -4,7 +4,7 @@
 #include "AnyID_FlashM25.h"
 
 
-#define FLASH_UPDATA_LEN                2048       
+#define FLASH_UPDATA_LEN                1024       
 #define FLASH_DATA_OPEN_ADDR            0
 
 

@@ -10,6 +10,7 @@
 
 typedef struct framBootDevicePar{
     u8 flag;
+    u8 size;    //2kһƬ
     u16 appState;
     u16 addr;
     u8 verSion[FRAM_VERSION_SIZE];

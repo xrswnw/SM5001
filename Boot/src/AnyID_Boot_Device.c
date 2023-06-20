@@ -146,7 +146,7 @@ BOOL Device_Chk_VersionFrame(u8 *pBuffer, DEVICE_UPDATA_INFO *pDataInfo)
     BOOL bOk = FALSE;
     
     memset(pDataInfo, 0, sizeof(DEVICE_UPDATA_INFO));
-     if(strstr((char const *)pBuffer, "\"code\":0") != NULL)
+    if(strstr((char const *)pBuffer, "\"code\":0") != NULL)
     {
         if(strstr((char const *)pBuffer, "SM5001") != NULL)     //版本相同无需更改，但平台有筛选功能，暂不处理
         {
@@ -156,7 +156,7 @@ BOOL Device_Chk_VersionFrame(u8 *pBuffer, DEVICE_UPDATA_INFO *pDataInfo)
             memcpy(pDataInfo->md5, pBuffer + DEVICE_UPDATA_BUFFER_MD5_LEN, DEVICE_SOFTVERSION_MD5);
             Device_Analys_Data(pDataInfo);
             Device_Erase_Flash();  
-
+            g_sFramBootParamenter.size = pDataInfo->num ;
             g_sFramBootParamenter.flag = DEVICE_TYPE_SM5001;
             pDataInfo->type = DEVICE_TYPE_SM5001;
             pDataInfo->flag = DEVICE_UPDATA_FLAG_DOWN; 
@@ -171,6 +171,7 @@ BOOL Device_Chk_VersionFrame(u8 *pBuffer, DEVICE_UPDATA_INFO *pDataInfo)
             Device_Analys_Data(pDataInfo);
             Device_Erase_Flash(); 
 
+            g_sFramBootParamenter.size = pDataInfo->num ;
             g_sFramBootParamenter.flag = DEVICE_TYPE_SM5002;
             pDataInfo->type = DEVICE_TYPE_SM5002;
             pDataInfo->flag = DEVICE_UPDATA_FLAG_DOWN; 
@@ -185,6 +186,7 @@ BOOL Device_Chk_VersionFrame(u8 *pBuffer, DEVICE_UPDATA_INFO *pDataInfo)
             Device_Analys_Data(pDataInfo);
             Device_Erase_Flash(); 
 
+            g_sFramBootParamenter.size = pDataInfo->num ;
             g_sFramBootParamenter.flag = DEVICE_TYPE_SM5003;
             pDataInfo->type = DEVICE_TYPE_SM5003;
             pDataInfo->flag = DEVICE_UPDATA_FLAG_DOWN; 
@@ -285,7 +287,7 @@ BOOL Device_Chk_Version()
 {
     BOOL tf = FALSE;
 
-    if(Flash_ReadBuffer(FLASH_DATA_OPEN_ADDR + 2 * FLASH_UPDATA_LEN, FLASH_UPDATA_LEN, g_nFlashUpData))
+    if(Flash_ReadBuffer(FLASH_DATA_OPEN_ADDR + 4 * FLASH_UPDATA_LEN, FLASH_UPDATA_LEN, g_nFlashUpData))
     {
         if(g_sFramBootParamenter.flag == DEVICE_TYPE_SM5001)
         {     
