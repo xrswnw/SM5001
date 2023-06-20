@@ -27,7 +27,7 @@ void Gate_Init(GATE_PARAMS *pGateParams, u32 tick)
 }
 
 void Gate_Stop(void)
-{
+{                                                                                                         
     USART_TypeDef* uart = NULL;
 
     (GATE_RXDMA_CH)->CCR &= CCR_ENABLE_Reset;

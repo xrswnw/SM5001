@@ -193,7 +193,12 @@ BOOL Device_Chk_VersionFrame(u8 *pBuffer, DEVICE_UPDATA_INFO *pDataInfo)
             bOk = TRUE;
         }
         
-    }   
+    } 
+    else if(strstr((char const *)pBuffer, "12012") != NULL)
+    {
+        bOk = TRUE;
+        pDataInfo->flag = DEVICE_UPDATA_INFORM_OK;
+    }
     
     return bOk;
 }

@@ -156,7 +156,11 @@ void Sys_Init(void)
     
     EC20_Init();
     Sys_Delayms(5);
+    /*
     memcpy(g_nSoftWare, (u8 *)(SYS_BOOT_VER_ADDR ), EC20_SOFTVERSON_LEN);
+    
+    memcpy(g_sFramBootParamenter.verSion, g_nSoftWare, EC20_SOFTVERSON_LEN);
+    Fram_WriteBootParamenter();      */
     
     //SysTick ≥ı ºªØ 5ms
     STick_InitSysTick();
@@ -233,12 +237,13 @@ void Sys_BootTask(void)
     
     if(bootState != g_sFramBootParamenter.appState)
     {
-        if(g_sFramBootParamenter.appState == FRAM_BOOT_APP_OK || g_sFramBootParamenter.appState == FRAM_BOOT_APP_REPLACE_OVER || g_sFramBootParamenter.appState == FRAM_BOOT_APP_NULL_REPLACE)
+        if(g_sFramBootParamenter.appState == FRAM_BOOT_APP_OK  || g_sFramBootParamenter.appState == FRAM_BOOT_APP_NULL_REPLACE)
         {
             a_SetState(g_nSysState, SYS_STAT_IDLE);
         }
         else if(g_sFramBootParamenter.appState == FRAM_BOOT_APP_DATA_DOWD || g_sFramBootParamenter.appState == FRAM_BOOT_APP_FAIL)
         {
+            Device_Version_UpData();
             a_SetStateBit(g_nSysState, SYS_STAT_DOWNLOAD);
             g_sDeviceUpDataInfo.flag = DEVICE_UPDATA_FLAG_RQ;
         }
@@ -248,9 +253,16 @@ void Sys_BootTask(void)
         }
         else if(g_sFramBootParamenter.appState == FRAM_BOOT_APP_REPLACE )
         {
+            Device_Version_UpData();
             a_SetStateBit(g_nSysState, SYS_STAT_REPLACE_DATA);
             g_nDeviceNxtEraseAddr = SYS_APP_START_ADDR;
             FLASH_Unlock();
+        }
+        else if(g_sFramBootParamenter.appState == FRAM_BOOT_APP_REPLACE_OVER)
+        {
+            //g_sDeviceUpDataInfo.tF = FALSE;
+          Device_Version_UpData();
+          a_SetStateBit(g_nSysState, SYS_STAT_INFORM_INFO);
         }
         
         bootState = g_sFramBootParamenter.appState;
@@ -720,7 +732,7 @@ void Sys_ServerTask(void)
 
 void Sys_DownDataTask()
 {   
-    static u8 upTime = 0, upTick = 0; 
+    static u8 upTime = 0, upTick = 0, infromTick = 0, infromTime = 0; 
     if(a_CheckStateBit(g_nSysState, SYS_STAT_LTEDTU) && a_CheckStateBit(g_nSysState, SYS_STAT_DOWNLOAD)) 
     {
         if(a_CheckStateBit(g_nSysState, SYS_STAT_UPDATA))
@@ -736,7 +748,6 @@ void Sys_DownDataTask()
                 else if(g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_FLAG_DOWN)
                 {   
                     g_sDeviceUpDataInfo.flag = DEVICE_UPDATA_FLAG_DOWNING;
-                    
                     Device_At_Rsp(EC20_CNT_TIME_1S * 2, EC20_CNT_REPAT_NULL, DEVICE_HTTP_GET_REQUEST_DOWNLOAD);
                 }
                 else if(g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_FLAG_FAIL)
@@ -745,6 +756,7 @@ void Sys_DownDataTask()
                 }
                 else if(g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_FLAG_OVER)
                 {   
+                    a_ClearStateBit(g_nSysState, SYS_STAT_DOWNLOAD)  ;
                     g_sFramBootParamenter.appState = FRAM_BOOT_APP_DATA_DOWN_OVER;
                 }
                 else
@@ -762,6 +774,39 @@ void Sys_DownDataTask()
             {
                 upTick = 0;
                 g_sFramBootParamenter.appState = FRAM_BOOT_APP_NULL_REPLACE;
+            }
+            a_ClearStateBit(g_nSysState, SYS_STAT_UPDATA);
+        }
+    }
+    
+    
+     if(a_CheckStateBit(g_nSysState, SYS_STAT_LTEDTU) && a_CheckStateBit(g_nSysState, SYS_STAT_INFORM_INFO)) 
+    {
+        if(a_CheckStateBit(g_nSysState, SYS_STAT_UPDATA))
+        {
+            if(infromTick == DEVICE_UPDATA_CHK_TIME)
+            {
+                infromTick = 0;
+                if(g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_FLAG_OVER || g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_FLAG_NULL )
+                {
+                    infromTime ++;
+                    memcpy(g_nSoftWare, (u8 *)(SYS_BOOT_VER_ADDR ), EC20_SOFTVERSON_LEN);
+                    Device_At_Rsp(EC20_CNT_TIME_1S, EC20_CNT_REPAT_NULL, DEVICE_HTTP_GET_REQUEST_CKECK);
+                }
+                else if(g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_INFORM_OK)
+                {
+                    g_sFramBootParamenter.appState = FRAM_BOOT_APP_OK;
+                }
+            }
+            else
+            {
+                infromTick ++;
+            }
+            
+            if(infromTime == DEVICE_UPDATA_CHK_TIME)
+            {
+                infromTime = 0;
+                g_sFramBootParamenter.appState = FRAM_BOOT_APP_OK;
             }
             a_ClearStateBit(g_nSysState, SYS_STAT_UPDATA);
         }

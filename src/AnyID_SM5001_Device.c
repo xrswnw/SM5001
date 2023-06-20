@@ -1,6 +1,6 @@
 #include "AnyID_SM5001_Device.h"
 
-const u8 DEVICE_VERSION[DEVICE_VERSION_SIZE]@0x08005000 = "SM500100_23061901 GD322302";
+const u8 DEVICE_VERSION[DEVICE_VERSION_SIZE]@0x08005000 = "SM500100_23062003 GD322302";
 
 
 READER_RSPFRAME g_sDeviceRspFrame = {0};
@@ -9,7 +9,7 @@ DEVICE_TEST g_nDeviceTestInfo  = {0};
 DEVICE_SENVER_TXBUFFER g_nDeviceServerTxBuf = {0};
 DEVICE_IMPRSP_INFO g_nDeviceImpRspInfo = {0};
 
-
+BOOL g_nBatOpenFlag = TRUE;
 BOOL g_nMasterFlag = FALSE;
 void Device_Init()
 {
@@ -641,6 +641,7 @@ BOOL Device_GateProceRspFrame(u8 *pFrame, GATE_OPINFO *pOpInfo, u32 tick)
     u16 paramsLen = 0;
     u16 addr = 0;
 
+    
     addr = *((u16 *)(pFrame + UART_FRAME_POS_SRCADDR));
     if(addr == pOpInfo->slvIndex + 1 && pFrame[UART_RFRAME_POS_CMD] == pOpInfo->cmd)
     {
@@ -679,12 +680,19 @@ BOOL Device_GateProceRspFrame(u8 *pFrame, GATE_OPINFO *pOpInfo, u32 tick)
             case GATE_FRAME_CMD_RTNBAT:
             if(paramsLen == 2)
             {
+                  
                   if(a_CheckStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_REBAT))
                   {  
                        pOpInfo->rtnBat.step  = pParams[0];     
                         pOpInfo->rtnBat.flag = pParams[1]; 
                        a_ClearStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_REBAT);
-                       pOpInfo->batOpState = GATE_OP_BAT_STAT_ING;
+                      // pOpInfo->batOpState = GATE_OP_BAT_STAT_ING;
+                       if(g_nBatOpenFlag)
+                       {
+                         g_nBatOpenFlag = FALSE;
+                         pOpInfo->batOpState = GATE_OP_BAT_STAT_OPEN;
+                         
+                       }
                        g_sDeviceRspFrame.len = Device_ResponseBat(&g_sDeviceRspFrame, GATE_FRAME_CMD_RTNBAT);
                        Device_At_Rsp(W232_CNT_TIME_500MS, W232_CNT_REPAT_NULL, W232_MQTT_TOPIC_CMD);
                   }
@@ -696,6 +704,7 @@ BOOL Device_GateProceRspFrame(u8 *pFrame, GATE_OPINFO *pOpInfo, u32 tick)
 
                         pOpInfo->rtnBat.tick
                           = g_nSysTick;
+                        g_nBatOpenFlag = TRUE;
                         pOpInfo->rtnBat.step  = pParams[0];     
                         pOpInfo->rtnBat.flag = pParams[1]; 
                         pOpInfo->batOpState = GATE_OP_BAT_STAT_OVER;
@@ -712,7 +721,14 @@ BOOL Device_GateProceRspFrame(u8 *pFrame, GATE_OPINFO *pOpInfo, u32 tick)
                            pOpInfo->rtnBat.tick = g_nSysTick;
                            pOpInfo->rtnBat.step  = pParams[0];     
                            pOpInfo->rtnBat.flag = pParams[1];
-                           pOpInfo->batOpState = GATE_OP_BAT_STAT_ING;
+                         //  pOpInfo->batOpState = GATE_OP_BAT_STAT_ING;
+                           
+                          if(g_nBatOpenFlag)
+                         {
+                           g_nBatOpenFlag = FALSE;
+                           pOpInfo->batOpState = GATE_OP_BAT_STAT_OPEN;
+                           
+                         }
                            g_nDeviceImpRspInfo.rtuLen = Device_ResponseRtBat(g_nDeviceImpRspInfo.rtuBuffer);
                            Device_At_Rsp(W232_CNT_TIME_500MS, W232_CNT_REPAT_NULL, W232_MQTT_TOPIC_REBAT);
                             
@@ -741,7 +757,14 @@ BOOL Device_GateProceRspFrame(u8 *pFrame, GATE_OPINFO *pOpInfo, u32 tick)
                         pOpInfo->brwBat.step  = pParams[0];     
                         pOpInfo->brwBat.flag = pParams[1];
                         a_ClearStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_BWBAT);
-                        pOpInfo->batOpState = GATE_OP_BAT_STAT_ING;
+                        //pOpInfo->batOpState = GATE_OP_BAT_STAT_ING;
+                        
+                        if(g_nBatOpenFlag)
+                       {
+                         g_nBatOpenFlag = FALSE;
+                         pOpInfo->batOpState = GATE_OP_BAT_STAT_OPEN;
+                         
+                       }
                         g_sDeviceRspFrame.len = Device_ResponseBat(&g_sDeviceRspFrame, GATE_FRAME_CMD_BRWBAT);
                         Device_At_Rsp(W232_CNT_TIME_500MS, W232_CNT_REPAT_NULL, W232_MQTT_TOPIC_CMD);
                     }
@@ -751,6 +774,7 @@ BOOL Device_GateProceRspFrame(u8 *pFrame, GATE_OPINFO *pOpInfo, u32 tick)
                       {
                           b = TRUE;       //这里要上报数据
                           pOpInfo->slvCmd.cmd = 0;            //操作完成，清空操作
+                          g_nBatOpenFlag = TRUE;
                           pOpInfo->brwBat.step  = pParams[0];     
                           pOpInfo->brwBat.flag = pParams[1];
                           pOpInfo->brwBat.tick = g_nSysTick;
@@ -766,7 +790,14 @@ BOOL Device_GateProceRspFrame(u8 *pFrame, GATE_OPINFO *pOpInfo, u32 tick)
                               pOpInfo->brwBat.tick = g_nSysTick;
                               pOpInfo->brwBat.step  = pParams[0];     
                               pOpInfo->brwBat.flag = pParams[1];
-                              pOpInfo->batOpState = GATE_OP_BAT_STAT_ING;
+                              //pOpInfo->batOpState = GATE_OP_BAT_STAT_ING;
+                              
+                               if(g_nBatOpenFlag)
+                               {
+                                 g_nBatOpenFlag = FALSE;
+                                 pOpInfo->batOpState = GATE_OP_BAT_STAT_OPEN;
+                                 
+                               }
                               g_nDeviceImpRspInfo.brwLen = Device_ResponseBrBat(g_nDeviceImpRspInfo.brwBuffer);
                               Device_At_Rsp(W232_CNT_TIME_500MS, W232_CNT_REPAT_NULL, W232_MQTT_TOPIC_BWBAT);
                           }
@@ -1406,7 +1437,7 @@ u16 Device_HeartFormat(u8 *pBuffer, u32 tick)
     for(index = 0 ;index < (GATE_SLAVER_NUM << 1); index ++)
     {
         pBuffer[pos++] = index + 1;
-        if(g_aGateSlvInfo[index].bTxInfo)
+        if(g_aGateSlvInfo[index].state  == GATE_STAT_OK)
         {
             memcpy(pBuffer + pos, "23060600", GATE_VERSION_LEN);
             pos += GATE_VERSION_LEN;
@@ -1414,10 +1445,8 @@ u16 Device_HeartFormat(u8 *pBuffer, u32 tick)
             pos += GATE_VERSION_LEN;
              
             pBuffer[pos++] = g_aGateSlvInfo[index].sensorInfo.tmpr;
-            pBuffer[pos++] = (g_aGateSlvInfo[index].sensorInfo.sensorState.fan << 3) | 
-                           (g_aGateSlvInfo[index].sensorInfo.sensorState.smoke << 2) | 
-                            (g_aGateSlvInfo[index].sensorInfo.sensorState.rfid << 1) | 
-                             (g_aGateSlvInfo[index].sensorInfo.sensorState.door << 0);
+            pBuffer[pos++] = (g_aGateSlvInfo[index].sensorInfo.sensorState.fan << 3) | (g_aGateSlvInfo[index].sensorInfo.sensorState.smoke << 2) | 
+                            (g_aGateSlvInfo[index].sensorInfo.sensorState.rfid << 1) | (g_aGateSlvInfo[index].sensorInfo.sensorState.door << 0);
             
             pBuffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.state;
             pBuffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.status.volLev;
@@ -1449,6 +1478,7 @@ u16 Device_HeartFormat(u8 *pBuffer, u32 tick)
 
 void Device_ChkTempr()
 {
+    static u32 temprTick = 0;
     Win_CalAvg(&g_sDeviceParams.temprUp, AD_GetTemper1Value());
     AD_GetTmpr(&g_sDeviceParams.temprUp);
     Win_CalAvg(&g_sDeviceParams.temprDown, AD_GetTemper2Value());
@@ -1456,12 +1486,16 @@ void Device_ChkTempr()
 
     if((g_sDeviceParams.temprUp.t >= g_sDeviceParams.gateParams.alarmTmpr) || (g_sDeviceParams.temprDown.t >=  g_sDeviceParams.gateParams.alarmTmpr))
     {
-        g_sIoInfo.flag |= IO_FLAG_TEMPR_UP;
+        temprTick ++;
+        if(temprTick > 5)
+        {
+          g_sIoInfo.flag |= IO_FLAG_TEMPR_UP;
+        }
+
     }
     else
-    {
-        g_sIoInfo.flag &= ~ IO_FLAG_TEMPR_UP;
-        
+    {     temprTick = 0;
+          g_sIoInfo.flag &= ~ IO_FLAG_TEMPR_UP;
     }
 }
 
@@ -1472,36 +1506,45 @@ void Device_IO_Ctr(u8 flag)
 {
     if(!g_nMasterFlag)
     {
-         if(a_CheckStateBit(g_sIoInfo.flag, IO_FLAG_TEMPR_UP) || a_CheckStateBit(g_sIoInfo.flag, IO_FLAG_FIRE) || a_CheckStateBit(g_sIoInfo.state, IO_STAT_WATER))//////smoke 
-         {
-           
-            if((a_CheckStateBit(g_sIoInfo.flag, IO_FLAG_TEMPR_UP) || a_CheckStateBit(g_sIoInfo.flag, IO_FLAG_FIRE)))// && !a_CheckStateBit(g_sIoInfo.state, IO_STAT_FAN) )//////smoke 
+          if((a_CheckStateBit(g_sIoInfo.flag, IO_FLAG_TEMPR_UP) || a_CheckStateBit(g_sIoInfo.state, IO_FLAG_FIRE)))
+          {  
+            if(!a_CheckStateBit(g_sIoInfo.state, IO_STAT_FAN))
              {
-                  IO_Fan_Open();
-                  a_SetStateBit(g_sIoInfo.state,IO_STAT_FAN);
+                 IO_Fan_Open();
+                a_SetStateBit(g_sIoInfo.state,IO_STAT_FAN);   
              }
-               
+          } 
+          else
+          {
+              if(a_CheckStateBit(g_sIoInfo.state, IO_STAT_FAN))
+             {
+                IO_Fan_Close();
+                a_ClearStateBit(g_sIoInfo.state,IO_STAT_FAN);
+             }
+          }
+            
+          if((a_CheckStateBit(g_sIoInfo.state, IO_STAT_WATER) || a_CheckStateBit(g_sIoInfo.state, IO_FLAG_FIRE)))
+          {
             if(a_CheckStateBit(g_sIoInfo.state, IO_STAT_RELAY))
-            {
+             {
                   IO_Realy_Close();    //测试关闭
-                  a_ClearStateBit(g_sIoInfo.state,IO_STAT_RELAY);
-            }
-        }
-        else
-        {
-           if(!a_CheckStateBit(g_sIoInfo.state, IO_STAT_RELAY))
-           {
-             IO_Realy_Open();
-             a_SetStateBit(g_sIoInfo.state,IO_STAT_RELAY);
-           }
-           
-            if(a_CheckStateBit(g_sIoInfo.state, IO_STAT_FAN))
-           {
-             IO_Fan_Close();
-             a_ClearStateBit(g_sIoInfo.state,IO_STAT_FAN);
-           }
-        }
+                  a_ClearStateBit(g_sIoInfo.state,IO_STAT_RELAY); 
+             }
+          } 
+          else
+          {
+             if(!a_CheckStateBit(g_sIoInfo.state, IO_STAT_RELAY))
+             {
+                IO_Realy_Open();
+                a_SetStateBit(g_sIoInfo.state,IO_STAT_RELAY);
+             }
+          }
+          
+        
+        
+        
     }
+    else
     {
     
     }

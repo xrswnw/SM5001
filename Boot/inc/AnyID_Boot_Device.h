@@ -28,12 +28,14 @@
 
 
 
+#define DEVICE_UPDATA_FLAG_NULL         0
 #define DEVICE_UPDATA_FLAG_RQ           1
 #define DEVICE_UPDATA_FLAG_DOWN         2
 #define DEVICE_UPDATA_FLAG_DOWNING      3
 #define DEVICE_UPDATA_FLAG_FAIL         4
 #define DEVICE_UPDATA_FLAG_OVER         5
 #define DEVICE_UPDATA_START             6
+#define DEVICE_UPDATA_INFORM_OK         7
 
 #define DEVICE_DATA_MASK_R              0x0D
 #define DEVICE_DATA_MASK_N              0x0A
@@ -65,6 +67,11 @@
                                                    }while(0)
 #define Device_At_Rsp(opt,repat,cmd)      do{g_sDeviceServerTxBuf.to[g_sDeviceServerTxBuf.num] = opt;g_sDeviceServerTxBuf.repeat[g_sDeviceServerTxBuf.num] = repat;g_sDeviceServerTxBuf.op[g_sDeviceServerTxBuf.num++] = cmd;g_sDeviceServerTxBuf.state = EC20_CNT_OP_STAT_TX;}while(0)
 
+#define Device_Version_UpData()         do{\
+                                                memcpy(g_nSoftWare, (u8 *)(SYS_BOOT_VER_ADDR ), EC20_SOFTVERSON_LEN);\
+                                                memcpy(g_sFramBootParamenter.verSion, g_nSoftWare, EC20_SOFTVERSON_LEN);\
+                                                Fram_WriteBootParamenter();\
+                                            }while(0)
 
 typedef struct deviceSenverTxBuff{
     u8 num;
@@ -86,6 +93,7 @@ typedef struct deviceSenverTxBuff{
 #define DEVICE_SOFTVERSION_MD5                  32
 #define DEVICE_SOFTVERSION_DATA_LEN             2048
 typedef struct deviceUpDataInfo{
+    BOOL tF;
     u8 type;
     u8 state;
     u8 flag;

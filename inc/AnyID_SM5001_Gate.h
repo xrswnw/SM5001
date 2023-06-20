@@ -241,7 +241,7 @@ typedef struct gateOpBatResult{
     u32 tick;
 }GATE_OPBAT;
 
-#define GATE_RPT_NUM            2       //通信重发次数
+#define GATE_RPT_NUM            5       //通信重发次数
 typedef struct gateOpInfo{
     u8 mode;
     u8 batAddr;

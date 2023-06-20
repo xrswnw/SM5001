@@ -307,6 +307,8 @@ typedef struct deviceImpRspInfo{
 }DEVICE_IMPRSP_INFO;
 
 
+extern BOOL g_nBatOpenFlag;
+
 void Device_Init();
 void Device_ServerProcessRxInfo(W232_RCVBUFFER *pRcvBuffer, u32 tick); 
 void Modele_Ctl(u8 cmd);

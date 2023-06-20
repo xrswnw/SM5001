@@ -149,9 +149,6 @@ void Sys_Init(void)
     FRam_InitInterface();
     IO_Init();
     
-    
-    
-    
     W232_Init();
     
     Sound_Init();
@@ -161,9 +158,9 @@ void Sys_Init(void)
     Gate_Init(&g_sDeviceParams.gateParams, g_nSysTick);
     Water_Init();
     Sys_Delayms(500);WDG_FeedIWDog();
-     IO_Realy_Open();                       //继电器开启问题
-    Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();
-    Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();  Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();
+    IO_Realy_Open(); a_SetStateBit(g_sIoInfo.state,IO_STAT_RELAY);                      //继电器开启问题
+    Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();//Sys_Delayms(500);WDG_FeedIWDog();
+    Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();  
     Device_Init();
 #if SYS_ENABLE_WDT
     WDG_FeedIWDog();
@@ -226,7 +223,7 @@ void Sys_LedTask(void)
 
 void Sys_GateTask(void)
 {
-   static u8 bratIngTick = 0;
+   static u32 bratIngTick = 0;
     if(Gate_UartCheckErr())
     {
         Gate_Stop();
@@ -245,6 +242,7 @@ void Sys_GateTask(void)
                 {
                     a_SetState(g_sGateOpInfo.rpt, SYS_NULL_TICK);//清空RPT标志
                     
+                    /*
                     if(g_sGateOpInfo.batOpState == GATE_OP_BAT_STAT_ING)
                     {
                         g_sGateOpInfo.state = GATE_OP_STAT_WAIT;
@@ -252,7 +250,22 @@ void Sys_GateTask(void)
                     else
                     {
                        Gate_StartOpDelay(GATE_OP_DLY_TIM, g_nSysTick);         //延时等待下一次操作
+                    } */
+                        
+                    
+                    if(g_sGateOpInfo.batOpState == GATE_OP_BAT_STAT_ING)
+                    {
+                        g_sGateOpInfo.state = GATE_OP_STAT_WAIT;
                     }
+                    else if(g_sGateOpInfo.batOpState == GATE_OP_BAT_STAT_OPEN)
+                    {
+                        g_sGateOpInfo.state = GATE_OP_STAT_WAIT;
+                    }
+                    else
+                    {
+                       Gate_StartOpDelay(GATE_OP_DLY_TIM, g_nSysTick);         //延时等待下一次操作
+                    }
+                    
                 }
             }
         }
@@ -285,26 +298,35 @@ void Sys_GateTask(void)
     }
     else if(g_sGateOpInfo.state == GATE_OP_STAT_WAIT)
     {
-      
+       
+      /*
         if(g_sGateOpInfo.batOpState == GATE_OP_BAT_STAT_ING)
         {
              bratIngTick = g_nSysTick  ;
             //g_sGateOpInfo.batOpState = GATE_OP_BAT_STAT_ING ;
             g_sGateOpInfo.tick = g_nSysTick;
         }
-        /*
-        else
+*/
+
+        if(g_sGateOpInfo.batOpState == GATE_OP_BAT_STAT_OPEN)
+        {
+             bratIngTick = g_nSysTick  ;
+            g_sGateOpInfo.batOpState = GATE_OP_BAT_STAT_ING ;
+            g_sGateOpInfo.tick = g_nSysTick;
+        }
+        else if(g_sGateOpInfo.batOpState == GATE_OP_BAT_STAT_ING)
         {
             g_sGateOpInfo.tick = g_nSysTick;
             if(bratIngTick + GATE_OP_BR_BAT_TIM < g_nSysTick)
             {
                 bratIngTick =   g_nSysTick;
                 g_sGateOpInfo.batOpState = GATE_OP_BAT_STAT_OVER ;
+                g_nBatOpenFlag = TRUE;
                 
             }
         
         }
-*/
+      
         if(g_sGateOpInfo.tick + GATE_OP_TO_TIM < g_nSysTick)
         {
             g_sGateOpInfo.comErr[g_sGateOpInfo.slvIndex]++;
