@@ -155,9 +155,9 @@
         <mode>0</mode>
     </DisassembleMode>
     <Breakpoints2>
-        <Bp0>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_FlashM25.c}.0.1" 0 0 1 "" 0 "" 0</Bp0>
-        <Bp1>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_FlashM25.c}.0.1" 0 0 1 "" 0 "" 0</Bp1>
-        <Bp2>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_FlashM25.c}.0.1" 0 0 1 "" 0 "" 0</Bp2>
+        <Bp0>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_FlashM25.c}.10.1" 0 0 1 "" 0 "" 0</Bp0>
+        <Bp1>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_FlashM25.c}.10.1" 0 0 1 "" 0 "" 0</Bp1>
+        <Bp2>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_FlashM25.c}.10.1" 0 0 1 "" 0 "" 0</Bp2>
         <Bp3>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.0.1" 0 0 1 "" 0 "" 0</Bp3>
         <Bp4>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.252.14" 0 0 1 "" 0 "" 0</Bp4>
         <Bp5>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.312.13" 0 0 1 "" 0 "" 0</Bp5>

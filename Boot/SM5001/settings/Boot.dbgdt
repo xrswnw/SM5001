@@ -1021,7 +1021,7 @@
                     <item>g_sEC20RcvFrame</item>
                     <item>g_nSoftWare</item>
                     <item>g_sDeviceUpDataInfo</item>
-                    <item></item>
+                    <item />
                 </expressions>
                 <col-names>
                     <item>Expression</item>

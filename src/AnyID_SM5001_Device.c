@@ -1504,6 +1504,7 @@ void Device_ChkTempr()
 
 void Device_IO_Ctr(u8 flag)
 {
+    static BOOL fireFlag = TRUE;
     if(!g_nMasterFlag)
     {
           if((a_CheckStateBit(g_sIoInfo.flag, IO_FLAG_TEMPR_UP) || a_CheckStateBit(g_sIoInfo.state, IO_FLAG_FIRE)))
@@ -1525,6 +1526,13 @@ void Device_IO_Ctr(u8 flag)
             
           if((a_CheckStateBit(g_sIoInfo.state, IO_STAT_WATER) || a_CheckStateBit(g_sIoInfo.state, IO_FLAG_FIRE)))
           {
+            if(fireFlag)
+            {
+              if(a_CheckStateBit(g_sIoInfo.state, IO_FLAG_FIRE))
+              {
+                  fireFlag = FALSE;
+              }
+            }
             if(a_CheckStateBit(g_sIoInfo.state, IO_STAT_RELAY))
              {
                   IO_Realy_Close();    //≤‚ ‘πÿ±’
@@ -1533,16 +1541,15 @@ void Device_IO_Ctr(u8 flag)
           } 
           else
           {
-             if(!a_CheckStateBit(g_sIoInfo.state, IO_STAT_RELAY))
-             {
-                IO_Realy_Open();
-                a_SetStateBit(g_sIoInfo.state,IO_STAT_RELAY);
-             }
+              if(fireFlag)
+              {
+                 if(!a_CheckStateBit(g_sIoInfo.state, IO_STAT_RELAY))
+                 {
+                    IO_Realy_Open();
+                    a_SetStateBit(g_sIoInfo.state,IO_STAT_RELAY);
+                 }
+              }
           }
-          
-        
-        
-        
     }
     else
     {

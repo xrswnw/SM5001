@@ -158,7 +158,7 @@ void Sys_Init(void)
     Gate_Init(&g_sDeviceParams.gateParams, g_nSysTick);
     Water_Init();
     Sys_Delayms(500);WDG_FeedIWDog();
-    IO_Realy_Open(); a_SetStateBit(g_sIoInfo.state,IO_STAT_RELAY);                      //继电器开启问题
+    //IO_Realy_Open(); a_SetStateBit(g_sIoInfo.state,IO_STAT_RELAY);                      //继电器开启问题
     Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();//Sys_Delayms(500);WDG_FeedIWDog();
     Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();Sys_Delayms(500);WDG_FeedIWDog();  
     Device_Init();

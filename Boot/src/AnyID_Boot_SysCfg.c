@@ -147,7 +147,7 @@ void Sys_Init(void)
     Flash_ReadId();
     Flash_Demo();
 
-   //g_sFramBootParamenter.appState = FRAM_BOOT_APP_DATA_DOWD;//≤‚ ‘
+   g_sFramBootParamenter.appState = FRAM_BOOT_APP_OK;//≤‚ ‘
     
 
     Uart_InitInterface(UART_BAUDRARE);

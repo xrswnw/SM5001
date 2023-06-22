@@ -977,7 +977,7 @@
                     <item>g_aGateSlvInfo</item>
                     <item>g_nDeviceServerTxBuf</item>
                     <item>g_sFramBootParamenter</item>
-                    <item></item>
+                    <item />
                 </expressions>
                 <col-names>
                     <item>Expression</item>
@@ -1070,7 +1070,7 @@
                     <item>addr</item>
                     <item>b</item>
                     <item>DEVICE_VERSION</item>
-                    <item></item>
+                    <item />
                 </expressions>
                 <col-names>
                     <item>Expression</item>
