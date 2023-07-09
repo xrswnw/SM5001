@@ -133,7 +133,7 @@ typedef struct w232Par{
 #define W232_TOKEN_LEN                          99//131//129//129//127
 #define W232_CNT_IMEI_SRT_LEN					8
 
-#define W232_HEART_OFFLINE_TIME                 0x08
+#define W232_HEART_OFFLINE_TIME                 20
 
 #define W232_SERVER_TX_TO_TIME                  100
 typedef struct w232Connect{

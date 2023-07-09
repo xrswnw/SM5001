@@ -23,9 +23,9 @@
 
 if ($debugfile -eq "")
 {
-& "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.3\common\bin\cspybat" -f "E:\AnyID\Git\FY\SM5001\SM5001\settings\SM5001.Build.general.xcl" --backend -f "E:\AnyID\Git\FY\SM5001\SM5001\settings\SM5001.Build.driver.xcl" 
+& "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.3\common\bin\cspybat" -f "E:\AnyId\Git\SM5001_New\SM5001\settings\SM5001.Build.general.xcl" --backend -f "E:\AnyId\Git\SM5001_New\SM5001\settings\SM5001.Build.driver.xcl" 
 }
 else
 {
-& "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.3\common\bin\cspybat" -f "E:\AnyID\Git\FY\SM5001\SM5001\settings\SM5001.Build.general.xcl" --debug_file=$debugfile --backend -f "E:\AnyID\Git\FY\SM5001\SM5001\settings\SM5001.Build.driver.xcl" 
+& "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.3\common\bin\cspybat" -f "E:\AnyId\Git\SM5001_New\SM5001\settings\SM5001.Build.general.xcl" --debug_file=$debugfile --backend -f "E:\AnyId\Git\SM5001_New\SM5001\settings\SM5001.Build.driver.xcl" 
 }

@@ -29,6 +29,9 @@ extern const PORT_INF IO_WATER_INPUT;
 #define IO_Water_Chk()              ((IO_WATER_INPUT.Port->IDR & IO_WATER_INPUT.Pin) != (uint32_t)Bit_RESET)
 
 extern const PORT_INF IO_LIMIT_INPUT;
+#define IO_Rfid_Chk()              ((IO_LIMIT_INPUT.Port->IDR & IO_LIMIT_INPUT.Pin)  != (uint32_t)Bit_RESET)
+
+extern const PORT_INF IO_LIMIT_INPUT;
 #define IO_Door_Chk()              ((IO_LIMIT_INPUT.Port->IDR & IO_LIMIT_INPUT.Pin)  != (uint32_t)Bit_RESET)
 
 extern const PORT_INF IO_PWR_INPUT;

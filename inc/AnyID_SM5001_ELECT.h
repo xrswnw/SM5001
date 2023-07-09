@@ -13,6 +13,10 @@
 
 #define ELECT_GET_VALUE_FAIL            0xFFFFFFFF
 
+
+
+
+
 #define ELECT_STAT_IDLE                 0x00
 #define ELECT_STAT_RCV 		        0x01
 #define ELECT_STAT_OVR 		        0x04
@@ -44,6 +48,16 @@
 
 #define ELECT_WOEK_NORMAL                 0x00
 #define ELECT_WORK_SET_ZERO               0x01
+
+
+#define ELECT_MODE_645_SOF              0xFE
+#define ELECT_MODE_645_START            0x68
+#define ELECT_MODE_645_READER           0x11
+#define ELECT_MODE_645_ADDR_BROAD       0xAA
+#define ELECT_MODE_645_ADDR_NORMAL      0x000000000001
+
+#define ELECT_MODE_CMD_SET_CFG          0x15
+
 
 #define ELECT_STAT_OPEN_SAMPLE            0x01
 #define ELECT_STAT_STOP_SAMPLE            0x02
@@ -93,8 +107,8 @@ u16 Elect_GetCrc16(u8 *pBuffer, u8 len);
 u32 Float32(u32 NumFloat32);
 
 BOOL Elect_CheckFrame(ELECT_RX_BUF *pRcvFrame);
-
-void Elect_Init();
+u8 Elect_645_SetAdder(u8 *pBuffer, u8 cmd);
+void Elect_Init(u8 mode);
 void Elect_TransmitCmd(ELECT_TX_BUF *pBuffer);
-
+u8 Elect_Get_Sum(u8 *pFrame, u8 len);
 #endif

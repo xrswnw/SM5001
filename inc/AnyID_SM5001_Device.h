@@ -28,7 +28,7 @@ extern const PORT_INF DEV_INSEN_DAT;
 #define Device_GetInSensor()                     (DEV_INSEN_DAT.Port->IDR & DEV_INSEN_DAT.Pin)
 
 extern const PORT_INF DEV_INSEN_RFID0;
-#define Device_GetRfid0()                       (DEV_INSEN_RFID0.Port->IDR & DEV_INSEN_RFID0.Pin)
+
 
 extern const PORT_INF DEV_INSEN_WAT_FB;
 #define Device_GetWaterFB()                       (DEV_INSEN_WAT_FB.Port->IDR & DEV_INSEN_WAT_FB.Pin)
@@ -47,6 +47,12 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define DEVICE_CMD_GATE_DISENABLE           0x23
 #define DEVICE_CMD_GATE_KEY_CTR             0x24
 #define DEVICE_CMD_GATE_VOICE_CTR           0x25
+#define DEVICE_CMD_CTR_DOOR                 0x21
+#define DEVICE_CMD_CTR_LED                  0x26
+#define DEVICE_CMD_CTR_RELAY                0x27
+#define DEVICE_CMD_CTR_FAN                  0x28
+#define DEVICE_CMD_VERSION_UPDATA           0x29
+
 #define DEVICE_CMD_MQTT_KEY_WRITE           0x52
 #define DEVICE_CMD_MQTT_GET_IMEI            0x53
 
@@ -62,6 +68,8 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define DEVICE_SERVER_SATA_TX               2
 #define DEVICE_SERVER_SATA_RX               3
 
+
+#define DEVICE_CTR_DOOR_TIME                    100
 #define DEVICE_TEMPR_HIGH                       32
 
 #define DEVICE_HEART_MIN                     570
@@ -80,6 +88,8 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define DEVICE_STEP_ONE         0x01
 #define DEVICE_STEP_TWICE       0x02
 
+#define DEVICE_MASK_FLAG_NULL                   0
+#define DEVICE_MASK_FLAG_MAST                   0x01
 #define DEVICE_STEP_FLAG_OK                     0x00
 #define DEVICE_STEP_FLAG_DOOR_FAIL              0x01
 #define DEVICE_STEP_FLAG_BAT_NO_RTN             0x02
@@ -98,7 +108,8 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define DEVICE_FRAME_INFO_OK             0x00
 #define DEVICE_FRAME_INFO_FAIL           0x04
 
-
+#define DEVICE_IO_DEVICE_CLOSE           0x00
+#define DEVICE_IO_DEVICE_OPEN            0x01
 
 #define DEVICE_FRAME_ERR_DATA            0x01
 
@@ -120,6 +131,7 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define READER_RESPONSE_ERR_DEVICE      0x03
 
 #define DEVICE_RESPONSE_FLAG_RESET      0x01
+#define DEVICE_RESPONSE_FLAG_UPDATA     0x02
 
 #define DEVICE_FRAME_BROADCAST_ADDR     0xFFFF
 
@@ -138,6 +150,10 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define DEVICE_SERVERRSP_NUM            20
 
 //modele
+
+#define DEVICE_GATE_OP_TICK             20
+
+
 
 #define DEVICE_MODELE_LED               0x01
 #define DEVICE_MODELE_FAN               0x02
@@ -197,6 +213,8 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 
 #define DEVICE_KEY_UID_LEN              0x0C
 
+
+
 #define DEVICE_TEST_FLAG_DOOE_MODE           0x00000001
 
 #define DEVICE_TEST_DOOR_OPEN_TIM               5
@@ -215,6 +233,17 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define Device_At_Rsp(opt,repat,cmd)      do{g_nDeviceServerTxBuf.to[g_nDeviceServerTxBuf.num] = opt;g_nDeviceServerTxBuf.repeat[g_nDeviceServerTxBuf.num] = repat;g_nDeviceServerTxBuf.op[g_nDeviceServerTxBuf.num++] = cmd;g_nDeviceServerTxBuf.state |= DEVICE_SERVER_TXST_AT;}while(0)
 
 
+#define Device_Chk_Device_Stat(stat)          ({\
+                                                  u8 bOk = 0;\
+                                                  if(g_sIoInfo.deviceState & stat)\
+                                                  {\
+                                                        bOk = 1;\
+                                                  }\
+                                                    bOk;\
+                                                })
+
+
+
 #define Device_ChkBat_Num()       ({\
                                          u8 i = 0;\
                                          u8 num = 0;\
@@ -229,7 +258,7 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
                                     })\
 
 
-#define Device_Chk_Uid(p)       (p[0] != 0x00 && p[1] != 0x00&& p[1] != 0x00&& p[2] != 0x00&& p[3] != 0x00&& p[4] != 0x00&& p[5] != 0x00&& p[6] != 0x00) 
+#define Device_Chk_Uid(p)       (p[0] != 0x00 && p[1] != 0x00 && p[1] != 0x00 && p[2] != 0x00 && p[3] != 0x00 && p[4] != 0x00 && p[5] != 0x00 && p[6] != 0x00) 
 #define Gate_ClearOpInfo()      do{\
                                     g_sGateOpInfo.mode = 0;\
                                     g_sGateOpInfo.state = 0;\
@@ -248,6 +277,8 @@ typedef struct deviceParams{
     u8 rfu1;                            
     u16 rfu2;
     u8 addr;
+    u8 voiceSth;
+    u8 electMode;
     u8 offLineTime;
     u16 heartTick;
     GATE_PARAMS gateParams;
@@ -318,7 +349,7 @@ void Device_GateRsvSlvInfo(u8 *pParams, u16 paramsLen, GATE_OPINFO *pOpInfo);
 void Device_ReadDeviceParamenter(void);
 void Device_ReadMqttKey();
 void Device_ChkTempr();
-void Device_IO_Ctr(u8 flag);
+void Device_IO_Ctr();
 void Device_Ctr_BatVolce(u16 add, u8 mode, u8 step, u8 flag);
 void Device_VoiceCtr();
 void Device_InfoChgRsp(u8 *pBuffer, char *strAtBuff, char *strRspBuff, u8 addr, u32 id);

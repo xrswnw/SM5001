@@ -49,9 +49,14 @@ extern const PORT_INF ELECT_PORT_CTRL;
                                                      (ELECT_DMA)->IFCR = ELECT_RXDMA_TC_FLAG;\
                                                     (ELECT_RXDMA_CH)->CCR &= CCR_ENABLE_Reset;\
                                                 }while(0)
-#define Elect_GetRxLen()                     (ELECT_BUFFER_MAX_LEN - (ELECT_RXDMA_CH)->CNDTR)                                               
+#define Elect_GetRxLen()                     (ELECT_BUFFER_MAX_LEN - (ELECT_RXDMA_CH)->CNDTR)  
+                                                  
+#define ELECT_MODE_MODBUS_8_2           0x02 
+#define ELECT_MODE_MODBUS_8_1           0x01 
+#define ELECT_MODE_645                  0x00 
 
-void Elect_InitInterface(u32 baudrate);
+
+void Elect_InitInterface(u32 baudrate, u8 mode);
 void Elect_ConfigInt(FunctionalState state);
 void Elect_InitTxDma(u8 *pTxBuffer, u32 len);
 void Elect_InitRxDma(u8 *pRxBuffer, u32 len);

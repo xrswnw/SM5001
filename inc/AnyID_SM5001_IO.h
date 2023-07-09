@@ -28,17 +28,57 @@
 #define IO_STAT_SOUND_FAIL       0x0100
 #define IO_STAT_ELECT_FAIL       0x0200
 
+
+#define IO_FLAG_DOOR             0x0001
+#define IO_FLAG_FIRE             0x0002
+#define IO_FLAG_FAN              0x0004
+#define IO_FLAG_WATER            0x0008
+#define IO_FLAG_THUNDER          0x0010
+#define IO_FLAG_THUNDER_ATTCK    0x0020
+#define IO_FLAG_LIGHT            0x0040
+#define IO_FLAG_RELAY            0x0080
+#define IO_FLAG_SOUND_FAIL       0x0100
+#define IO_FLAG_ELECT_FAIL       0x0200
+
 #define IO_FLAG_TEMPR_UP         0x0001
 #define IO_FLAG_FIRE             0x0002
 
+
+
+#define IO_SENSOR_STAT_DOOR            0x01
+#define IO_SENSOR_STAT_SMOKE           0x02
+#define IO_SENSOR_STAT_WATER           0x04
+#define IO_SENSOR_STAT_THUNDER         0x08
+#define IO_SENSOR_STAT_THUNDER_ERR     0x10
+
+#define IO_SENSOR_STAT_RFID            0x08
+#define IO_SENSOR_STAT_TEMPR           0x40
+
+
+#define IO_DEVICE_STAT_FAN             0x01
+#define IO_DEVICE_STAT_RELAY           0x02
+#define IO_DEVICE_STAT_DOOR            0x04
+#define IO_DEVICE_STAT_LED             0x08
+
+#define IO_DEVICE_MASK_FLAG_FAN         0x01
+#define IO_DEVICE_MASK_FLAG_RELAY       0x02
+#define IO_DEVICE_MASK_FLAG_DOOR        0x04
+#define IO_DEVICE_MASK_FLAG_LED         0x08
+
+
 typedef struct ioInfo{
-    u32 state;
-    u32 tempState;
-    u32 flag;
+
     u8 ioState ;
     u8 eleMacTick ;  
     u8 warnValue;
+    u8 deviceState;
+    u8 senserState;
     u8 tick;
+    u8 maskFlag;
+    u32 state;
+    u32 tempState;
+    u32 flag;
+    u32 ctrlDoorTick;
 }IO_INFO;
 extern IO_INFO g_sIoInfo;
 
@@ -46,5 +86,7 @@ extern IO_INFO g_sIoInfo;
 u8 IO_Stat_Chk();
 
 void IO_Init();
+
+u8 IO_Sersor_Chk();
 
 #endif

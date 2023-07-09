@@ -3,9 +3,9 @@
 ELECT_INFO g_sElectInfo = {0};
 ELECT_RX_BUF g_sElectTempRcv = {0};
 
-void Elect_Init()
+void Elect_Init(u8 mode)
 {	
-    Elect_InitInterface(ELECT_BAUDRARE);
+    Elect_InitInterface(ELECT_BAUDRARE, mode);
     Elect_ConfigInt(ENABLE);
     Elect_InitTxDma(g_sElectInfo.txBuf.buffer, g_sElectInfo.txBuf.len);
     Elect_InitRxDma(g_sElectInfo.rxBuf.buffer, g_sElectInfo.rxBuf.len);
@@ -117,3 +117,45 @@ u32 Float32(u32 NumFloat32)
     return result;	
 }
 
+
+
+u8 Elect_645_SetAdder(u8 *pBuffer, u8 cmd)
+{
+    u8 pos = 0;
+    u8 len = 0;
+    pBuffer[pos++] = ELECT_MODE_645_SOF;
+    pBuffer[pos++] = ELECT_MODE_645_SOF;
+    pBuffer[pos++] = ELECT_MODE_645_SOF;
+    pBuffer[pos++] = ELECT_MODE_645_SOF;
+    pBuffer[pos++] = ELECT_MODE_645_START;
+    pBuffer[pos++] = ELECT_MODE_645_START;
+    pBuffer[pos++] = ELECT_MODE_645_ADDR_BROAD;
+    pBuffer[pos++] = ELECT_MODE_645_ADDR_BROAD;
+    pBuffer[pos++] = ELECT_MODE_645_ADDR_BROAD;
+    pBuffer[pos++] = ELECT_MODE_645_ADDR_BROAD;
+    pBuffer[pos++] = ELECT_MODE_645_ADDR_BROAD;
+    pBuffer[pos++] = ELECT_MODE_645_ADDR_BROAD;
+    pBuffer[pos++] = ELECT_MODE_645_START;
+    pBuffer[pos++] = 0x13;
+    pBuffer[pos++] = 0x00;
+    len += pos;
+    pBuffer[pos++] = Elect_Get_Sum(pBuffer, len);
+    pBuffer[pos++] = 0x16;
+
+    return pos;
+}
+
+u8 Elect_Get_Sum(u8 *pFrame, u8 len)
+{
+    u8 data = 0, i = 0;
+    
+    for(i = 0; i < len; i ++)
+    {
+        data += pFrame[i];
+    }
+    
+    
+    
+    return data;
+
+}

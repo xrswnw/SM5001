@@ -6,7 +6,7 @@ const PORT_INF ELECT_PORT_TX      = {GPIOA, GPIO_Pin_2};
 const PORT_INF ELECT_PORT_RX      = {GPIOA, GPIO_Pin_3};
 const PORT_INF ELECT_PORT_CTRL    = {GPIOA, GPIO_Pin_4};
 
-void Elect_InitInterface(u32 baudrate)
+void Elect_InitInterface(u32 baudrate, u8 mode)
 {
     GPIO_InitTypeDef GPIO_InitStructure = {0};
     USART_InitTypeDef USART_InitStructure = {0};
@@ -29,7 +29,19 @@ void Elect_InitInterface(u32 baudrate)
     
     USART_InitStructure.USART_BaudRate = baudrate;
     USART_InitStructure.USART_WordLength = USART_WordLength_8b;
-    USART_InitStructure.USART_StopBits = USART_StopBits_1;
+    if(mode == ELECT_MODE_645)
+    {
+        USART_InitStructure.USART_StopBits = USART_StopBits_1;
+    }
+    else if(mode == ELECT_MODE_MODBUS_8_1)
+    {
+    
+    }
+    else if(mode == ELECT_MODE_MODBUS_8_2)
+    {
+    
+    }
+    
     USART_InitStructure.USART_Parity = USART_Parity_No;
     USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
     USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;

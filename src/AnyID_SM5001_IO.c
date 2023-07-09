@@ -16,12 +16,10 @@ u8 IO_Stat_Chk()
     if(IO_Smoke_Chk())
     {
          g_sIoInfo.state |= IO_STAT_FIRE; 
-         g_sIoInfo.flag |= IO_FLAG_FIRE;
     }
     else
     {
         g_sIoInfo.state &= ~IO_STAT_FIRE;
-        g_sIoInfo.flag &= ~IO_FLAG_FIRE;
     }
      if(IO_Water_Chk())
     {
@@ -31,14 +29,7 @@ u8 IO_Stat_Chk()
     {
         g_sIoInfo.state &= ~IO_STAT_WATER;
     }
-     if(IO_Door_Chk())
-    {
-         g_sIoInfo.state |=  IO_STAT_DOOR;
-    }
-    else
-    {
-        g_sIoInfo.state &= ~IO_STAT_DOOR;
-    }
+
      if(IO_Pwr_Chk())
     {
          g_sIoInfo.state |= IO_STAT_THUNDER_ATTCK;
@@ -55,8 +46,42 @@ u8 IO_Stat_Chk()
     {
         g_sIoInfo.state &= ~IO_STAT_THUNDER;
     }
-  return g_sIoInfo.state;
+    
+    return g_sIoInfo.state;
 
+}
+
+
+u8 IO_Sersor_Chk()
+{
+    u8 sersorState = 0;
+    
+     if(IO_Door_Chk())
+    {
+         sersorState |=  IO_SENSOR_STAT_DOOR;
+    } 
+    if(IO_Smoke_Chk())
+    {
+         sersorState |= IO_SENSOR_STAT_SMOKE; 
+    }
+
+     if(IO_Water_Chk())
+    {
+         sersorState |= IO_SENSOR_STAT_WATER;
+    }
+     if(IO_Pwr_Chk())
+    {
+         sersorState |= IO_SENSOR_STAT_THUNDER;
+    }
+
+     if(IO_Pwr_Err_Chk())
+    {
+         sersorState |= IO_SENSOR_STAT_THUNDER_ERR;
+    }
+
+
+
+    return sersorState;
 }
 
 

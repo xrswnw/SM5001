@@ -153,7 +153,7 @@ void Sys_Init(void)
     
     Sound_Init();
     
-    Elect_Init();
+    //Elect_Init();
     Device_InitInSensor();
     Gate_Init(&g_sDeviceParams.gateParams, g_nSysTick);
     Water_Init();
@@ -184,21 +184,6 @@ void Sys_LedTask(void)
     {
         a_ClearStateBit(g_nSysState, SYS_STAT_RUNLED);
         g_nLedDelayTime++;
-        
-        if(Device_GetWaterFB() == 0)
-        {
-            g_nTestIndex++;
-            if(g_nTestIndex == 1)
-            {
-                u8 sn[] = {0x63, 0x22, 0x12, 0x00, 0x01, 0x19};
-                //Gate_ChagSlaver(&g_sGateOpInfo.slvCmd, 0, GATE_SUB_INDEX0, GATE_CHAG_ENABLE);
-                Gate_BrwBat(&g_sGateOpInfo.slvCmd, 0, GATE_SUB_INDEX0, sn);
-                g_sGateOpInfo.brwBat.step = 0xFF;
-                g_sGateOpInfo.brwBat.flag = 0xFF;
-                g_sGateOpInfo.brwBat.tick = g_nSysTick;
-            }
-        }
-        
         if(a_CheckStateBit(g_nSysState, SYS_STAT_MQTT_ACCESS))
         {
             if(g_nLedDelayTime & 0x0A)
@@ -241,17 +226,6 @@ void Sys_GateTask(void)
                 if(Device_GateProceRspFrame(g_sGateOpInfo.rxFrame.buffer + startPos, &g_sGateOpInfo, g_nSysTick))
                 {
                     a_SetState(g_sGateOpInfo.rpt, SYS_NULL_TICK);//清空RPT标志
-                    
-                    /*
-                    if(g_sGateOpInfo.batOpState == GATE_OP_BAT_STAT_ING)
-                    {
-                        g_sGateOpInfo.state = GATE_OP_STAT_WAIT;
-                    }
-                    else
-                    {
-                       Gate_StartOpDelay(GATE_OP_DLY_TIM, g_nSysTick);         //延时等待下一次操作
-                    } */
-                        
                     
                     if(g_sGateOpInfo.batOpState == GATE_OP_BAT_STAT_ING)
                     {
@@ -298,16 +272,6 @@ void Sys_GateTask(void)
     }
     else if(g_sGateOpInfo.state == GATE_OP_STAT_WAIT)
     {
-       
-      /*
-        if(g_sGateOpInfo.batOpState == GATE_OP_BAT_STAT_ING)
-        {
-             bratIngTick = g_nSysTick  ;
-            //g_sGateOpInfo.batOpState = GATE_OP_BAT_STAT_ING ;
-            g_sGateOpInfo.tick = g_nSysTick;
-        }
-*/
-
         if(g_sGateOpInfo.batOpState == GATE_OP_BAT_STAT_OPEN)
         {
              bratIngTick = g_nSysTick  ;
@@ -322,9 +286,7 @@ void Sys_GateTask(void)
                 bratIngTick =   g_nSysTick;
                 g_sGateOpInfo.batOpState = GATE_OP_BAT_STAT_OVER ;
                 g_nBatOpenFlag = TRUE;
-                
             }
-        
         }
       
         if(g_sGateOpInfo.tick + GATE_OP_TO_TIM < g_nSysTick)
@@ -339,30 +301,49 @@ void Sys_GateTask(void)
             {
                 Gate_StartOpDelay(GATE_OP_DLY_TIM, g_nSysTick);
             }
+            if(g_sGateOpInfo.comErr[g_sGateOpInfo.slvIndex] >= DEVICE_GATE_OP_TICK)
+            {
+                g_aGateSlvInfo[2 * (g_sGateOpInfo.slvIndex - 1)].bTxInfo = FALSE;
+                g_aGateSlvInfo[2 * (g_sGateOpInfo.slvIndex - 1) + 1].bTxInfo = FALSE;
+            }
+            
             
         }
-        if( a_CheckStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_GATE))
+        if( a_CheckStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_GATE))  //cmd命令超时处理   add
         { 
-            if(g_sGateOpInfo.tickCmd + GATE_OP_TO_TIM * 2 < g_nSysTick)
+            if(g_sGateOpInfo.tickCmd + GATE_OP_MQTT_CMD_TIM < g_nSysTick)
             {
-              
-                a_ClearStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_GATE);
-                g_sDeviceRspFrame.err = READER_RESPONSE_ERR_DEVICE;
-                g_sDeviceRspFrame.len = Device_ResponseFrame(NULL, 0, &g_sDeviceRspFrame);
-                Device_At_Rsp(W232_CNT_TIME_1S, W232_CNT_REPAT_NULL, W232_MQTT_TOPIC_CMD);
+                if(g_sGateOpInfo.rpt < GATE_RPT_NUM)
+                {
+                    g_sGateOpInfo.state = GATE_OP_STAT_TX;
+                }
+                else
+                {
+                    a_ClearStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_GATE);
+                    g_sDeviceRspFrame.err = READER_RESPONSE_ERR_DEVICE;
+                    g_sDeviceRspFrame.len = Device_ResponseFrame(NULL, 0, &g_sDeviceRspFrame);
+                    Device_At_Rsp(W232_CNT_TIME_1S, W232_CNT_REPAT_NULL, W232_MQTT_TOPIC_CMD);
+                }
             }
             
         }
 
-        if(a_CheckStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_BWBAT) || a_CheckStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_REBAT))
+        if(a_CheckStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_BWBAT) || a_CheckStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_REBAT)) //cmd命令超时处理 add
         {
-            if(g_sGateOpInfo.tickCmd + GATE_OP_TO_TIM * 2 < g_nSysTick)
+            if(g_sGateOpInfo.tickCmd + GATE_OP_MQTT_CMD_TIM < g_nSysTick)
             {   
-                a_ClearStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_BWBAT); 
-                a_ClearStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_REBAT);
-                g_sDeviceRspFrame.err = READER_RESPONSE_ERR_DEVICE;
-                g_sDeviceRspFrame.len = Device_ResponseFrame(NULL, 0, &g_sDeviceRspFrame);
-                Device_At_Rsp(W232_CNT_TIME_1S, W232_CNT_REPAT_NULL, W232_MQTT_TOPIC_CMD);
+                if(g_sGateOpInfo.rpt < GATE_RPT_NUM)
+                {
+                    g_sGateOpInfo.state = GATE_OP_STAT_TX;
+                }
+                else
+                {
+                    a_ClearStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_BWBAT); 
+                    a_ClearStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_REBAT);
+                    g_sDeviceRspFrame.err = READER_RESPONSE_ERR_DEVICE;
+                    g_sDeviceRspFrame.len = Device_ResponseFrame(NULL, 0, &g_sDeviceRspFrame);
+                    Device_At_Rsp(W232_CNT_TIME_1S, W232_CNT_REPAT_NULL, W232_MQTT_TOPIC_CMD);
+                }
             }
         
         }
@@ -418,14 +399,14 @@ void Sys_SoundTask()
     {
         a_ClearStateBit(g_sSoundInfo.state, SOUND_STAT_TX);
 
-            if(g_sSoundInfo.txBuf.index < g_sSoundInfo.txBuf.num)
-            {
-                Sound_ClearRxBuffer();
-                Sound_CtrTxCmd(&g_sSoundInfo.txBuf, g_nSysTick);
-                g_sSoundInfo.txBuf.flag = SOUNE_VOICE_LOADING;
-                a_SetState(g_sSoundInfo.state, SOUND_STAT_RCV | SOUND_STAT_WAIT);
-            }
-            Sounde_Open();
+        if(g_sSoundInfo.txBuf.index < g_sSoundInfo.txBuf.num)
+        {
+            Sound_ClearRxBuffer();
+            Sound_CtrTxCmd(&g_sSoundInfo.txBuf, g_nSysTick);
+            g_sSoundInfo.txBuf.flag = SOUNE_VOICE_LOADING;
+            a_SetState(g_sSoundInfo.state, SOUND_STAT_RCV | SOUND_STAT_WAIT);
+        }
+        Sounde_Open();
     }
     
     if(a_CheckStateBit(g_sSoundInfo.state, SOUND_STAT_WAIT))    
@@ -456,7 +437,7 @@ void Sys_SoundTask()
         Sound_ConnectStep(&g_sSoundInfo.txBuf); 
         
             a_SetState(g_sSoundInfo.state, SOUND_STAT_TX);
-            if(g_sSoundInfo.txBuf.index == g_sSoundInfo.txBuf.num )              
+            if(g_sSoundInfo.txBuf.index >= g_sSoundInfo.txBuf.num )              
             {
                 memset(&g_sSoundInfo.txBuf, 0 ,sizeof(SOUND_TX_BUF));
             }
@@ -492,7 +473,7 @@ void Sys_ElectTask()
 	USART_ClearFlag(ELECT_PORT, USART_FLAG_NE | USART_FLAG_FE | USART_FLAG_PE); 
 	Sys_Delayms(5);
 	memset(&(g_sElectInfo.rxBuf), 0, sizeof(ELECT_INFO));
-        Elect_Init();
+        //Elect_Init();
 	g_sElectInfo.state = ELECT_STAT_IDLE;
 
     }
@@ -517,7 +498,7 @@ void Sys_ElectTask()
     {
         a_ClearStateBit(g_sElectInfo.state, ELECT_STAT_TX);
         g_sElectInfo.time ++;
-        if(g_sElectInfo.time == ELECT_SAMPLE_TIME)
+        if(g_sElectInfo.time > ELECT_SAMPLE_TIME)
         {
               g_sElectInfo.tick = g_nSysTick;
               a_SetState(g_sElectInfo.time, SYS_NULL_TICK);
@@ -531,7 +512,7 @@ void Sys_ElectTask()
         if(g_sElectInfo.tick + ELECT_OP_TIME < g_nSysTick) 
         {
             g_sElectInfo.repeat ++ ;
-            if(g_sElectInfo.repeat == ELECT_SAMPLE_NUM)       
+            if(g_sElectInfo.repeat > ELECT_SAMPLE_NUM)       
             { 
                 g_sElectInfo.tick  = g_nSysTick;
                 g_sElectInfo.electValue = ELECT_GET_VALUE_FAIL;
@@ -733,6 +714,9 @@ void Sys_W232Task(void)
         {
             if(g_sW232Connect.cmd == W232_CNT_CMD_PWRON)                //开机执行失败，请求关闭，这里不需要重连了，因为下次还是会重连的
             {
+                W232_CtrlLow();
+                W232_KeyLow();
+                Reader_Delayms(20000);
                 W232_ConnectInit(&g_sW232Connect, W232_CNT_CMD_PWROFF, &g_sDeviceParams.serverParams);
                 a_SetState(g_sW232Connect.state, W232_CNT_OP_STAT_TX);
             }
@@ -846,7 +830,7 @@ void Sys_ServerTask(void)
             }
             else
             {
-                //a_SetStateBit(g_nDeviceServerTxBuf.state, DEVICE_SERVER_TXST_AT);             
+                a_SetStateBit(g_nDeviceServerTxBuf.state, DEVICE_SERVER_TXST_AT);             
             }
         }
     }
@@ -954,31 +938,37 @@ void Sys_WaterTask()
 
 
 void Sys_IOTask()
-{
+{  
+    static u8 tempState = 0;
+    
     if(a_CheckStateBit(g_nSysState, SYS_STAT_SENSOR_CHK))
     {   
-      
-        if(g_sIoInfo.warnValue == IO_Stat_Chk())
+        if(tempState == IO_Sersor_Chk())
         {
             g_sIoInfo.tick++;
-            if(g_sIoInfo.tick == DEVICE_REPEAT_TIME)
+            if(g_sIoInfo.tick > DEVICE_REPEAT_TIME)
             {
                 a_SetState(g_sIoInfo.tick, SYS_NULL_TICK);
-                Device_IO_Ctr(g_sIoInfo.flag);
-
+                g_sIoInfo.senserState = tempState;
+                Device_IO_Ctr(g_sIoInfo.flag); 
             }
         }
         else
         {
             a_SetState(g_sIoInfo.tick, SYS_NULL_TICK);
-            g_sIoInfo.warnValue = IO_Stat_Chk();
+            tempState = IO_Sersor_Chk();
         }
         a_ClearStateBit(g_nSysState, SYS_STAT_SENSOR_CHK);
         
     }
-
     
-
+    if((g_sIoInfo.state & IO_DEVICE_STAT_DOOR || g_sIoInfo.senserState & IO_SENSOR_STAT_DOOR) && g_sIoInfo.ctrlDoorTick + DEVICE_CTR_DOOR_TIME < g_nSysTick)//门开
+    {
+        IO_Door_Close();
+        g_sIoInfo.state &= ~IO_DEVICE_STAT_DOOR;
+    }
+    
+    
 }
 
 void Sys_AdTask()   
@@ -987,7 +977,6 @@ void Sys_AdTask()
     {
         a_ClearStateBit(g_nSysState, SYS_STAT_AD);
         Device_ChkTempr();
-        
     }
 }
 
@@ -1003,7 +992,7 @@ void Sys_HeratTask()
         a_ClearStateBit(g_nSysState, SYS_STAT_MQTT_HEART);
         g_sDeviceParams.heartTick ++;
         
-        if(g_sDeviceParams.heartTick == (g_sDeviceParams.gateTick * DEVICE_HEART_MIN))
+        if(g_sDeviceParams.heartTick > (g_sDeviceParams.gateTick * DEVICE_HEART_MIN))
         {
             WDG_FeedIWDog();
             g_sDeviceParams.heartTick = 0;
@@ -1012,7 +1001,7 @@ void Sys_HeratTask()
         }
     }
     
-    if(g_sDeviceParams.offLineTime & (W232_HEART_OFFLINE_TIME ))
+    if(g_sDeviceParams.offLineTime >  W232_HEART_OFFLINE_TIME)
     {
         a_ClearStateBit(g_nSysState, SYS_STAT_LTEDTU);                                  //離綫，等待重連
         Water_WriteStr("twice link") ;                                                //離綫處理
@@ -1025,7 +1014,7 @@ void Sys_HeratTask()
         static u8 statTick = 0;
         
         statTick ++;
-        if(statTick == DEVICE_STAT_CHK_TIM)
+        if(statTick > DEVICE_STAT_CHK_TIM)
         { 
           a_SetState(statTick, SYS_NULL_TICK);
           Device_Gate_StateRsp();
@@ -1065,7 +1054,7 @@ void Sys_TestTask()
     if(a_CheckStateBit(g_nSysState, SYS_STAT_TEST_TIM)) 
     {
           a_ClearStateBit(g_nSysState, SYS_STAT_TEST_TIM); 
-          if(tick == DEVICE_TEST_DOOR_OPEN_TIM)
+          if(tick > DEVICE_TEST_DOOR_OPEN_TIM)
           {
               tick = 0;
               if(addr <= (GATE_SLAVER_NUM << 1))
@@ -1094,12 +1083,6 @@ void Sys_TestTask()
             tick ++;
           }
     }
-    
-
-
-
-
-
 }
 
 

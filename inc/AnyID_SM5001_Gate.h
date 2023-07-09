@@ -137,6 +137,8 @@ typedef struct gateSlvState{
 #define GATE_FRAME_CMD_GATE_TEST        0x88
 
 #define GATE_RRAME_OPEN_DOOR            0x02
+
+
 typedef struct gateTxFrame{
     u8 buffer[GATE_TX_FRAME_LEN];
     u16 len;
@@ -161,6 +163,7 @@ typedef struct gateRxFrame{
 #define GATE_INIT_DLY_TIM       (200 * 3)       //开机延时，等待从机工作正常，才可以操作设别
 #define GATE_OP_DLY_TIM         0x01
 #define GATE_OP_TO_TIM          200
+#define GATE_OP_MQTT_CMD_TIM    600
 #define GATE_OP_TX_TIM          0x05
 
 #define GATE_OP_BR_BAT_TIM      12000
@@ -259,7 +262,7 @@ typedef struct gateOpInfo{
     u8 rpt;
     //
     u8 flag;
-    //
+    u8 relust;
     GATE_PARAMS *pGateParams;
     GATE_SLVCMD slvCmd;
     GATE_OPBAT brwBat;

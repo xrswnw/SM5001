@@ -113,7 +113,7 @@
 
 
 #define SOUND_VOCIE_MAX                 0x1E
-
+#define SOUND_VOCIE_NORMAL              0x0F
 #define SOUND_OP_TIM                    800
 
 #define SOUND_VOICE_NUM                 100
