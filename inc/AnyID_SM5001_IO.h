@@ -75,6 +75,7 @@ typedef struct ioInfo{
     u8 senserState;
     u8 tick;
     u8 maskFlag;
+    u8 tempState1;
     u32 state;
     u32 tempState;
     u32 flag;

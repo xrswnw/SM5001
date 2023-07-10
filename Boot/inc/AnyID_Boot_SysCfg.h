@@ -65,8 +65,8 @@ void Sys_ReplaceDeviceTask();
 
 void Sys_EC20Task(void);
 
-#define SYS_VER_HEAD                            "SM500100"
-#define SYS_VER_HEAD_SIZE                       8
+#define SYS_VER_HEAD                            "SM5001"
+#define SYS_VER_HEAD_SIZE                       6
 #define SYS_VER_HARD_TYPE                       "GD322302"
     
 

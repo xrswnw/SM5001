@@ -166,7 +166,9 @@ typedef struct gateRxFrame{
 #define GATE_OP_MQTT_CMD_TIM    600
 #define GATE_OP_TX_TIM          0x05
 
-#define GATE_OP_BR_BAT_TIM      12000
+#define GATE_OP_BR_BAT_TIM      400
+
+#define GATE_OP_TIM_FRAME       0xEE
 
 #define CHAG_STEP_NUM           3
 #define CHAG_STEP_IDX0          0
@@ -227,7 +229,10 @@ typedef struct gateParams{
 #define GATE_OP_BAT_STAT_OVER                       0x01
 #define GATE_OP_BAT_STAT_ING                        0x02
 #define GATE_OP_BAT_STAT_OPEN                       0x04
+#define GATE_OP_BAT_STAT_STEP                       0x08
 
+
+#define GATE_OP_BAT_INFO_REPATNUM                       5
 
 #define GATE_FLAG_DOOR_TEST             1
 
@@ -263,6 +268,7 @@ typedef struct gateOpInfo{
     //
     u8 flag;
     u8 relust;
+    u8 batInfoRepat;
     GATE_PARAMS *pGateParams;
     GATE_SLVCMD slvCmd;
     GATE_OPBAT brwBat;

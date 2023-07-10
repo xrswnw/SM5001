@@ -221,19 +221,32 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define DEVICE_GATE_OPEN_DOOR                   0x02
 
 
-#define Device_Chk_Gate(v)                      (v != DEVICE_SM5001_ID && v != DEVICE_SM5003_ID)
-#define Device_Ansy_Frame(add, c, frame)        do{g_sGateOpInfo.mode = GATE_MODE_CMD;g_sGateOpInfo.state = GATE_OP_STAT_WAIT;g_sGateOpInfo.cmd = c;g_sGateOpInfo.slvIndex = (add -1)>> 1;g_sGateOpInfo.slvCmd.paramsLen = 2;g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;g_sGateOpInfo.slvCmd.params[1] = frame;}while(0)    
-#define Device_Ansy_Test_Frame(add, c, frame)   do{g_sGateOpInfo.mode = GATE_MODE_CMD;g_sGateOpInfo.state = GATE_OP_STAT_WAIT;g_sGateOpInfo.cmd = c;g_sGateOpInfo.slvIndex = add ;g_sGateOpInfo.slvCmd.paramsLen = 2;g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;g_sGateOpInfo.slvCmd.params[1] = frame;}while(0)
-#define Device_Gate_RtBat(add)                  do{g_sGateOpInfo.add = add - 1;g_sGateOpInfo.state = GATE_OP_STAT_WAIT;g_sGateOpInfo.mode = GATE_MODE_CMD;g_sGateOpInfo.cmd = GATE_FRAME_CMD_RTNBAT;g_sGateOpInfo.slvIndex = (add -1)>> 1;g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;g_sGateOpInfo.slvCmd.paramsLen = DEVICE_BAT_SN_LEN + 1;}while(0)                                 
-#define Device_Gate_BrBat(add)                  do{g_sGateOpInfo.add = add - 1;g_sGateOpInfo.state = GATE_OP_STAT_WAIT;g_sGateOpInfo.mode = GATE_MODE_CMD;g_sGateOpInfo.cmd = GATE_FRAME_CMD_BRWBAT;g_sGateOpInfo.slvIndex = (add -1)>> 1;g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;g_sGateOpInfo.slvCmd.paramsLen = DEVICE_BAT_SN_LEN + 1;}while(0) 
-#define Device_Gate_PlBat(add,v)                do{g_sGateOpInfo.add = add - 1;g_sGateOpInfo.state = GATE_OP_STAT_WAIT;g_sGateOpInfo.mode = GATE_MODE_CMD;g_sGateOpInfo.cmd = GATE_FRAME_CMD_PLANE_BAT;g_sGateOpInfo.slvIndex = (add -1)>> 1;g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;g_sGateOpInfo.slvCmd.params[1]= v;g_sGateOpInfo.slvCmd.paramsLen = DEVICE_BAT_SN_LEN + 1 + 1;}while(0)
-
-#define Device_Voice_Apo(opt,repat,cmd,vn)     do{g_sSoundInfo.txBuf.index = 0;g_sSoundInfo.txBuf.num = 0;/**/g_sSoundInfo.txBuf.cd[g_sSoundInfo.txBuf.num] = SOUND_FRAME_CMD_APPOINT_FOLDER; g_sSoundInfo.txBuf.to[g_sSoundInfo.txBuf.num] = opt;g_sSoundInfo.txBuf.id[g_sSoundInfo.txBuf.num] = vn;g_sSoundInfo.txBuf.repeat[g_sSoundInfo.txBuf.num] = repat;g_sSoundInfo.txBuf.op[g_sSoundInfo.txBuf.num++] = cmd;g_sSoundInfo.state = SOUND_STAT_TX;}while(0)
-#define Device_Voice_Ctr(opt,repat,cmd,vn)     do{g_sSoundInfo.txBuf.index = 0;g_sSoundInfo.txBuf.num = 0;g_sSoundInfo.txBuf.to[g_sSoundInfo.txBuf.num] = opt;g_sSoundInfo.txBuf.id[g_sSoundInfo.txBuf.num] = vn;g_sSoundInfo.txBuf.repeat[g_sSoundInfo.txBuf.num] = repat;g_sSoundInfo.txBuf.cd[g_sSoundInfo.txBuf.num] = SOUND_FRAME_CMD_VOL_STR_AOP;g_sSoundInfo.txBuf.op[g_sSoundInfo.txBuf.num++] = cmd;g_sSoundInfo.state = SOUND_STAT_TX;}while(0)
-#define Device_At_Rsp(opt,repat,cmd)      do{g_nDeviceServerTxBuf.to[g_nDeviceServerTxBuf.num] = opt;g_nDeviceServerTxBuf.repeat[g_nDeviceServerTxBuf.num] = repat;g_nDeviceServerTxBuf.op[g_nDeviceServerTxBuf.num++] = cmd;g_nDeviceServerTxBuf.state |= DEVICE_SERVER_TXST_AT;}while(0)
+#define Device_ChkGate(v)                      (v != DEVICE_SM5001_ID && v != DEVICE_SM5003_ID)
+#define Device_AnsyFrame(add, c, frame)        do{g_sGateOpInfo.mode = GATE_MODE_CMD;g_sGateOpInfo.state = GATE_OP_STAT_WAIT;g_sGateOpInfo.cmd = c;g_sGateOpInfo.slvIndex = (add -1)>> 1;g_sGateOpInfo.slvCmd.paramsLen = 2;g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;g_sGateOpInfo.slvCmd.params[1] = frame;}while(0)    
+#define Device_AnsyTestFrame(add, c, frame)   do{g_sGateOpInfo.mode = GATE_MODE_CMD;g_sGateOpInfo.state = GATE_OP_STAT_WAIT;g_sGateOpInfo.cmd = c;g_sGateOpInfo.slvIndex = add ;g_sGateOpInfo.slvCmd.paramsLen = 2;g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;g_sGateOpInfo.slvCmd.params[1] = frame;}while(0)
+#define Device_GateRtBat(add)                  do{g_sGateOpInfo.add = add - 1;g_sGateOpInfo.state = GATE_OP_STAT_WAIT;g_sGateOpInfo.mode = GATE_MODE_CMD;g_sGateOpInfo.cmd = GATE_FRAME_CMD_RTNBAT;g_sGateOpInfo.slvIndex = (add -1)>> 1;g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;g_sGateOpInfo.slvCmd.paramsLen = DEVICE_BAT_SN_LEN + 1;}while(0)                                 
+#define Device_GateBrBat(add)                  do{g_sGateOpInfo.add = add - 1;g_sGateOpInfo.state = GATE_OP_STAT_WAIT;g_sGateOpInfo.mode = GATE_MODE_CMD;g_sGateOpInfo.cmd = GATE_FRAME_CMD_BRWBAT;g_sGateOpInfo.slvIndex = (add -1)>> 1;g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;g_sGateOpInfo.slvCmd.paramsLen = DEVICE_BAT_SN_LEN + 1;}while(0) 
+#define Device_GatePlBat(add,v)                do{g_sGateOpInfo.add = add - 1;g_sGateOpInfo.state = GATE_OP_STAT_WAIT;g_sGateOpInfo.mode = GATE_MODE_CMD;g_sGateOpInfo.cmd = GATE_FRAME_CMD_PLANE_BAT;g_sGateOpInfo.slvIndex = (add -1)>> 1;g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;g_sGateOpInfo.slvCmd.params[1]= v;g_sGateOpInfo.slvCmd.paramsLen = DEVICE_BAT_SN_LEN + 1 + 1;}while(0)
 
 
-#define Device_Chk_Device_Stat(stat)          ({\
+/*
+#define Device_GateBatTwice(cmd,addr)             do{\
+                                                      g_sGateOpInfo.add = addr - 1;\
+                                                      g_sGateOpInfo.state = GATE_OP_STAT_WAIT;\
+                                                      g_sGateOpInfo.mode = GATE_MODE_CMD;\
+                                                      g_sGateOpInfo.cmd = cmd;\
+                                                      g_sGateOpInfo.slvIndex = (addr -1)>> 1;\
+                                                      g_sGateOpInfo.slvCmd.params[0] = (addr + 1)% 2;\
+                                                      g_sGateOpInfo.slvCmd.paramsLen = 1;\
+                                                  }while(0)
+   */                                                 
+
+#define Device_VoiceApoFrame(opt,repat,cmd,vn)     do{g_sSoundInfo.txBuf.index = 0;g_sSoundInfo.txBuf.num = 0;/**/g_sSoundInfo.txBuf.cd[g_sSoundInfo.txBuf.num] = SOUND_FRAME_CMD_APPOINT_FOLDER; g_sSoundInfo.txBuf.to[g_sSoundInfo.txBuf.num] = opt;g_sSoundInfo.txBuf.id[g_sSoundInfo.txBuf.num] = vn;g_sSoundInfo.txBuf.repeat[g_sSoundInfo.txBuf.num] = repat;g_sSoundInfo.txBuf.op[g_sSoundInfo.txBuf.num++] = cmd;g_sSoundInfo.state = SOUND_STAT_TX;}while(0)
+#define Device_VoiceCtrFrame(opt,repat,cmd,vn)     do{g_sSoundInfo.txBuf.index = 0;g_sSoundInfo.txBuf.num = 0;g_sSoundInfo.txBuf.to[g_sSoundInfo.txBuf.num] = opt;g_sSoundInfo.txBuf.id[g_sSoundInfo.txBuf.num] = vn;g_sSoundInfo.txBuf.repeat[g_sSoundInfo.txBuf.num] = repat;g_sSoundInfo.txBuf.cd[g_sSoundInfo.txBuf.num] = SOUND_FRAME_CMD_VOL_STR_AOP;g_sSoundInfo.txBuf.op[g_sSoundInfo.txBuf.num++] = cmd;g_sSoundInfo.state = SOUND_STAT_TX;}while(0)
+#define Device_AtRsp(opt,repat,cmd)                do{g_nDeviceServerTxBuf.to[g_nDeviceServerTxBuf.num] = opt;g_nDeviceServerTxBuf.repeat[g_nDeviceServerTxBuf.num] = repat;g_nDeviceServerTxBuf.op[g_nDeviceServerTxBuf.num++] = cmd;g_nDeviceServerTxBuf.state |= DEVICE_SERVER_TXST_AT;}while(0)
+
+
+#define Device_ChkDeviceStat(stat)          ({\
                                                   u8 bOk = 0;\
                                                   if(g_sIoInfo.deviceState & stat)\
                                                   {\
@@ -274,6 +287,10 @@ typedef struct deviceParams{
     W232_PARAMS serverParams;
     WINAVG_INFO temprUp;
     WINAVG_INFO temprDown;
+    GATE_PARAMS gateParams;
+    u16 gateTick;                       //仓控交互数据时间间隔
+    u16 gateNum;                        //仓控板数目
+    u16 gateTxTick;                     //仓信息上报记录时间间隔
     u8 rfu1;                            
     u16 rfu2;
     u8 addr;
@@ -281,20 +298,14 @@ typedef struct deviceParams{
     u8 electMode;
     u8 offLineTime;
     u16 heartTick;
-    GATE_PARAMS gateParams;
-    u16 gateTick;                       //仓控交互数据时间间隔
-    u16 gateNum;                        //仓控板数目
-    u16 gateTxTick;                     //仓信息上报记录时间间隔
     u32 crc;
 }DEVICE_PARAMS;
-extern DEVICE_PARAMS g_sDeviceParams;
 
 typedef struct deviceTest{
      u8 num;
      u8 index;  
      u32 flag;
 }DEVICE_TEST ;
-extern DEVICE_TEST g_nDeviceTestInfo;
 
 typedef struct readerRspFrame{
     u16 len;
@@ -307,9 +318,6 @@ typedef struct readerRspFrame{
     u32 mark;
     u8 repeat;
 }READER_RSPFRAME;
-extern READER_RSPFRAME g_sDeviceRspFrame;
-
-
 
 typedef struct deviceSenverTxBuff{
     u8 num;
@@ -324,8 +332,6 @@ typedef struct deviceSenverTxBuff{
     u32 tick;
     u32 state;
 }DEVICE_SENVER_TXBUFFER;
-extern DEVICE_SENVER_TXBUFFER g_nDeviceServerTxBuf;
-
 
 typedef struct deviceImpRspInfo{
   u8 add;
@@ -339,6 +345,13 @@ typedef struct deviceImpRspInfo{
 
 
 extern BOOL g_nBatOpenFlag;
+extern u32 g_nBratIngTick  ;
+extern DEVICE_IMPRSP_INFO g_nDeviceImpRspInfo   ;
+extern DEVICE_SENVER_TXBUFFER g_nDeviceServerTxBuf;
+extern READER_RSPFRAME g_sDeviceRspFrame;
+extern DEVICE_TEST g_nDeviceTestInfo;
+extern DEVICE_PARAMS g_sDeviceParams;
+
 
 void Device_Init();
 void Device_ServerProcessRxInfo(W232_RCVBUFFER *pRcvBuffer, u32 tick); 
@@ -349,8 +362,8 @@ void Device_GateRsvSlvInfo(u8 *pParams, u16 paramsLen, GATE_OPINFO *pOpInfo);
 void Device_ReadDeviceParamenter(void);
 void Device_ReadMqttKey();
 void Device_ChkTempr();
-void Device_IO_Ctr();
-void Device_Ctr_BatVolce(u16 add, u8 mode, u8 step, u8 flag);
+void Device_IoCtr();
+void Device_CtrBatVolce(u16 add, u8 mode, u8 step, u8 flag);
 void Device_VoiceCtr();
 void Device_InfoChgRsp(u8 *pBuffer, char *strAtBuff, char *strRspBuff, u8 addr, u32 id);
 void Device_RtuRsp(u8 *pBuffer, char *strAtBuff, char *strRspBuff, u8 addr, u32 id);
@@ -359,24 +372,22 @@ void Device_UpHeartData(u32 id, u8 *pBuffer, char *strAtBuff, char *strRspBuff, 
 void Device_PostRsp(W232_CONNECT *pCntOp0,u8 *pBuffer, char *strAtBuff, char *strRspBuff,u16 len);
 void Device_CommunTxCmd(DEVICE_SENVER_TXBUFFER *pCntOp, u32 sysTick);
 void Device_CommunStep(DEVICE_SENVER_TXBUFFER *pCntOp);
-void Device_Gate_StateChk(u8 index);
-void Device_VoiceCtr();
-void Device_Gate_StateInit();
-void Device_Gate_StateRsp();
-
+void Device_GateStateInit();
+void Device_GateStateRsp();
+void Device_GateBatTwice(u8 cmd, u8 addr);
 
 BOOL Device_CheckRsp(W232_CONNECT *pCntOp, u8 *pRxBuf, u8 len) ;
 BOOL Device_WriteDeviceParamenter(void);
-BOOL Device_Set_Cfg(u8 *pBuffer);
+BOOL Device_SetCfg(u8 *pBuffer);
 BOOL Device_WriteMqttKey();
 BOOL Device_GateProceRspFrame(u8 *pFrame, GATE_OPINFO *pOpInfo, u32 tick);
 BOOL Device_CommunCheckRsp(DEVICE_SENVER_TXBUFFER *pCntOp, u8 *pRxBuf);
-BOOL Device_Chk_Version();
+BOOL Device_ChkVersion();
 
 u8 Device_UrlEncode(char *sign);
-u8 Device_Chk_Door();
+u8 Device_ChkDoor();
 
-u16 Device_Mqtt_Requeat_Sck(u8 *pBuffer); 
+u16 Device_MqttRequeatSck(u8 *pBuffer); 
 u16 Device_WaterProceRspFrame(u8 *pFrame, WATER_INFO *pOpInfo, u8 len);
 u16 Device_ResponseGateFrame(u8 add, u8 mode, READER_RSPFRAME *pOpResult);
 u16 Device_ResponseFrame(u8 *pParam, u8 len, READER_RSPFRAME *pOpResult);

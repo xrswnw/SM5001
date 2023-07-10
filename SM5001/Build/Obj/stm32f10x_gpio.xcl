@@ -1,18 +1,18 @@
-"E:\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\src\stm32f10x_gpio.c"
+"E:\AnyId\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\src\stm32f10x_gpio.c"
 -std=c11
 -ferror-limit=0
 -fbracket-depth=512
 -MD
 -MF
-E:\AnyId\Git\SM5001_New\SM5001\Build\Obj\stm32f10x_gpio.pbi.dep
+E:\AnyId\Git\SM5001_23071001\SM5001\SM5001\Build\Obj\stm32f10x_gpio.pbi.dep
 -o
 stm32f10x_gpio.pbi
 -I
-E:\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\src
+E:\AnyId\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\src
 -I
-E:\AnyId\Git\SM5001_New\SM5001\..
+E:\AnyId\Git\SM5001_23071001\SM5001\SM5001\..
 -I
-E:\AnyId\Git\SM5001_New\SM5001\..\inc
+E:\AnyId\Git\SM5001_23071001\SM5001\SM5001\..\inc
 -I
 E:\AnyID\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\startup
 -I
@@ -28,9 +28,9 @@ C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.3\arm\inc
 -I
 C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.3\arm\inc\c
 -I
-E:\AnyId\Git\SM5001_New
+E:\AnyId\Git\SM5001_23071001\SM5001
 -I
-E:\AnyId\Git\SM5001_New\inc
+E:\AnyId\Git\SM5001_23071001\SM5001\inc
 -I
 E:\AnyID\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\startup
 -I
