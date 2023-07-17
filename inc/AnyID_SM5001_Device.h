@@ -14,7 +14,7 @@
 #include "AnyID_SM5001_Sound.h"
 #include "AnyID_SM5001_Gate.h"
 #include "AnyID_SM5001_Water.h"
-
+#include "AnyID_SM5001_WDG_HL.h"
 
 #include "hmac_sha1.h"                                                                     
 #include "base64.h"
@@ -80,7 +80,7 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 
 #define DEVICE_FREAM_MIN_LEN            5
 
-#define DEVICE_REPEAT_TIME              3
+#define DEVICE_REPEAT_TIME              5
 
 #define DEVICE_IO_SAMPLE_TIME           2
 
@@ -148,12 +148,16 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 
 
 #define DEVICE_SERVERRSP_NUM            20
-
+#define DEVICE_TEST_SERSOR				2
 //modele
 
 #define DEVICE_GATE_OP_TICK             20
 
-
+//参数校验
+#define DEVICE_NORMAL_ADDR              0x01
+#define DEVICE_NORMAL_HEART_TIME        20
+#define DEVICE_NORMAL_TEMPR_MAST        40
+//
 
 #define DEVICE_MODELE_LED               0x01
 #define DEVICE_MODELE_FAN               0x02
@@ -165,7 +169,7 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define DEVICE_BAT_RTN                  0x01
 #define DEVICE_BAT_BRW                  0x02 
 
-
+#define DEVICE_HEART_TIME				1
 #define DEVICE_CMD_NORMAL               0x00
 #define DEVICE_TIME_HEART               50                      //测试5s
 
@@ -220,30 +224,22 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define DEVICE_TEST_DOOR_OPEN_TIM               5
 #define DEVICE_GATE_OPEN_DOOR                   0x02
 
+#define DEVICE_TEST_ERR_TEMPR		    0x01
+#define DEVICE_TEST_ERR_ELECT		    0x02
+
+
 
 #define Device_ChkGate(v)                      (v != DEVICE_SM5001_ID && v != DEVICE_SM5003_ID)
-#define Device_AnsyFrame(add, c, frame)        do{g_sGateOpInfo.mode = GATE_MODE_CMD;g_sGateOpInfo.state = GATE_OP_STAT_WAIT;g_sGateOpInfo.cmd = c;g_sGateOpInfo.slvIndex = (add -1)>> 1;g_sGateOpInfo.slvCmd.paramsLen = 2;g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;g_sGateOpInfo.slvCmd.params[1] = frame;}while(0)    
-#define Device_AnsyTestFrame(add, c, frame)   do{g_sGateOpInfo.mode = GATE_MODE_CMD;g_sGateOpInfo.state = GATE_OP_STAT_WAIT;g_sGateOpInfo.cmd = c;g_sGateOpInfo.slvIndex = add ;g_sGateOpInfo.slvCmd.paramsLen = 2;g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;g_sGateOpInfo.slvCmd.params[1] = frame;}while(0)
-#define Device_GateRtBat(add)                  do{g_sGateOpInfo.add = add - 1;g_sGateOpInfo.state = GATE_OP_STAT_WAIT;g_sGateOpInfo.mode = GATE_MODE_CMD;g_sGateOpInfo.cmd = GATE_FRAME_CMD_RTNBAT;g_sGateOpInfo.slvIndex = (add -1)>> 1;g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;g_sGateOpInfo.slvCmd.paramsLen = DEVICE_BAT_SN_LEN + 1;}while(0)                                 
-#define Device_GateBrBat(add)                  do{g_sGateOpInfo.add = add - 1;g_sGateOpInfo.state = GATE_OP_STAT_WAIT;g_sGateOpInfo.mode = GATE_MODE_CMD;g_sGateOpInfo.cmd = GATE_FRAME_CMD_BRWBAT;g_sGateOpInfo.slvIndex = (add -1)>> 1;g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;g_sGateOpInfo.slvCmd.paramsLen = DEVICE_BAT_SN_LEN + 1;}while(0) 
-#define Device_GatePlBat(add,v)                do{g_sGateOpInfo.add = add - 1;g_sGateOpInfo.state = GATE_OP_STAT_WAIT;g_sGateOpInfo.mode = GATE_MODE_CMD;g_sGateOpInfo.cmd = GATE_FRAME_CMD_PLANE_BAT;g_sGateOpInfo.slvIndex = (add -1)>> 1;g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;g_sGateOpInfo.slvCmd.params[1]= v;g_sGateOpInfo.slvCmd.paramsLen = DEVICE_BAT_SN_LEN + 1 + 1;}while(0)
-
-
-/*
-#define Device_GateBatTwice(cmd,addr)             do{\
-                                                      g_sGateOpInfo.add = addr - 1;\
-                                                      g_sGateOpInfo.state = GATE_OP_STAT_WAIT;\
-                                                      g_sGateOpInfo.mode = GATE_MODE_CMD;\
-                                                      g_sGateOpInfo.cmd = cmd;\
-                                                      g_sGateOpInfo.slvIndex = (addr -1)>> 1;\
-                                                      g_sGateOpInfo.slvCmd.params[0] = (addr + 1)% 2;\
-                                                      g_sGateOpInfo.slvCmd.paramsLen = 1;\
-                                                  }while(0)
-   */                                                 
+#define Device_AnsyFrame(add, c, frame)        do{g_sGateOpInfo.mode = GATE_MODE_CMD;g_sGateOpInfo.state = GATE_OP_STAT_TX;g_sGateOpInfo.cmd = c;g_sGateOpInfo.slvIndex = (add -1)>> 1;g_sGateOpInfo.slvCmd.paramsLen = 2;g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;g_sGateOpInfo.slvCmd.params[1] = frame;}while(0)    
+#define Device_AnsyTestFrame(add, c, frame)   do{g_sGateOpInfo.mode = GATE_MODE_CMD;g_sGateOpInfo.state = GATE_OP_STAT_TX;g_sGateOpInfo.cmd = c;g_sGateOpInfo.slvIndex = add ;g_sGateOpInfo.slvCmd.paramsLen = 2;g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;g_sGateOpInfo.slvCmd.params[1] = frame;}while(0)
+#define Device_GateRtBat(add)                  do{g_sGateOpInfo.add = add - 1;g_sGateOpInfo.state = GATE_OP_STAT_TX;g_sGateOpInfo.mode = GATE_MODE_CMD;g_sGateOpInfo.cmd = GATE_FRAME_CMD_RTNBAT;g_sGateOpInfo.slvIndex = (add -1)>> 1;g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;g_sGateOpInfo.slvCmd.paramsLen = DEVICE_BAT_SN_LEN + 1;}while(0)                                 
+#define Device_GateBrBat(add)                  do{g_sGateOpInfo.add = add - 1;g_sGateOpInfo.state = GATE_OP_STAT_TX;g_sGateOpInfo.mode = GATE_MODE_CMD;g_sGateOpInfo.cmd = GATE_FRAME_CMD_BRWBAT;g_sGateOpInfo.slvIndex = (add -1)>> 1;g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;g_sGateOpInfo.slvCmd.paramsLen = DEVICE_BAT_SN_LEN + 1;}while(0) 
+#define Device_GatePlBat(add,v)                do{g_sGateOpInfo.add = add - 1;g_sGateOpInfo.state = GATE_OP_STAT_TX;g_sGateOpInfo.mode = GATE_MODE_CMD;g_sGateOpInfo.cmd = GATE_FRAME_CMD_PLANE_BAT;g_sGateOpInfo.slvIndex = (add -1)>> 1;g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;g_sGateOpInfo.slvCmd.params[1]= v;g_sGateOpInfo.slvCmd.paramsLen = DEVICE_BAT_SN_LEN + 1 + 1;}while(0)
+                                          
 
 #define Device_VoiceApoFrame(opt,repat,cmd,vn)     do{g_sSoundInfo.txBuf.index = 0;g_sSoundInfo.txBuf.num = 0;/**/g_sSoundInfo.txBuf.cd[g_sSoundInfo.txBuf.num] = SOUND_FRAME_CMD_APPOINT_FOLDER; g_sSoundInfo.txBuf.to[g_sSoundInfo.txBuf.num] = opt;g_sSoundInfo.txBuf.id[g_sSoundInfo.txBuf.num] = vn;g_sSoundInfo.txBuf.repeat[g_sSoundInfo.txBuf.num] = repat;g_sSoundInfo.txBuf.op[g_sSoundInfo.txBuf.num++] = cmd;g_sSoundInfo.state = SOUND_STAT_TX;}while(0)
 #define Device_VoiceCtrFrame(opt,repat,cmd,vn)     do{g_sSoundInfo.txBuf.index = 0;g_sSoundInfo.txBuf.num = 0;g_sSoundInfo.txBuf.to[g_sSoundInfo.txBuf.num] = opt;g_sSoundInfo.txBuf.id[g_sSoundInfo.txBuf.num] = vn;g_sSoundInfo.txBuf.repeat[g_sSoundInfo.txBuf.num] = repat;g_sSoundInfo.txBuf.cd[g_sSoundInfo.txBuf.num] = SOUND_FRAME_CMD_VOL_STR_AOP;g_sSoundInfo.txBuf.op[g_sSoundInfo.txBuf.num++] = cmd;g_sSoundInfo.state = SOUND_STAT_TX;}while(0)
-#define Device_AtRsp(opt,repat,cmd)                do{g_nDeviceServerTxBuf.to[g_nDeviceServerTxBuf.num] = opt;g_nDeviceServerTxBuf.repeat[g_nDeviceServerTxBuf.num] = repat;g_nDeviceServerTxBuf.op[g_nDeviceServerTxBuf.num++] = cmd;g_nDeviceServerTxBuf.state |= DEVICE_SERVER_TXST_AT;}while(0)
+#define Device_AtRsp(opt,repat,cmd)                do{g_sDeviceServerTxBuf.to[g_sDeviceServerTxBuf.num] = opt;g_sDeviceServerTxBuf.repeat[g_sDeviceServerTxBuf.num] = repat;g_sDeviceServerTxBuf.op[g_sDeviceServerTxBuf.num++] = cmd;g_sDeviceServerTxBuf.state |= DEVICE_SERVER_TXST_AT;}while(0)
 
 
 #define Device_ChkDeviceStat(stat)          ({\
@@ -287,17 +283,18 @@ typedef struct deviceParams{
     W232_PARAMS serverParams;
     WINAVG_INFO temprUp;
     WINAVG_INFO temprDown;
-    GATE_PARAMS gateParams;
-    u16 gateTick;                       //仓控交互数据时间间隔
+    GATE_PARAMS gateParams; 
+    u8 voiceSth; 
+    u8 electMode;  
+    u8 offLineTime;
+    u8 addr; 
+    u8 rfu1; 
+    u16 gateTick;                       //主控心跳
     u16 gateNum;                        //仓控板数目
     u16 gateTxTick;                     //仓信息上报记录时间间隔
-    u8 rfu1;                            
     u16 rfu2;
-    u8 addr;
-    u8 voiceSth;
-    u8 electMode;
-    u8 offLineTime;
     u16 heartTick;
+    GATE_PARAMS gateParams0; 
     u32 crc;
 }DEVICE_PARAMS;
 
@@ -323,6 +320,8 @@ typedef struct deviceSenverTxBuff{
     u8 num;
     u8 index;
     u8 result;
+    u8 sigNum;
+    u8 channelErrNum;
     u16 len;
     u8 id[W232_CNT_OP_NUM];
     u8 op[W232_CNT_OP_NUM];
@@ -343,25 +342,30 @@ typedef struct deviceImpRspInfo{
   u8 warnBuffer[UART_FRAME_POS_MQTT_NORMAL_LEN];
 }DEVICE_IMPRSP_INFO;
 
+typedef struct deviceTestInfo{
+	u8 flag;
+	u8 gateAddr;
+	u8 err;
+	u32 tick;
+}DEVICE_TEST_INFO;
+
+
 
 extern BOOL g_nBatOpenFlag;
 extern u32 g_nBratIngTick  ;
-extern DEVICE_IMPRSP_INFO g_nDeviceImpRspInfo   ;
-extern DEVICE_SENVER_TXBUFFER g_nDeviceServerTxBuf;
+extern DEVICE_IMPRSP_INFO g_sDeviceImpRspInfo;
+extern DEVICE_SENVER_TXBUFFER g_sDeviceServerTxBuf;
 extern READER_RSPFRAME g_sDeviceRspFrame;
-extern DEVICE_TEST g_nDeviceTestInfo;
 extern DEVICE_PARAMS g_sDeviceParams;
+extern DEVICE_TEST_INFO g_sDeviceTestInfo;
 
 
 void Device_Init();
 void Device_ServerProcessRxInfo(W232_RCVBUFFER *pRcvBuffer, u32 tick); 
-void Modele_Ctl(u8 cmd);
 void Reader_Delayms(u32 n);
-void Device_InitInSensor(void);
 void Device_GateRsvSlvInfo(u8 *pParams, u16 paramsLen, GATE_OPINFO *pOpInfo);
 void Device_ReadDeviceParamenter(void);
 void Device_ReadMqttKey();
-void Device_ChkTempr();
 void Device_IoCtr();
 void Device_CtrBatVolce(u16 add, u8 mode, u8 step, u8 flag);
 void Device_VoiceCtr();
@@ -375,6 +379,7 @@ void Device_CommunStep(DEVICE_SENVER_TXBUFFER *pCntOp);
 void Device_GateStateInit();
 void Device_GateStateRsp();
 void Device_GateBatTwice(u8 cmd, u8 addr);
+BOOL Device_ChkSersor();
 
 BOOL Device_CheckRsp(W232_CONNECT *pCntOp, u8 *pRxBuf, u8 len) ;
 BOOL Device_WriteDeviceParamenter(void);
@@ -383,11 +388,8 @@ BOOL Device_WriteMqttKey();
 BOOL Device_GateProceRspFrame(u8 *pFrame, GATE_OPINFO *pOpInfo, u32 tick);
 BOOL Device_CommunCheckRsp(DEVICE_SENVER_TXBUFFER *pCntOp, u8 *pRxBuf);
 BOOL Device_ChkVersion();
+BOOL Device_ParmenterChkCode(DEVICE_PARAMS *pPaementInfo);
 
-u8 Device_UrlEncode(char *sign);
-u8 Device_ChkDoor();
-
-u16 Device_MqttRequeatSck(u8 *pBuffer); 
 u16 Device_WaterProceRspFrame(u8 *pFrame, WATER_INFO *pOpInfo, u8 len);
 u16 Device_ResponseGateFrame(u8 add, u8 mode, READER_RSPFRAME *pOpResult);
 u16 Device_ResponseFrame(u8 *pParam, u8 len, READER_RSPFRAME *pOpResult);

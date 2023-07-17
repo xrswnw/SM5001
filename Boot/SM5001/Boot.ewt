@@ -1257,6 +1257,12 @@
             <name>$PROJ_DIR$\..\src\AnyID_Boot_FRam_HL.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\src\AnyID_Boot_Gate.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\src\AnyID_Boot_Gate_HL.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c</name>
         </file>
         <file>
@@ -1264,9 +1270,6 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\src\AnyID_Boot_Uart.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\src\AnyID_Boot_Uart_HL.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\src\AnyID_FlashM25.c</name>

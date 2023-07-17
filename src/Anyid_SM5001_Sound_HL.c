@@ -10,7 +10,7 @@ const PORT_INF SOUND_PORT_CTL     = {GPIOC, GPIO_Pin_2};
 #define SOUND_INT_CHANNEL           UART4_IRQn
 const PORT_INF SOUND_PORT_TX      = {GPIOC, GPIO_Pin_10};
 const PORT_INF SOUND_PORT_RX      = {GPIOC, GPIO_Pin_11};*/
-void Sound_InitInterface(u32 baudrate)
+void  Sound_InitInterface(u32 baudrate)
 {
     GPIO_InitTypeDef GPIO_InitStructure = {0};
     USART_InitTypeDef USART_InitStructure = {0};

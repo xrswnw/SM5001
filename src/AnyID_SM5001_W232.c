@@ -30,6 +30,8 @@ void W232_ConnectInit(W232_CONNECT *pCntOp, u8 cmd, W232_PARAMS *pParams)
         pCntOp->to[num] = W232_CNT_TIME_100MS * 10;      pCntOp->repeat[num] = 2;    pCntOp->op[num++] = W232_CNT_OP_KEYON;          //寮�鏈?=500ms
         pCntOp->to[num] = W232_CNT_TIME_500MS * 2;       pCntOp->repeat[num] = 25;   pCntOp->op[num++] = W232_CNT_OP_COMM;           //寮�鏈?0s锛屼覆鍙ｆ湁鍝嶅簲
         pCntOp->to[num] = W232_CNT_TIME_500MS  * 2;      pCntOp->repeat[num] = 2;    pCntOp->op[num++] = W232_CNT_OP_ATE0;
+        //pCntOp->to[num] = W232_CNT_TIME_500MS  * 2;      pCntOp->repeat[num] = 2;    pCntOp->op[num++] = W232_CNT_OP_GET_QSQ;
+        
         pCntOp->to[num] = W232_CNT_TIME_500MS * 2;       pCntOp->repeat[num] = 10;    pCntOp->op[num++] = W232_CNT_OP_IMEI;
         pCntOp->to[num] = W232_CNT_TIME_500MS * 2;       pCntOp->repeat[num] = 10;    pCntOp->op[num++] = W232_CNT_OP_IMSI;
         pCntOp->to[num] = W232_CNT_TIME_500MS * 2;       pCntOp->repeat[num] = 2;    pCntOp->op[num++] = W232_CNT_OP_DTR1;        
@@ -94,6 +96,9 @@ void W232_ConnectTxCmd(W232_CONNECT *pCntOp, u32 sysTick)
         case W232_CNT_OP_ATE0:
             W232_WriteCmd("ATE0");
             break;
+        case W232_CNT_OP_GET_QSQ:
+            W232_WriteCmd("AT+CSQ");
+            break;
         case W232_CNT_OP_IMEI:
             W232_WriteCmd("AT+GSN");
             break;
@@ -152,7 +157,7 @@ void W232_ConnectTxCmd(W232_CONNECT *pCntOp, u32 sysTick)
             W232_WriteCmd("AT+QMTCFG=\"onenet\",0,\"598243\",\"zexoEnvCWH86x8eWjfpW32wUlWbELWEbUO1REV3OYyg=\""); //閰嶇疆绉诲姩骞冲彴 
             break;
         case  W232_CNT_OP_QMTCFG_TIME:
-              W232_WriteCmd("AT+QMTCFG=\"keepalive\",0,1000"); 
+              W232_WriteCmd("AT+QMTCFG=\"keepalive\",0,295"); 
           break;
         case W232_CNT_OP_QMTCFG_VERSION:
             
@@ -225,6 +230,16 @@ BOOL W232_ConnectCheckRsp(W232_CONNECT *pCntOp, u8 *pRxBuf)
             if(strstr((char const *)pRxBuf, "OK") != NULL)
             {
                 bOK = TRUE;
+            }
+            break;
+        case  W232_CNT_OP_GET_QSQ:
+            if(strstr((char const *)pRxBuf, "OK") != NULL)
+            {
+                bOK = TRUE;
+                memcpy(pCntOp->sigStr, pRxBuf + 8, 2);
+                memcpy(pCntOp->channelErrStr, pRxBuf + 11, 2);
+                pCntOp->sigNum = a_atoi((u8 *)pCntOp->sigStr, 2, STD_LIB_FMT_DEC);
+                pCntOp->channelErrNum = a_atoi((u8 *)pCntOp->channelErrStr, 2,STD_LIB_FMT_DEC);
             }
             break;
         case W232_CNT_OP_IMEI:
@@ -350,6 +365,7 @@ void W232_ConnectStep(W232_CONNECT *pCntOp)
         case W232_CNT_OP_DEACT:
         case W232_CNT_OP_ACT:
         case W232_CNT_OP_APN:
+        case W232_CNT_OP_GET_QSQ:
         case W232_CNT_OP_IMEI:
         case W232_CNT_OP_IMSI:
         case W232_CNT_OP_CCLK:
@@ -544,11 +560,16 @@ BOOL W232_DataHandle(W232_RCVBUFFER *pData, u8 *pBuffer)
         if((tempLen[0] << 8)|(tempLen[1] << 0))
         {
             g_sW232RcvBuffer.len = ((tempLen[0] & 0xFF) << 8) | ((tempLen[1] & 0xFF) << 0);
-            if(g_sW232RcvBuffer.len < UART_BUFFER_MAX_LEN)
+            if(g_sW232RcvBuffer.len < W232_RQUEST_BUFFER_LEN)                            //长度校验，越界
             {
               bOk = TRUE;
               memcpy(pData->bufferStr, pBuffer + W232_RTC_DATA_BUFFER_POS, g_sW232RcvBuffer.len * 2);
               a_Str2Hex(pData->bufferStr,g_sW232RcvBuffer.buffer);
+            }
+            else
+            {
+              bOk = TRUE;
+              memset(&g_sW232RcvBuffer.buffer, 0, W232_RQUEST_BUFFER_LEN);
             }
         }
         else

@@ -173,6 +173,20 @@ void EC20_IRQHandler(void)
 
 
 
+u8 g_nGateRxByte = 0;
+void Gate_IRQHandler(void)
+{
+    if(USART_GetITStatus(GATE_PORT, USART_IT_RXNE) != RESET)
+    {
+        g_nGateRxByte = Gate_ReadByte();
+        Uart_ReceiveFrame(g_nGateRxByte, &g_sGateRcvFrame);
+    }
+    else
+    {
+        Gate_ReadByte();
+    }
+    GATE_PORT->SR &= (~0x3FF);
+}
 
 
 

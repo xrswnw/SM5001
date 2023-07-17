@@ -133,7 +133,7 @@
 #define Sound_ResetFrame(rcvFrame)               do{(rcvFrame).state = SOUND_STAT_IDLE ; (rcvFrame).repeat =0;}while(0)
 
 #define Sound_ClearRxBuffer()                    memset(&g_sSoundInfo.rxBuf, 0,  sizeof(SOUND_RX_BUF)) //这里一定要用memset
-#define Sound_Voice_Appoint(t,fn,vn,c)                do{g_sSoundInfo.txBuf.tick = t;g_sSoundInfo.txBuf.data = 0x0000;g_sSoundInfo.txBuf.data |= (fn << 8);g_sSoundInfo.txBuf.data |= (vn << 0);g_sSoundInfo.txBuf.cmd = c;}while(0)
+#define Sound_Voice_Appoint(t,fn,vn,c)			do{g_sSoundInfo.txBuf.tick = t;g_sSoundInfo.txBuf.data = 0x0000;g_sSoundInfo.txBuf.data |= (fn << 8);g_sSoundInfo.txBuf.data |= (vn << 0);g_sSoundInfo.txBuf.cmd = c;}while(0)
 
 typedef struct soundVoice{
     u8 flag;

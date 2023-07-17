@@ -6,14 +6,17 @@
 #define FRAM_BOOT_APP_OK                    0x5555
 #define FRAM_BOOT_APP_FAIL                  0xAAAA
 #define FRAM_BOOT_APP_DATA_DOWD             0x1111
-#define FRAM_VERSION_SIZE                   17
+#define FRAM_VERSION_SIZE                   22
 
 typedef struct framBootDevicePar{
     u8 flag;
     u8 size;    //2kһƬ
+	u8 gateNum;
+    u8 rfu;
     u16 appState;
     u16 addr;
-    u8 verSion[FRAM_VERSION_SIZE];
+	u8 currentVerSion[FRAM_VERSION_SIZE];	//当前版本信息
+    u8 aimVerSion[FRAM_VERSION_SIZE];		//目标版本信息
     u16 crc;
 }FRAM_BOOTPARAMS;
 
@@ -21,13 +24,10 @@ extern FRAM_BOOTPARAMS g_sFramBootParamenter;
 
 
 
-
-
-
 #define FRAME_MEM_SIZE                      0x2000
 #define FRAME_UID_LEN                           8
-#define FRAME_INFO_ADDR                     0x0000
-#define FRAME_INFO_BACKUP_ADDR              0x0200
+#define FRAME_INFO_ADDR                     0x100
+#define FRAME_INFO_BACKUP_ADDR              0x300
 #define REAM_IMEI_LEN                           15
 
 #define FRAME_MQTT_KEY_KEY                      150
@@ -38,8 +38,8 @@ extern FRAM_BOOTPARAMS g_sFramBootParamenter;
 #define FRAME_KEY_ADDR                      0x1200          //key
 #define FRAME_KEY_BACKUP_ADDR               0x1280          //key
 
-#define FRAME_MQTT_KEY_ADDR                      0x0400          //key
-#define FRAME_MQTT_KEY_BACKUP_ADDR               0x0600          //key
+#define FRAME_MQTT_KEY_ADDR                      0x0500          //key
+#define FRAME_MQTT_KEY_BACKUP_ADDR               0x0700         //key
 
 #define FRAM_KEY_DFT_ADDR                   0x08008000
 #define FRAM_KEY1_POS_START                 12

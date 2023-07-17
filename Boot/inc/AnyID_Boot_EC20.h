@@ -22,8 +22,8 @@ extern UART_RCVFRAME g_sEC20RcvFrame;
   
 #define EC20_IP_LEN                             4
 #define EC20_STR_AT_LEN                         64
-#define EC20_STR_BUFFER_RSP_LEN                 512
-#define EC20_STR_BUFFER_LEN                     1024
+#define EC20_STR_BUFFER_RSP_LEN                 1500
+#define EC20_STR_BUFFER_LEN                     1500
 #define EC20_PAR_ADDR_MOD_IP                    0
 #define EC20_PAR_ADDR_MOD_URL                   1
 #define EC20_PAR_ADDR_URL_LEN                   64

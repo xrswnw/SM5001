@@ -79,7 +79,7 @@ void Sys_CfgPeriphClk(FunctionalState state)
                           RCC_APB2Periph_AFIO, state);
     
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2 | 
-                           RCC_APB1Periph_USART3 |
+                           RCC_APB1Periph_USART3 |RCC_APB1Periph_UART4|
                            RCC_APB1Periph_UART5  , state);
 
 }
@@ -104,7 +104,7 @@ void Sys_CfgNVIC(void)
 }
 
 const PORT_INF SYS_RUNLED_COM = {GPIOB, GPIO_Pin_1};
-
+const PORT_INF SYS_DATALED_COM = {GPIOB, GPIO_Pin_3};
 void Sys_CtrlIOInit(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
@@ -116,6 +116,8 @@ void Sys_CtrlIOInit(void)
 
     GPIO_InitStructure.GPIO_Pin = SYS_RUNLED_COM.Pin;
     GPIO_Init(SYS_RUNLED_COM.Port, &GPIO_InitStructure);
+    GPIO_InitStructure.GPIO_Pin = SYS_DATALED_COM.Pin;
+    GPIO_Init(SYS_DATALED_COM.Port, &GPIO_InitStructure);
 
 }
 
@@ -142,58 +144,48 @@ void Sys_Init(void)
     
     Flash_InitInterface();
     Flash_Init();
-    
-    //
     Flash_ReadId();
-    Flash_Demo();
+    Flash_Demo();               //--------------------测试
 
-   g_sFramBootParamenter.appState = FRAM_BOOT_APP_OK;//测试
+    Gate_InitInterface(GATE_BAUDRARE);
+    Gate_ConfigInt(ENABLE);
+    Gate_EnableInt(ENABLE, DISABLE);
     
+    if(g_sFramBootParamenter.appState != FRAM_BOOT_APP_OK)
+    {
+        EC20_Init();
+        EC20_ConnectInit(&g_sEC20Connect, EC20_CNT_CMD_PWRON, &g_sEC20Params);
+        a_SetState(g_sEC20Connect.state, EC20_CNT_OP_STAT_TX);
+    }
 
-    Uart_InitInterface(UART_BAUDRARE);
-    Uart_ConfigInt();
-    Uart_EnableInt(ENABLE, DISABLE);
-    
-    EC20_Init();
-    Sys_Delayms(5);
-    /*
-    memcpy(g_nSoftWare, (u8 *)(SYS_BOOT_VER_ADDR ), EC20_SOFTVERSON_LEN);
-    
-    memcpy(g_sFramBootParamenter.verSion, g_nSoftWare, EC20_SOFTVERSON_LEN);
-    Fram_WriteBootParamenter();      */
-    
     //SysTick 初始化 5ms
     STick_InitSysTick();
     Sys_RunLedOff();
 
-    EC20_ConnectInit(&g_sEC20Connect, EC20_CNT_CMD_PWRON, &g_sEC20Params);
-    a_SetState(g_sEC20Connect.state, EC20_CNT_OP_STAT_TX);
- 
     //使能中断
     Sys_EnableInt();
+    
+
+    
 }
 
 void Sys_LedTask(void)
-{
+{ 
+    static u32 ledTimes = 0;
     if(a_CheckStateBit(g_nSysState, SYS_STAT_RUNLED))
     {
-        static u32 ledTimes = 0;
-
         a_ClearStateBit(g_nSysState, SYS_STAT_RUNLED);
-
-        ledTimes++;
-
+        ledTimes ++;
         if(ledTimes & 0x01)
         {
             Sys_RunLedOff();
-
+            Sys_DataLedOff();
         }
         else
         {
             Sys_RunLedOn();
-
+            Sys_DataLedOn();
         }
-
     #if SYS_ENABLE_WDT
         WDG_FeedIWDog();
     #endif
@@ -231,11 +223,109 @@ void Sys_Jump(u32 address)
     Sys_EnableInt();
 }
 
+void Sys_GateTask(void)
+{
+    if(USART_GetFlagStatus(GATE_PORT, USART_FLAG_NE | USART_FLAG_FE | USART_FLAG_PE))
+    {
+        USART_ClearFlag(GATE_PORT, USART_FLAG_NE | USART_FLAG_FE | USART_FLAG_PE);
+        
+        Gate_EnableInt(DISABLE, DISABLE);
+        memset(&g_sGateBootInfo, 0, sizeof(GATE_BOOTINFO));
+        Gate_InitInterface(GATE_BAUDRARE);
+        Gate_ConfigInt(ENABLE);
+        Gate_EnableInt(ENABLE, DISABLE);
+    }
+
+    //这里还要增加判断是否是SM5002更新
+    if(a_CheckStateBit(g_nSysState, SYS_STAT_REPLACE_GATE_DATA))
+    {
+        if(Uart_IsRcvFrame(g_sGateRcvFrame))
+        {
+            Gate_ProcessBootFrame(&g_sGateRcvFrame);
+            Uart_ResetFrame(g_sGateRcvFrame);
+        }
+        
+        //
+        if(g_sGateBootInfo.state == GATE_OP_STAT_IDLE)
+        {
+            if(g_sGateBootInfo.slvIndex < g_sFramBootParamenter.gateNum)        //没有更新完成
+            {
+                Gate_ClearBootInfo();
+                g_sGateBootInfo.sectorNum = g_sFramBootParamenter.size - 1;     //包含了最终的crc校验帧，这个帧数据是不需要下载到单片机的
+                Flash_ReadBuffer(FLASH_DATA_OPEN_ADDR  + GATE_BOOT_SECTOR_SIZE * (g_sGateBootInfo.sectorNum - 1), GATE_BOOT_SECTOR_SIZE,  g_sGateBootInfo.bin);       //讀最後一組數據，開始寫入
+                g_sGateBootInfo.cmd = UART_FRAME_CMD_RESET;
+                g_sGateBootInfo.txFrame.len = Uart_ReqReset(g_sGateBootInfo.txFrame.buffer, g_sGateBootInfo.slvIndex + 1);
+                g_sGateBootInfo.state = GATE_OP_STAT_TX;
+            }
+            else
+            {
+                 a_ClearStateBit(g_nSysState, SYS_STAT_REPLACE_GATE_DATA);
+                 g_sFramBootParamenter.appState = FRAM_BOOT_APP_REPLACE_OVER;
+                //更新完毕---------
+            }
+        }
+        else if(g_sGateBootInfo.state == GATE_OP_STAT_TX)
+        {
+            memset(&g_sGateRcvFrame, 0, sizeof(UART_RCVFRAME));
+            Gate_WriteBuffer(g_sGateBootInfo.txFrame.buffer, g_sGateBootInfo.txFrame.len);
+            g_sGateBootInfo.txFrame.len = 0;
+            g_sGateBootInfo.tick = g_nSysTick;
+            g_sGateBootInfo.state = GATE_OP_STAT_WAIT;
+        }
+        else if(g_sGateBootInfo.state == GATE_OP_STAT_WAIT)
+        {
+            if(g_sGateBootInfo.tick + GATE_BOOT_TO_TIM < g_nSysTick)
+            {
+                g_sGateBootInfo.state = GATE_OP_STAT_TO | GATE_OP_STAT_STEP;
+            }
+        }
+        else if(g_sGateBootInfo.state & GATE_OP_STAT_STEP)
+        {
+            g_sGateBootInfo.state &= (~GATE_OP_STAT_STEP);
+            if(g_sGateBootInfo.state == GATE_OP_STAT_TO)            //超时尝试的次数？？？？？？？？？？？？？？？？？？？？？？？？？
+            {
+                //repeat多次之后，跳过这个设备g_sGateBootInfo.slvIndex++；
+                g_sGateBootInfo.state = GATE_OP_STAT_IDLE;
+                
+                if(g_sGateBootInfo.repat > GATE_UPDATA_OP_TICK)
+                {
+                    g_sGateBootInfo.slvIndex++;
+                    g_sGateBootInfo.repat = 0;
+                }
+                else
+                {
+                    g_sGateBootInfo.repat ++;
+                }
+            }
+            else
+            {
+                if(g_sGateBootInfo.cmd == UART_FRAME_CMD_DL)
+                {
+                    Flash_ReadBuffer(FLASH_DATA_OPEN_ADDR  + GATE_BOOT_SECTOR_SIZE * (g_sGateBootInfo.sectorIndex - 2), GATE_BOOT_SECTOR_SIZE,  g_sGateBootInfo.bin);;    
+                    //Flash_Readbuf(g_sGateBootInfo.bin, 1024, start + 1024 * (g_sGateBootInfo.sectorIndex - 2));
+                }
+                Gate_StepBoot(&g_sGateBootInfo, &g_sGateRcvFrame);
+                g_sGateBootInfo.repat = 0;
+                if(g_sGateBootInfo.txFrame.len > 0)
+                {
+                    g_sGateBootInfo.state = GATE_OP_STAT_TX;
+                }
+                else
+                {
+                    g_sGateBootInfo.state = GATE_OP_STAT_IDLE;
+                }
+                Sys_Delayms(10);
+            }
+            
+        }
+    }
+}
+
 void Sys_BootTask(void)
 {
     static u32 bootState =0;
     
-    if(bootState != g_sFramBootParamenter.appState)
+    if(bootState != g_sFramBootParamenter.appState)                                                                                                     
     {
         if(g_sFramBootParamenter.appState == FRAM_BOOT_APP_OK  || g_sFramBootParamenter.appState == FRAM_BOOT_APP_NULL_REPLACE)
         {
@@ -243,7 +333,6 @@ void Sys_BootTask(void)
         }
         else if(g_sFramBootParamenter.appState == FRAM_BOOT_APP_DATA_DOWD || g_sFramBootParamenter.appState == FRAM_BOOT_APP_FAIL)
         {
-            Device_Version_UpData();
             a_SetStateBit(g_nSysState, SYS_STAT_DOWNLOAD);
             g_sDeviceUpDataInfo.flag = DEVICE_UPDATA_FLAG_RQ;
         }
@@ -251,18 +340,32 @@ void Sys_BootTask(void)
         {
             a_SetStateBit(g_nSysState, SYS_STAT_CHK_VERSION);
         }
-        else if(g_sFramBootParamenter.appState == FRAM_BOOT_APP_REPLACE )
+        else if(g_sFramBootParamenter.appState == FRAM_BOOT_APP_REPLACE)
         {
-            Device_Version_UpData();
-            a_SetStateBit(g_nSysState, SYS_STAT_REPLACE_DATA);
-            g_nDeviceNxtEraseAddr = SYS_APP_START_ADDR;
-            FLASH_Unlock();
+            if(g_sFramBootParamenter.flag == DEVICE_TYPE_SM5001)
+            {
+                a_SetStateBit(g_nSysState, SYS_STAT_REPLACE_DATA);
+                g_nDeviceNxtEraseAddr = SYS_APP_START_ADDR;
+                FLASH_Unlock();
+            }
+            else if(g_sFramBootParamenter.flag == DEVICE_TYPE_SM5002)
+            {
+                a_SetStateBit(g_nSysState, SYS_STAT_REPLACE_GATE_DATA);
+            }
+            else
+            {
+                g_sFramBootParamenter.appState = FRAM_BOOT_APP_OK;
+            }
+
         }
         else if(g_sFramBootParamenter.appState == FRAM_BOOT_APP_REPLACE_OVER)
         {
-            //g_sDeviceUpDataInfo.tF = FALSE;
-          Device_Version_UpData();
-          a_SetStateBit(g_nSysState, SYS_STAT_INFORM_INFO);
+            Device_Clear_Info();  
+            Sys_SoftReset();     //暂时处理
+            /*
+           memcpy(g_sFramBootParamenter.currentVerSion, g_sFramBootParamenter.aimVerSion, FRAM_VERSION_SIZE);
+           Fram_WriteBootParamenter();
+           a_SetStateBit(g_nSysState, SYS_STAT_INFORM_INFO);*/
         }
         
         bootState = g_sFramBootParamenter.appState;
@@ -301,10 +404,10 @@ void Sys_BootTask(void)
        
        if(Device_Chk_Version())                                            //检查是否需要更新
        {
-            g_sFramBootParamenter.appState = FRAM_BOOT_APP_REPLACE;
-            if(g_sFramBootParamenter.flag == DEVICE_TYPE_SM5002 || g_sFramBootParamenter.flag == DEVICE_TYPE_SM5003)
+            //g_sFramBootParamenter.appState = FRAM_BOOT_APP_REPLACE;
+            if(g_sFramBootParamenter.flag == DEVICE_TYPE_SM5001 ||g_sFramBootParamenter.flag == DEVICE_TYPE_SM5002 || g_sFramBootParamenter.flag == DEVICE_TYPE_SM5003)
             {
-              g_sFramBootParamenter.appState = FRAM_BOOT_APP_OK;
+              g_sFramBootParamenter.appState = FRAM_BOOT_APP_REPLACE;//仓控程序存储
             }
        }
        else
@@ -312,27 +415,6 @@ void Sys_BootTask(void)
             g_sFramBootParamenter.appState = FRAM_BOOT_APP_NULL_REPLACE;
        }
     }
-}
-
-void Sys_UartTask(void)
-{
-    //串口错误处理:重新初始化
-    if(USART_GetFlagStatus(UART_PORT, USART_FLAG_NE | USART_FLAG_FE | USART_FLAG_PE))
-    {
-        USART_ClearFlag(UART_PORT, USART_FLAG_NE | USART_FLAG_FE | USART_FLAG_PE);
-        Uart_InitInterface(UART_BAUDRARE);
-        Uart_ConfigInt();
-        Uart_EnableInt(ENABLE, DISABLE);
-    }
-   
-    //串口数据帧解析
-    /*
-    if(Uart_IsRcvFrame(g_sUartRcvFrame))
-    {
-        Sys_ProcessBootFrame(&g_sUartRcvFrame, g_nDeviceComType);
-        Uart_ResetFrame(g_sUartRcvFrame);
-    }
-*/
 }
 
 BOOL Sys_CheckVersion(void)
@@ -356,9 +438,7 @@ BOOL Sys_CheckVersion(void)
             b = TRUE;
         }
     }
-    
-    
-    
+
     if(b == FALSE)
     {
         if(memcmp((u8 *)SYS_BOOT_HARDTYPE_ADDR, SYS_VER_HARD_TYPE, sizeof(SYS_VER_HARD_TYPE) - 1) == 0) //设备硬件型号正确也可以
@@ -370,143 +450,9 @@ BOOL Sys_CheckVersion(void)
     return b;
 }
 
-void Sys_ProcessBootFrame(UART_RCVFRAME *pRcvFrame, u8 com)
-{
-  
-    u16 crc1 = 0, crc2 = 0;
-    memcpy(&g_sUartTempRcvFrame, pRcvFrame, sizeof(UART_RCVFRAME));
-
-
-    crc1 = Uart_GetFrameCrc(g_sUartTempRcvFrame.buffer, g_sUartTempRcvFrame.index);
-    crc2 = a_GetCrc(g_sUartTempRcvFrame.buffer + UART_FRAME_POS_LEN, g_sUartTempRcvFrame.index - 4);
-
-    if(crc1 == crc2)
-    {
-        u8 cmd = g_sUartTempRcvFrame.buffer[UART_FRAME_POS_CMD];
-        u16 destAddr = 0;
-        
-        destAddr = *((u16 *)(pRcvFrame->buffer + UART_FRAME_POS_DESTADDR));
-        if((destAddr != SYS_FRAME_BROADCAST_ADDR) && (destAddr != g_sFramBootParamenter.addr))
-        {
-            return;
-        }
-        switch(cmd)
-        {
-            case UART_FRAME_CMD_RESET:
-                g_nSysTick = 0;
-                g_sUartTxFrame.len = Uart_RspReset();
-                break;
-            case UART_FRAME_CMD_ERASE:
-                if(a_CheckStateBit(g_nSysState, SYS_STAT_DOWNLOAD))
-                {
-                    BOOL bOk = FALSE;
-                    u32 addr = 0;
-                    u8 sector = 0;
-                    
-                    sector = g_sUartTempRcvFrame.buffer[UART_FRAME_POS_PAR];
-                    addr = SYS_APP_START_ADDR + (sector << 10);         //每个扇区1K
-                    
-                    if(addr >= SYS_APP_START_ADDR)
-                    {
-                        if(g_nDeviceNxtEraseAddr == addr)               //擦除地址必须是连续的，否则会有区域未擦除
-                        {
-                            g_nDeviceNxtEraseAddr = addr + (1 << 10);   //每个扇区1K
-                            
-                            bOk = Uart_EraseFlash(addr); 
-                            g_sUartTxFrame.len = Uart_RspErase(bOk);
-                        }
-                    }
-                }
-                break;
-            case UART_FRAME_CMD_DL:
-                if(a_CheckStateBit(g_nSysState, SYS_STAT_DOWNLOAD))
-                {
-                    BOOL bCheck = FALSE;
-                    u32 addr = 0;
-                    u32 size = 0;
-
-                    if(g_sUartTempRcvFrame.buffer[UART_FRAME_POS_LEN] == 0x00)
-                    {
-                        bCheck = (BOOL)(g_sUartTempRcvFrame.buffer[UART_FRAME_POS_PAR + 0]);
-                        addr = *((u32 *)(g_sUartTempRcvFrame.buffer + UART_FRAME_POS_PAR + 1));
-                        size = *((u32 *)(g_sUartTempRcvFrame.buffer + UART_FRAME_POS_PAR + 5));
-                        if(addr >= SYS_APP_START_ADDR)
-                        {
-                            //第一次不需要判定地址连续问题，因为boot程序是从后向前写数据，第一次不知道地址是什么
-                            if(addr + size == g_nDeviceNxtDownloadAddr || g_nDeviceNxtDownloadAddr == 0)
-                            {
-                                g_nDeviceNxtDownloadAddr = addr;
-                                //帧参数之前部分 + 基本参数(1 + 4 + 4) + size + crclen;
-                                //frameLen = UART_FRAME_POS_PAR + 9 + size + 2;
-                                Sys_RunLedOn();
-                                if(BL_WriteImagePage(addr, g_sUartTempRcvFrame.buffer + UART_FRAME_POS_PAR + 9, size))
-                                {
-                                    g_sUartTxFrame.len = Uart_RspDownload(bCheck, addr, size);
-                                }
-
-                                Sys_RunLedOff();
-
-                            }
-                        }
-                    }
-                }                       
-                break;
-            case UART_FRAME_CMD_BOOT:
-                g_sUartTxFrame.len = Uart_RspBoot();
-                if(g_sUartTxFrame.len)      //下面擦除操作消耗时间较长
-                {
-
-                        Uart_WriteBuffer(g_sUartTxFrame.frame, g_sUartTxFrame.len);
-
-                   Sys_Delayms(2);         //等待最后一个字节发送完成
-                   g_sUartTxFrame.len = 0;
-                }
-                a_ClearStateBit(g_nSysState, SYS_STAT_IDLE);
-                a_SetStateBit(g_nSysState, SYS_STAT_DOWNLOAD);
-                g_sFramBootParamenter.appState = FRAM_BOOT_APP_FAIL;
-                Fram_WriteBootParamenter();
-                Fram_WriteBackupBootParamenter();
-                FLASH_Unlock();
-                
-                Uart_EraseFlash(SYS_BOOT_VER_ADDR);          //版本信息区域擦除
-                g_nDeviceNxtEraseAddr = SYS_APP_START_ADDR;
-                g_nDeviceNxtDownloadAddr = 0;                   //boot是由后向前写入数据
-                
-                break;
-            case UART_FRAME_CMD_JMP:
-                if(Sys_CheckVersion() == TRUE)
-                {
-                    g_sUartTxFrame.len = Uart_RspJmp();
-                    a_SetStateBit(g_nSysState, SYS_STAT_JMP);
-                    g_sFramBootParamenter.appState = FRAM_BOOT_APP_OK;
-                    Fram_WriteBootParamenter();
-                    Fram_WriteBackupBootParamenter();
-                    FLASH_Lock();
-                }
-                break;
-            case UART_FRAME_CMD_VER:
-                g_sUartTxFrame.len = Uart_RspFrame(g_sUartTxFrame.frame, cmd, (u8 *)SYS_BOOT_VERSION, SYS_BOOT_VER_SIZE, UART_FRAME_FLAG_OK, UART_FRAME_RSP_NOERR);
-                break;
-            default:
-                break;
-        }
-    }
-    if(g_sUartTxFrame.len)
-    {
-        Uart_WriteBuffer(g_sUartTxFrame.frame, g_sUartTxFrame.len);
-        Sys_Delayms(2);         //等待最后一个字节发送完成
-        g_sUartTxFrame.len = 0;
-    }
-
-}
-
-
-
-
-
 void Sys_EC20Task(void)
 {
-    if(a_CheckStateBit(g_nSysState, SYS_STAT_LTEDTU))
+    if(a_CheckStateBit(g_nSysState, SYS_STAT_LTEDTU) || g_sFramBootParamenter.appState == FRAM_BOOT_APP_OK)
     {
         return; //只有不是透传模式，才需要按照AT指令解析
     }
@@ -521,7 +467,6 @@ void Sys_EC20Task(void)
 
     if(Uart_IsRcvFrame(g_sEC20RcvFrame))
     {
-        Uart_WriteBuffer(g_sEC20RcvFrame.buffer, g_sEC20RcvFrame.index);
         if(a_CheckStateBit(g_sEC20Connect.state, EC20_CNT_OP_STAT_RX))
         {
             if(EC20_ConnectCheckRsp(&g_sEC20Connect, g_sEC20RcvFrame.buffer, g_sEC20RcvFrame.index))   //如果校验响应帧失败，就继续接收，否则复位接收缓冲区
@@ -613,8 +558,6 @@ void Sys_EC20Task(void)
    
 }
 
-
-
 void Sys_ServerTask(void)
 {
     if(!a_CheckStateBit(g_nSysState, SYS_STAT_LTEDTU))  //只有透传了，才需要进入该任务
@@ -622,6 +565,7 @@ void Sys_ServerTask(void)
         return;
     }
     //串口错误处理:重新初始化
+
 
     if(USART_GetFlagStatus(EC20_PORT, USART_FLAG_NE | USART_FLAG_FE | USART_FLAG_PE))
     {
@@ -726,8 +670,6 @@ void Sys_ServerTask(void)
 
         }
     }
-
-
 }
 
 void Sys_DownDataTask()
@@ -742,20 +684,23 @@ void Sys_DownDataTask()
                 upTime = 0;
                 if(g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_FLAG_RQ)
                 {
-                    upTick ++;
+                    upTick++;
                     Device_At_Rsp(EC20_CNT_TIME_1S, EC20_CNT_REPAT_NULL, DEVICE_HTTP_GET_REQUEST_CKECK);
                 }
                 else if(g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_FLAG_DOWN)
                 {   
+                    Sys_DataLedOn();
                     g_sDeviceUpDataInfo.flag = DEVICE_UPDATA_FLAG_DOWNING;
                     Device_At_Rsp(EC20_CNT_TIME_1S * 2, EC20_CNT_REPAT_NULL, DEVICE_HTTP_GET_REQUEST_DOWNLOAD);
                 }
                 else if(g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_FLAG_FAIL)
                 {   
-                    g_sFramBootParamenter.appState = FRAM_BOOT_APP_DATA_DOWD;
+                      upTick ++;
+                    g_sFramBootParamenter.appState = FRAM_BOOT_APP_FAIL;
                 }
                 else if(g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_FLAG_OVER)
                 {   
+                    Sys_DataLedOff();
                     a_ClearStateBit(g_nSysState, SYS_STAT_DOWNLOAD)  ;
                     g_sFramBootParamenter.appState = FRAM_BOOT_APP_DATA_DOWN_OVER;
                 }
@@ -790,7 +735,7 @@ void Sys_DownDataTask()
                 if(g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_FLAG_OVER || g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_FLAG_NULL )
                 {
                     infromTime ++;
-                    memcpy(g_nSoftWare, (u8 *)(SYS_BOOT_VER_ADDR ), EC20_SOFTVERSON_LEN);
+                   
                     Device_At_Rsp(EC20_CNT_TIME_1S, EC20_CNT_REPAT_NULL, DEVICE_HTTP_GET_REQUEST_CKECK);
                 }
                 else if(g_sDeviceUpDataInfo.flag == DEVICE_UPDATA_INFORM_OK)
@@ -803,7 +748,7 @@ void Sys_DownDataTask()
                 infromTick ++;
             }
             
-            if(infromTime == DEVICE_UPDATA_CHK_TIME)
+            if(infromTime >= DEVICE_UPDATA_CHK_TIME)
             {
                 infromTime = 0;
                 g_sFramBootParamenter.appState = FRAM_BOOT_APP_OK;
@@ -836,21 +781,24 @@ void Sys_ReplaceDeviceTask()
                         {
                             if(g_nDeviceNxtEraseAddr == addr)               //擦除地址必须是连续的，否则会有区域未擦除
                             {
+                                Sys_DataLedOn();  
                                 g_nDeviceNxtEraseAddr = addr + (1 << 10);   //每个扇区1K
                                 if(addr <= SYS_APP_START_ADDR + (g_sFramBootParamenter.size + 1) *  (1 << 10))
                                 {
                                     if(Uart_EraseFlash(addr))
                                     {
                                         sector++;
+                                        
                                     }
                                     else
                                     {
                                         addr = 0;
                                         sector = 0;
                                         g_nDeviceNxtEraseAddr = 0;
-                                        Sys_RunLedOn();   //擦除失败
+                                        
                                         g_sFramBootParamenter.appState = FRAM_BOOT_APP_FAIL;
                                     }
+                                    Sys_DataLedOff();  
                                 }
                                 else
                                 {
@@ -867,49 +815,49 @@ void Sys_ReplaceDeviceTask()
                         addr = SYS_APP_START_ADDR + sector * FLASH_UPDATA_LEN;
                         if(addr >= SYS_APP_START_ADDR)
                         {
-                            if(sector <= g_sFramBootParamenter.size + 1)
+                            if(sector <= g_sFramBootParamenter.size )
                             {
+                                Sys_DataLedOn();
                                 if(Flash_ReadBuffer(FLASH_DATA_OPEN_ADDR + sector * FLASH_UPDATA_LEN, FLASH_UPDATA_LEN, g_nFlashUpData))
                                 {
                                     if(BL_WriteImagePage(addr, g_nFlashUpData, FLASH_UPDATA_LEN))
                                     {
                                       sector ++;
+                                      
                                     }
                                     else
                                     {
                                         sector = 0;
-                                        Sys_RunLedOn();
                                         g_sFramBootParamenter.appState = FRAM_BOOT_APP_FAIL;
                                         //写入失败
                                     }
                                 }
-                                            
-                                Sys_RunLedOff();
+                                Sys_DataLedOff();
                             }
                             else
                             {
                                 FLASH_Lock();
-                                g_sFramBootParamenter.appState = FRAM_BOOT_APP_REPLACE_OVER;
+                                if((g_nFlashUpData[3] << 8 | g_nFlashUpData[2] << 0) == a_GetCrc((u8 *)SYS_APP_START_ADDR, (g_nFlashUpData[1] << 8 | g_nFlashUpData[0] << 0)))
+                                {
+                                    g_sFramBootParamenter.appState = FRAM_BOOT_APP_REPLACE_OVER;
+                                }
+                                else
+                                {
+                                    g_sFramBootParamenter.appState = FRAM_BOOT_APP_FAIL;
+                                }
+                                a_ClearStateBit(g_nSysState, SYS_STAT_REPLACE_DATA);
+                                
                             }
                         }
                         
                     }
-               }
-               else
-               {
+                }
+                else
+                {
                     flashTime++;
-               }
+                }
                 a_ClearStateBit(g_nSysState, SYS_STAT_WR_RE_FLASH);
             }                                  
-          
-        }
-        else if(g_sFramBootParamenter.flag == DEVICE_TYPE_SM5002)
-        {
-        
-        }
-        else if(g_sFramBootParamenter.flag == DEVICE_TYPE_SM5003)
-        {
-        
         }
     }
 

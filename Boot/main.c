@@ -7,8 +7,8 @@ int main(void)
     while(1)
     {
         Sys_LedTask();
+        Sys_GateTask();
         Sys_BootTask();
-        Sys_UartTask();
         Sys_EC20Task();
         Sys_ServerTask();
         Sys_DownDataTask();

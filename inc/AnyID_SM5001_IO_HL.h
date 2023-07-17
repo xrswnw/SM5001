@@ -32,7 +32,7 @@ extern const PORT_INF IO_LIMIT_INPUT;
 #define IO_Rfid_Chk()              ((IO_LIMIT_INPUT.Port->IDR & IO_LIMIT_INPUT.Pin)  != (uint32_t)Bit_RESET)
 
 extern const PORT_INF IO_LIMIT_INPUT;
-#define IO_Door_Chk()              ((IO_LIMIT_INPUT.Port->IDR & IO_LIMIT_INPUT.Pin)  != (uint32_t)Bit_RESET)
+#define IO_Door_Chk()              (IO_LIMIT_INPUT.Port->IDR & IO_LIMIT_INPUT.Pin)
 
 extern const PORT_INF IO_PWR_INPUT;
 #define IO_Pwr_Chk()              ((IO_PWR_INPUT.Port->IDR & IO_PWR_INPUT.Pin) != (uint32_t)Bit_RESET)

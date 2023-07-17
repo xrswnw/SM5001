@@ -29,6 +29,7 @@ void Elect_InitInterface(u32 baudrate, u8 mode)
     
     USART_InitStructure.USART_BaudRate = baudrate;
     USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+     USART_InitStructure.USART_StopBits = USART_StopBits_1;
     if(mode == ELECT_MODE_645)
     {
         USART_InitStructure.USART_StopBits = USART_StopBits_1;

@@ -75,6 +75,9 @@ typedef struct batInfo{
 #define CHAG_STAT_CHARGE        0x20        //电池充电中
 #define CHAG_STAT_ERR           0x80        //故障
 
+
+#define GATE_CTR_DOOR_OPEN	   0x02
+
 #define CHAG_VENDOR_NAME_LEN    4
 #define CHAG_ERR_FLAG_LOW_MSK   0x000F
 #define CHAG_ERR_CODE_MIN       0x000A
@@ -161,7 +164,7 @@ typedef struct gateRxFrame{
 #define GATE_OP_CMD_WAIT        8
 
 #define GATE_INIT_DLY_TIM       (200 * 3)       //开机延时，等待从机工作正常，才可以操作设别
-#define GATE_OP_DLY_TIM         0x01
+#define GATE_OP_DLY_TIM         60//0x01
 #define GATE_OP_TO_TIM          200
 #define GATE_OP_MQTT_CMD_TIM    600
 #define GATE_OP_TX_TIM          0x05
@@ -235,6 +238,7 @@ typedef struct gateParams{
 #define GATE_OP_BAT_INFO_REPATNUM                       5
 
 #define GATE_FLAG_DOOR_TEST             1
+
 
 typedef struct gateSlvCmd{
     u8 index;

@@ -2,16 +2,14 @@
 #include <math.h>
 SOUND_INFO g_sSoundInfo = {0};
 
-
-
 void Sound_Init()
 {
     Sound_InitInterface(SOUND_BAUDRARE);
     Sound_ConfigInt();
     Sound_EnableInt(ENABLE,DISABLE);
     g_sSoundInfo.state = SOUND_STAT_IDLE;
-}
 
+}
 
 void Sound_ReceiveFrame(u8 byte, SOUND_INFO *Info)
 {

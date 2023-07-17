@@ -13,6 +13,8 @@ typedef struct temperatureInfo{
     u32 alarmTick;
 }WINAVG_INFO;
 
+#define AD_TEMPR_NORMAL					5
+
 #define AD_CHECK_ALARM_TME              1000    //超过10s
 #define AD_ALARM_THRD                   2       //回退的时候需要一个阈值空间
 

@@ -11,10 +11,6 @@
 extern UART_RCVFRAME g_sW232RcvFrame;
 #define W232_ClearRxBuffer()                    memset(&g_sW232RcvFrame, 0,  sizeof(UART_RCVFRAME)) //这里一定要用memset
 
-
-
-//#define TESTTOKEN       "version=2018-10-31&res=products%2F598243%2Fdevices%2F865396056278381&et=2599881240&method=md5&sign=KJKG%2Bc7bLEz25s%2Bid9OHtA%3D%3D"
-
 #define TESTTOKEN       "version=2018-10-31&res=products%2F598243&et=2599881240&method=md5&sign=n34n1AfhT1zyxT3Fftetug%3D%3D"
 
 #define W232_PRDOCT_ID                          "598243"    
@@ -86,6 +82,7 @@ typedef struct w232Par{
 #define W232_CNT_OP_QMTCFG_TIME                 32
 #define W232_CNT_OP_QMTSUB_RESPONSE_CMD         33
 #define W232_CNT_OP_QMTSUB_OTA                  34
+#define W232_CNT_OP_GET_QSQ                     35
 
 
 #define W232_CNT_OP_STAT_IDLE                   0x0001
@@ -104,7 +101,7 @@ typedef struct w232Par{
 
 #define W232_CNT_REPAT_NULL                     1
 #define W232_CNT_REPAT_THREE                    3
-#define W232_CNT_OP_NUM                         32
+#define W232_CNT_OP_NUM                         100
 #define W232_CNT_RESULT_OK                      0
 #define W232_CNT_RESULT_FAIL                    1
 #define W232_CNT_RESULT_TO                      2
@@ -133,7 +130,7 @@ typedef struct w232Par{
 #define W232_TOKEN_LEN                          99//131//129//129//127
 #define W232_CNT_IMEI_SRT_LEN					8
 
-#define W232_HEART_OFFLINE_TIME                 20
+#define W232_HEART_OFFLINE_TIME                 5
 
 #define W232_SERVER_TX_TO_TIME                  100
 typedef struct w232Connect{
@@ -147,10 +144,14 @@ typedef struct w232Connect{
     u8 repeat[W232_CNT_OP_NUM];
     u8 requestId[W232_RQUEST_ID_LEN];
     u8 requestBuffer[W232_RQUEST_BUFFER_LEN];
+    u8 sigStr[2];
+    u8 channelErrStr[2];
     u8 num;
     u8 index;
-    u16 state;
+    u8 sigNum;
+    u8 channelErrNum;
     u8 cmd;
+    u16 state;
     BOOL postFlag;
     u32 tick;
     u8 result;

@@ -12,18 +12,20 @@
 
 extern u32 g_nSysState;
 extern u8  g_nDeviceComType;
-#define SYS_STAT_IDLE           0x00000001	    //系统初始化后处于空闲状态
-#define SYS_STAT_RUNLED         0x00000002
-#define SYS_STAT_DOWNLOAD       0x40000000
-#define SYS_STAT_JMP            0x00000080
-#define SYS_STAT_RESET          0x00000100
-#define SYS_STAT_ALARMLED       0x00000200
-#define SYS_STAT_LTEDTU         0x00000400
-#define SYS_STAT_UPDATA         0x00000800
-#define SYS_STAT_CHK_VERSION    0x00001000
-#define SYS_STAT_REPLACE_DATA   0x80000000
-#define SYS_STAT_WR_RE_FLASH    0x00004000
-#define SYS_STAT_INFORM_INFO    0x00008000
+#define SYS_STAT_IDLE                   0x00000001	    //系统初始化后处于空闲状态
+#define SYS_STAT_RUNLED                 0x00000002
+#define SYS_STAT_DOWNLOAD               0x40000000
+#define SYS_STAT_JMP                    0x00000080
+#define SYS_STAT_RESET                  0x00000100
+#define SYS_STAT_ALARMLED               0x00000200
+#define SYS_STAT_LTEDTU                 0x00000400
+#define SYS_STAT_UPDATA                 0x00000800
+#define SYS_STAT_CHK_VERSION            0x00001000
+#define SYS_STAT_REPLACE_GATE_DATA      0x00002000
+#define SYS_STAT_REPLACE_DATA           0x80000000
+#define SYS_STAT_WR_RE_FLASH            0x00004000
+#define SYS_STAT_INFORM_INFO            0x00008000
+#define SYS_STAT_BOOT_LED               0x00010000
 
 #define SYS_STAT_HTTP_TEST      0x10000000
 
@@ -37,8 +39,11 @@ extern const PORT_INF SYS_RUNLED_COM;
 #define Sys_RunLedOn()              SYS_RUNLED_COM.Port->BSRR = SYS_RUNLED_COM.Pin
 
 
+extern const PORT_INF SYS_DATALED_COM;
+#define Sys_DataLedOff()             SYS_DATALED_COM.Port->BRR = SYS_DATALED_COM.Pin
+#define Sys_DataLedOn()              SYS_DATALED_COM.Port->BSRR = SYS_DATALED_COM.Pin  
 
-    
+
 void Sys_Delay5ms(u32 n);
 
 void Sys_CfgClock(void);
@@ -50,8 +55,7 @@ void Sys_CfgNVIC(void);
 void Sys_CtrlIOInit(void);
 void Sys_Init(void);
 
-void Sys_UartTask(void);
-void Sys_ProcessUartFrame(u8 *pBuffer, u16 len);
+void Sys_GateTask(void);
 void Sys_LedTask(void);
 
 

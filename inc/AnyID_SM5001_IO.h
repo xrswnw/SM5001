@@ -45,11 +45,12 @@
 
 
 
-#define IO_SENSOR_STAT_DOOR            0x01
+#define IO_SENSOR_STAT_DOOR_OPEN       0x01
 #define IO_SENSOR_STAT_SMOKE           0x02
 #define IO_SENSOR_STAT_WATER           0x04
 #define IO_SENSOR_STAT_THUNDER         0x08
 #define IO_SENSOR_STAT_THUNDER_ERR     0x10
+#define IO_SENSOR_STAT_TEMPR_CHANGE    0x20
 
 #define IO_SENSOR_STAT_RFID            0x08
 #define IO_SENSOR_STAT_TEMPR           0x40
@@ -67,7 +68,6 @@
 
 
 typedef struct ioInfo{
-
     u8 ioState ;
     u8 eleMacTick ;  
     u8 warnValue;
@@ -76,6 +76,7 @@ typedef struct ioInfo{
     u8 tick;
     u8 maskFlag;
     u8 tempState1;
+    u8 tempFlag;
     u32 state;
     u32 tempState;
     u32 flag;
@@ -84,10 +85,9 @@ typedef struct ioInfo{
 extern IO_INFO g_sIoInfo;
 
 
-u8 IO_Stat_Chk();
 
 void IO_Init();
 
-u8 IO_Sersor_Chk();
+u8 IO_Sersor_Chk(u8 tUp, u8 tDown, u8 limitTempr);
 
 #endif

@@ -8,46 +8,39 @@
 #define ELECT_REG_ADDR_A_V_VALUE	0x2000
 #define ELECT_REG_ADDR_A_I_VALUE	0x2002
 
-
-
-
 #define ELECT_GET_VALUE_FAIL            0xFFFFFFFF
 
-
-
-
-
-#define ELECT_STAT_IDLE                 0x00
+#define ELECT_STAT_IDLE				0x00
 #define ELECT_STAT_RCV 		        0x01
 #define ELECT_STAT_OVR 		        0x04
 #define ELECT_STAT_TX 		        0x08
-#define ELECT_STAT_TX_IDLE              0x10
-#define ELECT_STAT_WAIT                 0x20
+#define ELECT_STAT_TX_IDLE			0x10
+#define ELECT_STAT_WAIT				0x20
 
-#define ELECT_FLAG_IDLE                 0x00
+#define ELECT_FLAG_IDLE				0x00
 #define ELECT_FLAG_CMD 		        0x01
 #define ELECT_FLAG_REG 		        0x04
 #define ELECT_FLAG_OVR		        0x08
 
 
 
-#define ELECT_SAMPLE_TIME               60
-#define ELECT_MODBUS_READ_REG           0x03
-#define ELECT_MODBUS_SET_REG            0x10
+#define ELECT_SAMPLE_TIME			60
+#define ELECT_MODBUS_READ_REG		0x03
+#define ELECT_MODBUS_SET_REG		0x10
 
-#define ELECT_BUF_MAX_LEN               256
-#define ELECT_BUF_MIN_LEN               0x09
+#define ELECT_BUF_MAX_LEN			256
+#define ELECT_BUF_MIN_LEN			0x09
 
-#define ELECT_WIGHT_VALUE_STABLE  	0x01
-#define ELECT_WIGHT_VALUE_FAIL      	0x00
+#define ELECT_WIGHT_VALUE_STABLE	0x01
+#define ELECT_WIGHT_VALUE_FAIL		0x00
 #define ELECTWIGHT_VALUE_NUM		3
 
 
-#define ELECT_ELECT_VALUE_POS             0x03
-#define ELECT_BUFFER_MAX_LEN             (256 + 32) 
+#define ELECT_ELECT_VALUE_POS		0x03
+#define ELECT_BUFFER_MAX_LEN		(256 + 32) 
 
-#define ELECT_WOEK_NORMAL                 0x00
-#define ELECT_WORK_SET_ZERO               0x01
+#define ELECT_WOEK_NORMAL			0x00
+#define ELECT_WORK_SET_ZERO			0x01
 
 
 #define ELECT_MODE_645_SOF              0xFE

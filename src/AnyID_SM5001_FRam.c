@@ -42,6 +42,7 @@ void Fram_ReadBootParamenter(void)
 
     if(b == FALSE && bBackup == FALSE)
     {
+        memset(&g_sFramBootParamenter, 0, sizeof(FRAM_BOOTPARAMS));
         g_sFramBootParamenter.addr = 0x01;
         g_sFramBootParamenter.appState = FRAM_BOOT_APP_FAIL;
         Fram_WriteBootParamenter();

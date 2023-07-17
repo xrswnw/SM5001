@@ -38,7 +38,7 @@ void Uart_ReceiveFrame(u8 byte, UART_RCVFRAME *pRcvFrame)
             else if(byte == 0)
             {
                 pRcvFrame->state = UART_STAT_DATA;
-                pRcvFrame->dataLen = UART_FRAME_DATA_MIN_LEN + 3 + 9;
+                pRcvFrame->dataLen = UART_FRAME_DATA_MIN_LEN + 4 + 9;
                 pRcvFrame->buffer[2] = byte;
                 pRcvFrame->index = 3;
             }
@@ -50,19 +50,19 @@ void Uart_ReceiveFrame(u8 byte, UART_RCVFRAME *pRcvFrame)
         case UART_STAT_DATA:
             if(pRcvFrame->buffer[2] == 0)
             {
-                if(pRcvFrame->index == 14)
+                if(pRcvFrame->index == 15)
                 {
                     pRcvFrame->dataLen += byte;
                 }
-                else if(pRcvFrame->index == 15)
+                else if(pRcvFrame->index == 16)
                 {
                     pRcvFrame->dataLen += (byte << 8);
                 }
-                else if(pRcvFrame->index == 16)
+                else if(pRcvFrame->index == 17)
                 {
                     pRcvFrame->dataLen += (byte << 16);
                 }
-                else if(pRcvFrame->index == 17)
+                else if(pRcvFrame->index == 18)
                 {
                     pRcvFrame->dataLen += (byte << 24);
                 }
