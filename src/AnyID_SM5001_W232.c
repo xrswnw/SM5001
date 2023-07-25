@@ -47,9 +47,9 @@ void W232_ConnectInit(W232_CONNECT *pCntOp, u8 cmd, W232_PARAMS *pParams)
         pCntOp->to[num] = W232_CNT_TIME_1S * 4;          pCntOp->repeat[num] = 5;    pCntOp->op[num++] = W232_CNT_OP_QMTCONN;           //连接MQTT客户�?
         pCntOp->to[num] = W232_CNT_TIME_1S * 4 ;         pCntOp->repeat[num] = 50;    pCntOp->op[num++] = W232_CNT_OP_QMTSUB_CMD;              //订阅主�
         pCntOp->to[num] = W232_CNT_TIME_1S * 4 ;         pCntOp->repeat[num] = 50;    pCntOp->op[num++] = W232_CNT_OP_QMTSUB_JSON_ACCEPT;              //订阅主题
-        pCntOp->to[num] = W232_CNT_TIME_1S * 4 ;         pCntOp->repeat[num] = 50;    pCntOp->op[num++] = W232_CNT_OP_QMTSUB_JSON_REJECT;  
-        pCntOp->to[num] = W232_CNT_TIME_1S * 4 ;         pCntOp->repeat[num] = 50;    pCntOp->op[num++] = W232_CNT_OP_QMTSUB_RESPONSE_CMD;  
         pCntOp->to[num] = W232_CNT_TIME_1S * 4 ;         pCntOp->repeat[num] = 50;    pCntOp->op[num++] = W232_CNT_OP_QMTSUB_OTA;  
+        pCntOp->to[num] = W232_CNT_TIME_1S * 4 ;         pCntOp->repeat[num] = 50;    pCntOp->op[num++] = W232_CNT_OP_QMTSUB_RESPONSE_CMD;  
+       //pCntOp->to[num] = W232_CNT_TIME_1S * 4 ;         pCntOp->repeat[num] = 50;    pCntOp->op[num++] = W232_CNT_OP_QMTSUB_OTA;  
     
     }
     else
@@ -194,7 +194,6 @@ void W232_ConnectTxCmd(W232_CONNECT *pCntOp, u32 sysTick)
             W232_WriteCmd(strBuff);
             break;
         case W232_CNT_OP_QMTSUB_OTA:
-          
             sprintf(strBuff,"AT+QMTSUB=0,1,\"$sys/%.6s/%.15s/ota/inform\",1",W232_PRDOCT_ID,g_nImsiStr);
             W232_WriteCmd(strBuff);
             break;
@@ -334,6 +333,7 @@ BOOL W232_ConnectCheckRsp(W232_CONNECT *pCntOp, u8 *pRxBuf)
             }
             break;
     }
+	g_sW232Connect.comErr  = 0;
     return bOK;
 }
 

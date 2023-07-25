@@ -171,7 +171,6 @@ void Sys_Init(void)
     a_SetState(g_nSysState, SYS_STAT_IDLE);    
     a_SetStateBit(g_nSysState, SYS_STAT_KEY_CHK); 
     Sys_LedOff();
-    
     Sys_EnableInt();
     
 }
@@ -207,6 +206,59 @@ void Sys_LedTask(void)
                  Sys_LedOff();
             }
         
+        }
+        
+        if(a_CheckStateBit(g_sDeviceTestInfo.flag, DEVICE_TEST_SERSOR))
+        {
+            if(a_CheckStateBit(g_sDeviceTestInfo.err, DEVICE_TEST_ERR_TEMPR))
+            {
+                if(g_nLedDelayTime & 0x0A)
+                {
+                    
+                    IO_Led_Open();
+                }
+                else
+                {
+                     IO_Led_Close();
+                }
+            }
+            else if(a_CheckStateBit(g_sDeviceTestInfo.err, DEVICE_TEST_ERR_ELECT))
+            {
+                if(g_nLedDelayTime & 0x01)
+                {
+                    
+                    IO_Led_Open();
+                }
+                else
+                {
+                     IO_Led_Close();
+                }
+            }
+            else
+            {
+				W232_CtrlLow();
+				W232_KeyLow();
+				#if SYS_ENABLE_WDT
+				WDG_FeedIWDog();
+				#endif
+				Reader_Delayms(500);
+				#if SYS_ENABLE_WDT
+				WDG_FeedIWDog();
+				#endif
+				Reader_Delayms(500);
+				#if SYS_ENABLE_WDT
+				WDG_FeedIWDog();
+				#endif
+				Reader_Delayms(500);
+				#if SYS_ENABLE_WDT
+				WDG_FeedIWDog();
+				#endif
+				Reader_Delayms(500);
+				Sys_SoftReset();
+            
+            }
+
+
         }
 		
 
@@ -282,8 +334,14 @@ void Sys_GateTask(void)
     }
     else if(g_sGateOpInfo.state == GATE_OP_STAT_TX)
     {
+       if(g_sGateOpInfo.mode == GATE_MODE_MAIN_ERR_INFO)
+       {
+			Device_FormatMainInfo(&g_sGateOpInfo);
+       }
        Gate_TxFrame(&g_sGateOpInfo, g_nSysTick);
        g_sGateOpInfo.state = GATE_OP_STAT_WAIT;
+	   
+	   
        if(g_sGateOpInfo.batOpState == GATE_OP_BAT_STAT_ING)
        {
           g_sGateOpInfo.tickCmd = g_nSysTick;
@@ -636,11 +694,6 @@ void Sys_UartTask(void)
         a_SetStateBit(g_nSysState, SYS_STAT_UART_WAIT);
 
     }
-    
-    if((a_CheckStateBit(g_nSysState, SYS_STAT_UART_WAIT)))//
-    {
-
-    }
 
 }
 
@@ -728,6 +781,7 @@ void Sys_W232Task(void)
             {
                 a_ClearStateBit(g_sW232Connect.state, W232_CNT_OP_STAT_WAIT);
                 a_SetState(g_sW232Connect.state, W232_CNT_OP_STAT_STEP);
+				g_sW232Connect.comErr ++;
                 g_sW232Connect.result = W232_CNT_RESULT_TO;             //当前操作超时，GPRS执行流程错误
             }
             else
@@ -902,6 +956,7 @@ void Sys_ServerTask(void)
             {
                 a_ClearStateBit(g_sDeviceServerTxBuf.state, DEVICE_SERVER_TXSTAT_WAIT);
                 a_SetStateBit(g_sDeviceServerTxBuf.state, DEVICE_SERVER_TXST_STEP);
+				g_sW232Connect.comErr ++;
                 g_sDeviceServerTxBuf.result = W232_CNT_RESULT_TO;             
             }
             else
@@ -933,6 +988,7 @@ void Sys_ServerTask(void)
 
 void Sys_WaterTask()
 {
+	static u8 rfidTime = 0;
     if(USART_GetFlagStatus(WATER_PORT, USART_FLAG_NE | USART_FLAG_FE | USART_FLAG_PE))
     {
 		Elect_Stop();
@@ -957,6 +1013,8 @@ void Sys_WaterTask()
             {
                 a_ClearStateBit(g_sWaterInfo.state, WATER_STAT_WAIT);
                 Device_WaterProceRspFrame(g_sWaterTempRcv.buffer, &g_sWaterInfo,  g_sWaterTempRcv.len);
+				g_sWaterInfo.comErr = 0;
+				g_sWaterInfo.txBuf.repat[g_sWaterInfo.txBuf.mode] = 0;
             }
         }
 
@@ -964,16 +1022,17 @@ void Sys_WaterTask()
    
     
     if(a_CheckStateBit(g_nSysState, SYS_STAT_WATER_CTR))
-    {
-        static u8 rfidTime = 0;
-        
+    {   
         rfidTime ++;
         a_ClearStateBit(g_nSysState, SYS_STAT_WATER_CTR);
-        if(rfidTime == WATER_SAMPLE_NUM)
+        if(rfidTime > WATER_SAMPLE_NUM)
         {
             a_SetState(rfidTime, SYS_NULL_TICK); 
-            Water_TransmitCmd(&g_sWaterInfo, g_nSysTick);
-            a_SetStateBit(g_sWaterInfo.state, WATER_STAT_TX);
+			if(!a_CheckStateBit(g_sWaterInfo.state, WATER_STAT_WAIT))
+			{
+				Water_TransmitCmd(&g_sWaterInfo, g_nSysTick);
+				a_SetStateBit(g_sWaterInfo.state, WATER_STAT_TX);
+			}
         }
     }
     
@@ -988,16 +1047,20 @@ void Sys_WaterTask()
     
     if(a_CheckStateBit(g_sWaterInfo.state, WATER_STAT_WAIT))
     {
-		if(g_sWaterInfo.txBuf.tick[g_sWaterInfo.txBuf.mode] + WATER_SAMPLE_TIME < g_nSysTick)
+		if(g_sWaterInfo.txBuf.tick[g_sWaterInfo.txBuf.mode] + WATER_SAMPLE_OP_TIME < g_nSysTick)
 		{
             g_sWaterInfo.txBuf.repat[g_sWaterInfo.txBuf.mode] ++;
+			g_sWaterInfo.state = WATER_STAT_TX;
+			g_sWaterInfo.txBuf.tick[g_sWaterInfo.txBuf.mode] = g_nSysTick;
             if(g_sWaterInfo.txBuf.repat[g_sWaterInfo.txBuf.mode]  > WATER_SAMPLE_NUM)
             {
+				g_sWaterInfo.comErr ++;
+				g_sWaterInfo.txBuf.repat[g_sWaterInfo.txBuf.mode] = 0;
+				g_sWaterInfo.state = WATER_STAT_IDLE;
                g_sWaterInfo.txBuf.result[g_sWaterInfo.txBuf.mode]  = FALSE;    
             }
         
         }
-    
     }
    
     
@@ -1086,17 +1149,17 @@ void Sys_HeratTask()
         
     }
     
-	if(g_sDeviceParams.offLineTime >=  W232_HEART_OFFLINE_TIME)
+    if(g_sDeviceParams.offLineTime >=  W232_HEART_OFFLINE_TIME)
     {
         a_ClearStateBit(g_nSysState, SYS_STAT_LTEDTU);                                  //離綫，等待重連
         Water_WriteStr("twice link") ;                                                //離綫處理
-		a_SetStateBit(g_nSysState,SYS_STAT_MQTT_OFFLINE);
+        a_SetStateBit(g_nSysState,SYS_STAT_MQTT_OFFLINE);
     }
     
     if(a_CheckStateBit(g_nSysState, SYS_STAT_GATE_STAT_CHK))
     {
-		Device_GateStateRsp();
-		a_ClearStateBit(g_nSysState, SYS_STAT_GATE_STAT_CHK);
+        Device_GateStateRsp();
+        a_ClearStateBit(g_nSysState, SYS_STAT_GATE_STAT_CHK);
     }
     if(memcmp(g_sMqttKey.imsiStr, g_nImsiStr,W232_IMSI_LEN))
     {
@@ -1191,9 +1254,13 @@ void Sys_TestTask()
 			else
 			{
 				IO_Door_Open();
-				g_sIoInfo.state |= IO_DEVICE_STAT_DOOR;
-				g_sIoInfo.ctrlDoorTick = g_nSysTick;	
+				Reader_Delayms(400);
+				#if SYS_ENABLE_WDT
+				WDG_FeedIWDog();
+				#endif
+				IO_Door_Close();
 				g_sDeviceTestInfo.flag = DEVICE_TEST_SERSOR;
+
 			}
 			g_sGateOpInfo.state = GATE_OP_STAT_TX;
 		}
@@ -1203,8 +1270,10 @@ void Sys_TestTask()
 	{
 		if(Device_ChkSersor())
 		{
-			a_ClearStateBit(g_sDeviceTestInfo.flag, DEVICE_TEST_SERSOR);
+			                       //測試完成通過后重啓？
 			a_SetStateBit(g_nSysState, SYS_STAT_KEY_CHK);
+                        
+                        /*
 			W232_CtrlLow();
 			W232_KeyLow();
 			#if SYS_ENABLE_WDT
@@ -1224,10 +1293,9 @@ void Sys_TestTask()
 			#endif
 			Reader_Delayms(500);
 			Sys_SoftReset();
+                        */
 		}
 	}
 }
-
-
 
 

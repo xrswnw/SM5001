@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <settings>
     <DebugChecksum>
-        <Checksum>547009730</Checksum>
+        <Checksum>980869338</Checksum>
     </DebugChecksum>
     <Exceptions>
         <StopOnUncaught>_ 0</StopOnUncaught>
@@ -28,6 +28,7 @@
         <HideCovered>0</HideCovered>
     </CodeCoverage>
     <Disassembly>
+        <MixedMode>1</MixedMode>
         <InstrCount>0</InstrCount>
     </Disassembly>
     <CallStack>
@@ -68,8 +69,9 @@
         <Fmt1>{W}1:sector	3	0</Fmt1>
         <Fmt2>{W}42:g_nDeviceNxtDownloadAddr	4	0</Fmt2>
         <Fmt3>{W}42:g_nSysState	4	0</Fmt3>
-        <Fmt4>{W}42:id	4	0</Fmt4>
-        <Fmt5>{W}42:sector	3	0</Fmt5>
+        <Fmt4>{W}42:g_nSysTick	3	0</Fmt4>
+        <Fmt5>{W}42:id	4	0</Fmt5>
+        <Fmt6>{W}42:sector	3	0</Fmt6>
     </watch_formats>
     <Trace2>
         <Enabled>0</Enabled>
@@ -155,25 +157,31 @@
         <mode>0</mode>
     </DisassembleMode>
     <Breakpoints2>
-        <Bp0>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_FlashM25.c}.0.1" 0 0 1 "" 0 "" 0</Bp0>
-        <Bp1>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_FlashM25.c}.0.1" 0 0 1 "" 0 "" 0</Bp1>
-        <Bp2>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_FlashM25.c}.0.1" 0 0 1 "" 0 "" 0</Bp2>
-        <Bp3>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.0.1" 0 0 1 "" 0 "" 0</Bp3>
-        <Bp4>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_Uart.c}.0.1" 0 0 1 "" 0 "" 0</Bp4>
+        <Bp0>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_FlashM25.c}.11.1" 0 0 1 "" 0 "" 0</Bp0>
+        <Bp1>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_FlashM25.c}.11.1" 0 0 1 "" 0 "" 0</Bp1>
+        <Bp2>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_FlashM25.c}.11.1" 0 0 1 "" 0 "" 0</Bp2>
+        <Bp3>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.897.1" 0 0 1 "" 0 "" 0</Bp3>
+        <Bp4>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_Uart.c}.194.1" 0 0 1 "" 0 "" 0</Bp4>
         <Bp5>_ 0 "EMUL_CODE" "" 0 0 1 "" 0 "" 0</Bp5>
-        <Bp6>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_FRam.c}.22.17" 0 0 1 "" 0 "" 0</Bp6>
-        <Bp7>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_FRam.c}.50.17" 0 0 1 "" 0 "" 0</Bp7>
-        <Bp8>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.0.1" 0 0 1 "" 0 "" 0</Bp8>
-        <Bp9>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.0.1" 0 0 1 "" 0 "" 0</Bp9>
-        <Bp10>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.348.17" 0 0 1 "" 0 "" 0</Bp10>
-        <Bp11>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_Device.c}.180.6" 0 0 1 "" 0 "" 0</Bp11>
-        <Bp12>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.341.13" 0 0 1 "" 0 "" 0</Bp12>
-        <Bp13>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.337.13" 0 0 1 "" 0 "" 0</Bp13>
-        <Bp14>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_Gate.c}.54.13" 0 0 1 "" 0 "" 0</Bp14>
-        <Bp15>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.363.13" 0 0 1 "" 0 "" 0</Bp15>
-        <Bp16>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.332.13" 0 0 1 "" 0 "" 0</Bp16>
-        <Bp17>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\main.c}.6.5" 0 0 1 "" 0 "" 0</Bp17>
-        <Count>18</Count>
+        <Bp6>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.897.1" 0 0 1 "" 0 "" 0</Bp6>
+        <Bp7>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.897.1" 0 0 1 "" 0 "" 0</Bp7>
+        <Bp8>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.395.11" 0 0 1 "" 0 "" 0</Bp8>
+        <Bp9>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_Device.c}.386.1" 0 0 1 "" 0 "" 0</Bp9>
+        <Bp10>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_Device.c}.92.17" 0 0 1 "" 0 "" 0</Bp10>
+        <Bp11>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.420.4" 0 0 1 "" 0 "" 0</Bp11>
+        <Bp12>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_Device.c}.218.17" 0 0 1 "" 0 "" 0</Bp12>
+        <Bp13>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_Device.c}.222.17" 0 0 1 "" 0 "" 0</Bp13>
+        <Bp14>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.686.3" 0 0 1 "" 0 "" 0</Bp14>
+        <Bp15>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.333.13" 0 0 1 "" 0 "" 0</Bp15>
+        <Bp16>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.337.13" 0 0 1 "" 0 "" 0</Bp16>
+        <Bp17>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.342.5" 0 0 1 "" 0 "" 0</Bp17>
+        <Bp18>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.350.17" 0 0 1 "" 0 "" 0</Bp18>
+        <Bp19>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.356.17" 0 0 1 "" 0 "" 0</Bp19>
+        <Bp20>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.360.17" 0 0 1 "" 0 "" 0</Bp20>
+        <Bp21>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_Device.c}.229.17" 0 0 1 "" 0 "" 0</Bp21>
+        <Bp22>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_Device.c}.242.3" 0 0 1 "" 0 "" 0</Bp22>
+        <Bp23>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_Boot_SysCfg.c}.412.13" 0 0 1 "" 0 "" 0</Bp23>
+        <Count>24</Count>
     </Breakpoints2>
     <Aliases>
         <A0>_ "E:\AnyID\Git\FY\SM5001\Boot\src\AnyID_Boot_Uart.c" ""</A0>

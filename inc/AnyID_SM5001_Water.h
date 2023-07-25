@@ -13,6 +13,8 @@
 #define WATER_STAT_TX_IDLE              0x10
 #define WATER_STAT_WAIT                 0x20
 
+
+#define WATER_COM_OP_TICK             3
 #define WATER_BUF_MAX_LEN               48
 #define WATER_UID_LEN                   8
 #define WATER_BUFFER_MAX_LEN            (256 + 32) 
@@ -30,6 +32,8 @@
 
 #define WATER_SAMPLE_NUM                5
 #define WATER_SAMPLE_TIME               3
+
+#define WATER_SAMPLE_OP_TIME            100
 
 #define WATER_NUM                       12
 #define WATER_GETUID_BUFFER_LEN         7
@@ -81,6 +85,7 @@ typedef struct WatertInfo{
     u8 flag;
     u8 mode;
     u8 parmas;
+	u8 comErr;
     u8 uid[WATER_UID_LEN];
     WATER_OPINFO slaveInfo[2];
     WATER_TX_BUF txBuf;

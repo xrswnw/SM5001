@@ -85,6 +85,19 @@ void Gate_WriteBuffer(u8 *pBuffer, u32 len)
     Gate_EnableRx();
 }
 
+void Gate_WriteByte(u8 ch)
+{
+    while(((GATE_PORT)->SR & USART_FLAG_TXE) == (u16)RESET);
+	(GATE_PORT)->DR = (ch & (u16)0x01FF);
+}
+
+void Gate_WriteCmd(char *str)
+{
+    Gate_WriteBuffer((u8 *)str, strlen(str));
+    Gate_WriteByte('\r');
+    Gate_WriteByte('\n');
+}
+
 BOOL Gate_UartCheckErr(void)
 {
     BOOL b = FALSE;

@@ -61,13 +61,13 @@ void Fram_ReadBootParamenter(void)
             repeat++;
         }
     }while(repeat < 3);
-    
-    if(bBackUp == FALSE && b == FALSE)
+
+    if((bBackUp == FALSE && b == FALSE) || (g_sFramBootParamenter.currentVerSion[0] == 0 && g_sFramBootParamenter.currentVerSion[1] == 0))
     {
         memset(&g_sFramBootParamenter, 0, sizeof(FRAM_BOOTPARAMS));
         g_sFramBootParamenter.addr = 0x01;
         g_sFramBootParamenter.appState = FRAM_BOOT_APP_FAIL;
-        
+		memcpy(g_sFramBootParamenter.currentVerSion, "SM5001_00000000_FFFF", FRAM_VERSION_SIZE);//读取参数失败，恢复默认
         Fram_WriteBootParamenter();
         Fram_WriteBackupBootParamenter();
     }
@@ -80,6 +80,13 @@ void Fram_ReadBootParamenter(void)
         memcpy(&g_sFramBootParamenter, &backupParams, sizeof(FRAM_BOOTPARAMS));
         Fram_WriteBootParamenter();
     }
+	
+	if((g_sFramBootParamenter.currentVerSion[0] == 0 && g_sFramBootParamenter.currentVerSion[1] == 0))
+	{
+		memcpy(g_sFramBootParamenter.currentVerSion, "SM5001_00000000_FFFF", FRAM_VERSION_SIZE);//读取参数失败，恢复默认
+		Fram_WriteBootParamenter();
+        Fram_WriteBackupBootParamenter();
+	}
     
 }
 

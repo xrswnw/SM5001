@@ -53,7 +53,7 @@ void Water_TransmitCmd(WATER_INFO *pWaterInfo, u32 tick)
             g_sWaterInfo.txBuf.cmd = WATER_CMD_GET_UID; 
             pWaterInfo->txBuf.tick[WATER_STAT_MODE_RFID] = tick;
             pWaterInfo->txBuf.len = Water_FormatFarme(&(pWaterInfo->txBuf), g_nWaterGetUidBuffer, WATER_GETUID_BUFFER_LEN);
-            pWaterInfo->txBuf.mode = WATER_STAT_MODE_WATER_1;
+            pWaterInfo->txBuf.mode = WATER_STAT_MODE_RFID;		////----------------------
         }
         else if(pWaterInfo->txBuf.mode == WATER_STAT_MODE_WATER_1)
         {

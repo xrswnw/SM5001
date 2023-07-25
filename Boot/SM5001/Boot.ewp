@@ -1069,6 +1069,9 @@
     <group>
         <name>EWARMv5</name>
         <file>
+            <name>$PROJ_DIR$\..\src\AnyID_FlashM25.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\..\..\..\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\startup\startup_stm32f10x_hd.s</name>
         </file>
     </group>
@@ -1145,9 +1148,6 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\src\AnyID_Boot_Uart.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\src\AnyID_FlashM25.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\src\AnyID_FRam.c</name>

@@ -53,7 +53,7 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define DEVICE_CMD_CTR_FAN                  0x28
 #define DEVICE_CMD_VERSION_UPDATA           0x29
 
-#define DEVICE_CMD_MQTT_KEY_WRITE           0x52
+#define DEVICE_CMD_INFOR_MAIN_INFO          0x52
 #define DEVICE_CMD_MQTT_GET_IMEI            0x53
 
 
@@ -166,6 +166,9 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 
 #define DEVICE_BAT_SN_LEN               6
 
+#define DEVICE_COM_STAT_FAIL			0xFF
+
+
 #define DEVICE_BAT_RTN                  0x01
 #define DEVICE_BAT_BRW                  0x02 
 
@@ -230,7 +233,15 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 
 
 #define Device_ChkGate(v)                      (v != DEVICE_SM5001_ID && v != DEVICE_SM5003_ID)
-#define Device_AnsyFrame(add, c, frame)        do{g_sGateOpInfo.mode = GATE_MODE_CMD;g_sGateOpInfo.state = GATE_OP_STAT_TX;g_sGateOpInfo.cmd = c;g_sGateOpInfo.slvIndex = (add -1)>> 1;g_sGateOpInfo.slvCmd.paramsLen = 2;g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;g_sGateOpInfo.slvCmd.params[1] = frame;}while(0)    
+#define Device_AnsyFrame(add, c, frame)        do{\
+													g_sGateOpInfo.mode = GATE_MODE_CMD;\
+													g_sGateOpInfo.state = GATE_OP_STAT_TX;\
+													g_sGateOpInfo.cmd = c;\
+													g_sGateOpInfo.slvIndex = (add -1)>> 1;\
+													g_sGateOpInfo.slvCmd.paramsLen = 2;\
+													g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;\
+													g_sGateOpInfo.slvCmd.params[1] = frame;\
+												}while(0)    
 #define Device_AnsyTestFrame(add, c, frame)   do{g_sGateOpInfo.mode = GATE_MODE_CMD;g_sGateOpInfo.state = GATE_OP_STAT_TX;g_sGateOpInfo.cmd = c;g_sGateOpInfo.slvIndex = add ;g_sGateOpInfo.slvCmd.paramsLen = 2;g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;g_sGateOpInfo.slvCmd.params[1] = frame;}while(0)
 #define Device_GateRtBat(add)                  do{g_sGateOpInfo.add = add - 1;g_sGateOpInfo.state = GATE_OP_STAT_TX;g_sGateOpInfo.mode = GATE_MODE_CMD;g_sGateOpInfo.cmd = GATE_FRAME_CMD_RTNBAT;g_sGateOpInfo.slvIndex = (add -1)>> 1;g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;g_sGateOpInfo.slvCmd.paramsLen = DEVICE_BAT_SN_LEN + 1;}while(0)                                 
 #define Device_GateBrBat(add)                  do{g_sGateOpInfo.add = add - 1;g_sGateOpInfo.state = GATE_OP_STAT_TX;g_sGateOpInfo.mode = GATE_MODE_CMD;g_sGateOpInfo.cmd = GATE_FRAME_CMD_BRWBAT;g_sGateOpInfo.slvIndex = (add -1)>> 1;g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;g_sGateOpInfo.slvCmd.paramsLen = DEVICE_BAT_SN_LEN + 1;}while(0) 
@@ -239,7 +250,15 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 
 #define Device_VoiceApoFrame(opt,repat,cmd,vn)     do{g_sSoundInfo.txBuf.index = 0;g_sSoundInfo.txBuf.num = 0;/**/g_sSoundInfo.txBuf.cd[g_sSoundInfo.txBuf.num] = SOUND_FRAME_CMD_APPOINT_FOLDER; g_sSoundInfo.txBuf.to[g_sSoundInfo.txBuf.num] = opt;g_sSoundInfo.txBuf.id[g_sSoundInfo.txBuf.num] = vn;g_sSoundInfo.txBuf.repeat[g_sSoundInfo.txBuf.num] = repat;g_sSoundInfo.txBuf.op[g_sSoundInfo.txBuf.num++] = cmd;g_sSoundInfo.state = SOUND_STAT_TX;}while(0)
 #define Device_VoiceCtrFrame(opt,repat,cmd,vn)     do{g_sSoundInfo.txBuf.index = 0;g_sSoundInfo.txBuf.num = 0;g_sSoundInfo.txBuf.to[g_sSoundInfo.txBuf.num] = opt;g_sSoundInfo.txBuf.id[g_sSoundInfo.txBuf.num] = vn;g_sSoundInfo.txBuf.repeat[g_sSoundInfo.txBuf.num] = repat;g_sSoundInfo.txBuf.cd[g_sSoundInfo.txBuf.num] = SOUND_FRAME_CMD_VOL_STR_AOP;g_sSoundInfo.txBuf.op[g_sSoundInfo.txBuf.num++] = cmd;g_sSoundInfo.state = SOUND_STAT_TX;}while(0)
-#define Device_AtRsp(opt,repat,cmd)                do{g_sDeviceServerTxBuf.to[g_sDeviceServerTxBuf.num] = opt;g_sDeviceServerTxBuf.repeat[g_sDeviceServerTxBuf.num] = repat;g_sDeviceServerTxBuf.op[g_sDeviceServerTxBuf.num++] = cmd;g_sDeviceServerTxBuf.state |= DEVICE_SERVER_TXST_AT;}while(0)
+#define Device_AtRsp(opt,repat,cmd)                do{\
+														g_sDeviceServerTxBuf.to[g_sDeviceServerTxBuf.num] = opt;\
+														g_sDeviceServerTxBuf.repeat[g_sDeviceServerTxBuf.num] = repat;\
+														g_sDeviceServerTxBuf.op[g_sDeviceServerTxBuf.num++] = cmd;\
+														if(g_sDeviceServerTxBuf.state == DEVICE_SERVER_TXSTAT_IDLE)\
+														{\
+															g_sDeviceServerTxBuf.state = DEVICE_SERVER_TXST_AT;\
+														}\
+												    }while(0)
 
 
 #define Device_ChkDeviceStat(stat)          ({\
@@ -379,8 +398,10 @@ void Device_CommunStep(DEVICE_SENVER_TXBUFFER *pCntOp);
 void Device_GateStateInit();
 void Device_GateStateRsp();
 void Device_GateBatTwice(u8 cmd, u8 addr);
-BOOL Device_ChkSersor();
+void Device_FormatMainInfo(GATE_OPINFO *pGateOpInfo);
 
+
+BOOL Device_ChkSersor();
 BOOL Device_CheckRsp(W232_CONNECT *pCntOp, u8 *pRxBuf, u8 len) ;
 BOOL Device_WriteDeviceParamenter(void);
 BOOL Device_SetCfg(u8 *pBuffer);

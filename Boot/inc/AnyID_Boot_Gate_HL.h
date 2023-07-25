@@ -22,9 +22,10 @@ extern const PORT_INF GATE_PORT_CTRL;
 void Gate_InitInterface(u32 baudrate);
 void Gate_EnableInt(FunctionalState rxState, FunctionalState txState);
 void Gate_ConfigInt(FunctionalState state);
-
+void Gate_WriteCmd(char *str);
 void Gate_Delayms(u32 n);             //œµÕ≥—” ±n∫¡√Î
 void Gate_WriteBuffer(u8 *pBuffer, u32 len);
+void Gate_WriteByte(u8 ch);
 BOOL Gate_UartCheckErr(void);
 #endif
 

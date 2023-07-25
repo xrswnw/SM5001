@@ -13,72 +13,17 @@ void Device_Delayms(u32 n)
     while(n--);
 }
 
-//char g_nHttpAtBuf[EC20_STR_BUFFER_RSP_LEN] = {0};
+
 void Device_CommunTxCmd(DEVICE_SENVER_TXBUFFER *pCntOp, u32 sysTick)
 {
-    
-    /*
-    u8 op = 0;
-
-    op = pCntOp->op[pCntOp->index];
-    switch(op)
-    {
-
-        case DEVICE_HTTP_GET_REQUEST_CKECK:
-          
-            memset(g_nHttpAtBuf, 0, EC20_STR_BUFFER_RSP_LEN);
-            
-            strcat(g_nHttpAtBuf,"GET http://iot-api.heclouds.com/fuse-ota/");
-            strcat(g_nHttpAtBuf,*(&EC20_PRDOCT_ID));
-            strcat(g_nHttpAtBuf,"/");
-            strcat(g_nHttpAtBuf, (const char *)(&g_nImsiStr));
-
-            strcat(g_nHttpAtBuf,"/check?type=1&version=");
-            strcat(g_nHttpAtBuf, (char *)&g_sFramBootParamenter.currentVerSion);
-           // memcpy(g_nHttpAtBuf, g_nHttpAtBuf, strlen(g_nHttpAtBuf));
-            strcat(g_nHttpAtBuf," HTTP/1.1\r\n");
-            strcat(g_nHttpAtBuf,"Content-Type: application/json\r\n");
-            strcat(g_nHttpAtBuf,"authorization:");
-            strcat(g_nHttpAtBuf,*(&HTTPTOKEN));
-            strcat(g_nHttpAtBuf,"\r\n");
-            strcat(g_nHttpAtBuf,"host:iot-api.heclouds.com\r\n");
-            
-            EC20_WriteCmd(g_nHttpAtBuf);
-            break;
-        case DEVICE_HTTP_GET_REQUEST_DOWNLOAD:
-          
-            memset(g_nHttpAtBuf, 0, EC20_STR_BUFFER_RSP_LEN);
-            
-            char lenBuf[20] = {0};
-            if(g_sDeviceUpDataInfo.step <= g_sDeviceUpDataInfo.num)
-            {
-                strcat(g_nHttpAtBuf,"GET http://iot-api.heclouds.com/fuse-ota/");
-                strcat(g_nHttpAtBuf,*(&EC20_PRDOCT_ID));
-                strcat(g_nHttpAtBuf,"/");
-                strcat(g_nHttpAtBuf, (const char *)(&g_nImsiStr));
-                strcat(g_nHttpAtBuf,"/");
-                strcat(g_nHttpAtBuf, g_sDeviceUpDataInfo.tid);
-                strcat(g_nHttpAtBuf, "/download HTTP/1.1\r\n");
-                strcat(g_nHttpAtBuf,"Content-Type: application/json\r\n");
-                strcat(g_nHttpAtBuf,"authorization: ");
-                strcat(g_nHttpAtBuf,*(&HTTPTOKEN));
-                strcat(g_nHttpAtBuf,"\r\n");
-                strcat(g_nHttpAtBuf,Device_Analys_Data_Len(lenBuf, g_sDeviceUpDataInfo.step));
-                strcat(g_nHttpAtBuf,"\r\n");
-                strcat(g_nHttpAtBuf,"host:iot-api.heclouds.com\r\n");
-            }
-            
-            EC20_WriteCmd(g_nHttpAtBuf);
-            break;
-    }
-    pCntOp->tick = sysTick;
-*/
-    
+   
     u8 op = 0;
     char atBuf[128] = {0};//------？？？？
     char lenBuf[20] = {0};
-    
     op = pCntOp->op[pCntOp->index];
+	
+	
+
     switch(op)
     {
 
@@ -124,9 +69,32 @@ void Device_CommunTxCmd(DEVICE_SENVER_TXBUFFER *pCntOp, u32 sysTick)
                 strcat(g_nHttpAtBuf,"\r\n");
                 strcat(g_nHttpAtBuf,"host:iot-api.heclouds.com\r\n");
             }
-            
+            //Gate_WriteCmd(g_nHttpAtBuf);
             EC20_WriteCmd(g_nHttpAtBuf);
             break;
+    case DEVICE_HTTP_POST_INFO_VERSION:
+          memset(g_nHttpAtBuf, 0, EC20_STR_BUFFER_RSP_LEN);
+			
+          
+                strcat(g_nHttpAtBuf,"POST http://iot-api.heclouds.com/fuse-ota/");
+                strcat(g_nHttpAtBuf,*(&EC20_PRDOCT_ID));
+                strcat(g_nHttpAtBuf,"/");
+                strcat(g_nHttpAtBuf, (const char *)(&g_nImsiStr));
+                strcat(g_nHttpAtBuf,"/");
+                strcat(g_nHttpAtBuf, g_sDeviceUpDataInfo.tid);
+                strcat(g_nHttpAtBuf, "/status HTTP/1.1\r\n");
+                strcat(g_nHttpAtBuf,"authorization: ");
+                strcat(g_nHttpAtBuf,*(&HTTPTOKEN));
+                strcat(g_nHttpAtBuf,"\r\n");
+				strcat(g_nHttpAtBuf,"Content-Type: application/json\r\n");
+				strcat(g_nHttpAtBuf,"data: {step: 99}\r\n");
+                                    //升级状态上报,动态上报
+                strcat(g_nHttpAtBuf,"host:iot-api.heclouds.com\r\n");
+				
+         		//Gate_WriteCmd(g_nHttpAtBuf);
+				EC20_WriteCmd(g_nHttpAtBuf);
+      
+      break;
     }
     pCntOp->tick = sysTick;
 }
@@ -140,6 +108,7 @@ BOOL Device_CommunCheckRsp(DEVICE_SENVER_TXBUFFER *pCntOp, u8 *pRxBuf)
     BOOL bOK = FALSE;
     u32 len = 0;
     op = pCntOp->op[pCntOp->index];
+	
     switch(op)
     {
         case DEVICE_HTTP_GET_REQUEST_CKECK:
@@ -181,6 +150,7 @@ BOOL Device_CommunCheckRsp(DEVICE_SENVER_TXBUFFER *pCntOp, u8 *pRxBuf)
 				}
                 bOK = TRUE;
             }
+
             break;
         case DEVICE_HTTP_GET_RONSPOND:
             if(strstr((char const *)pRxBuf, "CONNECT") != NULL)
@@ -189,7 +159,16 @@ BOOL Device_CommunCheckRsp(DEVICE_SENVER_TXBUFFER *pCntOp, u8 *pRxBuf)
                 bOK = TRUE;
             }
             break;
+		case DEVICE_HTTP_POST_INFO_VERSION:
+		//	Gate_WriteCmd(pRxBuf);
+		if(strstr((char const *)pRxBuf, "CONNECT") != NULL)
+            {
+                
+                bOK = TRUE;
+            }
+			break;
     }
+	g_sDeviceUpDataInfo.linkTick = 0;
     
     return bOK;
 }
@@ -257,7 +236,12 @@ BOOL Device_Chk_VersionFrame(u8 *pBuffer, DEVICE_UPDATA_INFO *pDataInfo)
 
             bOk = TRUE;
         } 
-    } 
+    }
+	else if(strstr((char const *)pBuffer, "\"code\":12012") != NULL)
+	{
+		g_sFramBootParamenter.appState = FRAM_BOOT_APP_NULL_REPLACE;
+	}
+		
 
     
     return bOk;
@@ -363,20 +347,15 @@ BOOL Device_Chk_Version()
     BOOL tf = FALSE;     //版本信息校验
 	
 	
-	if(memcmp(g_sFramBootParamenter.aimVerSion,g_sFramBootParamenter.currentVerSion, FRAM_VERSION_SIZE))    //主控更新
-	{
-		tf = TRUE;
+	//if(memcmp(g_sFramBootParamenter.aimVerSion,g_sFramBootParamenter.currentVerSion, FRAM_VERSION_SIZE))    //版本信息校验，相同则不更新
+	//{
 		if(Flash_ReadBuffer(FLASH_DATA_OPEN_ADDR + 4 * FLASH_UPDATA_LEN, FLASH_UPDATA_LEN, g_nFlashUpData))
 		{
 			if(g_sFramBootParamenter.flag == DEVICE_TYPE_SM5001)
 			{     
 			   if(!memcmp(g_nFlashUpData, (u8 *)DEVICE_BOOT_VER_ADDR, 6))	//固件信息校驗
-				{ 
+			   { 
 					tf = TRUE;
-				}
-			   else
-			   {
-			   		g_sFramBootParamenter.appState = FRAM_BOOT_APP_NULL_REPLACE;
 			   }
 			}
 			else if(g_sFramBootParamenter.flag == DEVICE_TYPE_SM5002 || g_sFramBootParamenter.flag == DEVICE_TYPE_SM5003)
@@ -384,27 +363,7 @@ BOOL Device_Chk_Version()
 				tf = TRUE;
 			}
 		}
-	}
-
-	/*
-    if(Flash_ReadBuffer(FLASH_DATA_OPEN_ADDR + 4 * FLASH_UPDATA_LEN, FLASH_UPDATA_LEN, g_nFlashUpData))
-    {
-        if(g_sFramBootParamenter.flag == DEVICE_TYPE_SM5001)
-        {     
-           if(!memcmp(g_nFlashUpData, g_sFramBootParamenter.verSion, 8))
-            { 
-                if(memcmp(g_nFlashUpData, g_sFramBootParamenter.verSion, DEVICE_SOFTVERSION_NAME_LEN))
-                {       
-                    tf = TRUE;
-                }
-            }
-        }
-        else if(g_sFramBootParamenter.flag == DEVICE_TYPE_SM5002 || g_sFramBootParamenter.flag == DEVICE_TYPE_SM5003)
-        {
-            tf = TRUE;
-        }
-    }
-    */
+	//}
     return tf;
 }
 

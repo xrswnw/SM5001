@@ -151,6 +151,7 @@ typedef struct w232Connect{
     u8 sigNum;
     u8 channelErrNum;
     u8 cmd;
+	u8 comErr;
     u16 state;
     BOOL postFlag;
     u32 tick;

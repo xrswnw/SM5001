@@ -224,6 +224,7 @@ typedef struct gateParams{
 #define GATE_MODE_GETVER        0x05    //初始化仓控板配置参数
 #define GATE_MODE_CTL_CMD       0x04    //命令操作
 #define GATE_MODE_PARPER        0x06    //初始化仓控板配置参数
+#define GATE_MODE_MAIN_ERR_INFO 0x07    //获取仓控板信息
 //#define GATE_MODE_RTNBAT        0x04    //还电池
 //#define GATE_MODE_BRWBAT        0x05    //借电池
 

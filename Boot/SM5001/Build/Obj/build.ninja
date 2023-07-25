@@ -21,6 +21,7 @@ rule browsedata
 
 #Build steps
 build system_stm32f10x.pbi : index system_stm32f10x.xcl
+build AnyID_FlashM25.pbi : index AnyID_FlashM25.xcl
 build main.pbi : index main.xcl
 build stm32f10x_it.pbi : index stm32f10x_it.xcl
 build misc.pbi : index misc.xcl
@@ -42,15 +43,14 @@ build AnyID_Boot_Gate_HL.pbi : index AnyID_Boot_Gate_HL.xcl
 build AnyID_Boot_SysCfg.pbi : index AnyID_Boot_SysCfg.xcl
 build AnyID_Boot_SysTick_HL.pbi : index AnyID_Boot_SysTick_HL.xcl
 build AnyID_Boot_Uart.pbi : index AnyID_Boot_Uart.xcl
-build AnyID_FlashM25.pbi : index AnyID_FlashM25.xcl
 build AnyID_FRam.pbi : index AnyID_FRam.xcl
 build AnyID_Stdlib.pbi : index AnyID_Stdlib.xcl
 build AnyID_Uart_Receive.pbi : index AnyID_Uart_Receive.xcl
-build Boot_part0.pbi : link system_stm32f10x.pbi main.pbi stm32f10x_it.pbi misc.pbi stm32f10x_flash.pbi
-build Boot_part1.pbi : link stm32f10x_gpio.pbi stm32f10x_iwdg.pbi stm32f10x_rcc.pbi stm32f10x_spi.pbi stm32f10x_usart.pbi
-build Boot_part2.pbi : link AnyID_Boot_Device.pbi AnyID_Boot_EC20.pbi AnyID_Boot_EC20_HL.pbi AnyID_Boot_Flash_HL.pbi AnyID_Boot_FlashM25.pbi
-build Boot_part3.pbi : link AnyID_Boot_FRam.pbi AnyID_Boot_FRam_HL.pbi AnyID_Boot_Gate.pbi AnyID_Boot_Gate_HL.pbi AnyID_Boot_SysCfg.pbi
-build Boot_part4.pbi : link AnyID_Boot_SysTick_HL.pbi AnyID_Boot_Uart.pbi AnyID_FlashM25.pbi AnyID_FRam.pbi AnyID_Stdlib.pbi
+build Boot_part0.pbi : link system_stm32f10x.pbi AnyID_FlashM25.pbi main.pbi stm32f10x_it.pbi misc.pbi
+build Boot_part1.pbi : link stm32f10x_flash.pbi stm32f10x_gpio.pbi stm32f10x_iwdg.pbi stm32f10x_rcc.pbi stm32f10x_spi.pbi
+build Boot_part2.pbi : link stm32f10x_usart.pbi AnyID_Boot_Device.pbi AnyID_Boot_EC20.pbi AnyID_Boot_EC20_HL.pbi AnyID_Boot_Flash_HL.pbi
+build Boot_part3.pbi : link AnyID_Boot_FlashM25.pbi AnyID_Boot_FRam.pbi AnyID_Boot_FRam_HL.pbi AnyID_Boot_Gate.pbi AnyID_Boot_Gate_HL.pbi
+build Boot_part4.pbi : link AnyID_Boot_SysCfg.pbi AnyID_Boot_SysTick_HL.pbi AnyID_Boot_Uart.pbi AnyID_FRam.pbi AnyID_Stdlib.pbi
 build Boot_part5.pbi : link AnyID_Uart_Receive.pbi
 build Boot.pbd : link Boot_part0.pbi Boot_part1.pbi Boot_part2.pbi Boot_part3.pbi Boot_part4.pbi Boot_part5.pbi
 build Boot.pbw : browsedata Boot.pbd

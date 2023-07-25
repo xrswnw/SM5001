@@ -28,7 +28,7 @@
 #define DEVICE_TYPE_SM5003              3
 
 
-#define DEVICE_BOOT_VER_ADDR                       0x08005000          //版本固定在当前系统
+#define DEVICE_BOOT_VER_ADDR			0x08005000          //版本固定在当前系统
 #define DEVICE_UPDATA_FLAG_NULL         0
 #define DEVICE_UPDATA_FLAG_RQ           1
 #define DEVICE_UPDATA_FLAG_DOWN         2
@@ -77,13 +77,16 @@
 											 
 #define Device_DownInfoChk()			
 
-#define Device_Clear_Info()             do{\
+#define Device_ClearInfo()             do{\
                                             memcpy(g_sFramBootParamenter.currentVerSion, g_sFramBootParamenter.aimVerSion, FRAM_VERSION_SIZE);\
                                             g_sFramBootParamenter.flag = 0;\
-                                            g_sFramBootParamenter.flag = 0;\
+                                            g_sFramBootParamenter.size = 0;\
                                             g_sFramBootParamenter.appState = FRAM_BOOT_APP_DATA_DOWD;\
                                             Fram_WriteBootParamenter();\
                                         }while(0)
+											
+											
+
 typedef struct deviceSenverTxBuff{
     u8 num;
     u8 index;
@@ -112,6 +115,7 @@ typedef struct deviceUpDataInfo{
     u8 flag;
     u8 step;
     u8 num;
+	u8 linkTick;
     u8 data[DEVICE_SOFTVERSION_DATA_LEN+ 2];
     char name[DEVICE_SOFTVERSION_NAME_LEN + 2];
     char tid[DEVICE_SOFTVERSION_TID_LEN + 2];

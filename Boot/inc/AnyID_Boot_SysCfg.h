@@ -84,6 +84,9 @@ BOOL Sys_CheckVersion(void);
 
 #define SYS_FRAME_BROADCAST_ADDR                0xFFFF
 
+
+#define SYS_LIMIT_TIME							120000//240000	
+
 #define SYS_COM_UART            1
 #define SYS_COM_485             2
 #define SYS_COM_TCP232          3

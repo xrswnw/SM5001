@@ -67,10 +67,17 @@ void Gate_GetNextOp(GATE_OPINFO *pGateOpInfo, u32 tick)
         {
             pGateOpInfo->slvIndex++;
             pGateOpInfo->rpt = 0;
-            if(pGateOpInfo->slvIndex >= GATE_SLAVER_NUM)
+			if(pGateOpInfo->slvIndex >= GATE_SLAVER_NUM)
             {
                 Gate_ClearOpInfo();
+				
+				/*
                 pGateOpInfo->mode = GATE_MODE_INFO;
+                pGateOpInfo->state = GATE_OP_STAT_TX;
+                pGateOpInfo->cmd = GATE_FRAME_CMD_GET_ININFO;       //获取信息
+                pGateOpInfo->tick = tick;
+*/
+				pGateOpInfo->mode = GATE_MODE_MAIN_ERR_INFO;
                 pGateOpInfo->state = GATE_OP_STAT_TX;
                 pGateOpInfo->cmd = GATE_FRAME_CMD_GET_ININFO;       //获取信息
                 pGateOpInfo->tick = tick;
@@ -78,6 +85,14 @@ void Gate_GetNextOp(GATE_OPINFO *pGateOpInfo, u32 tick)
         }
     }
     else if(pGateOpInfo->mode == GATE_MODE_CMD)
+    {
+        Gate_ClearOpInfo();
+        pGateOpInfo->mode = GATE_MODE_INFO;
+        pGateOpInfo->state = GATE_OP_STAT_TX;
+        pGateOpInfo->cmd = GATE_FRAME_CMD_GET_ININFO;       //获取信息
+        pGateOpInfo->tick = tick;
+    }
+	else if(pGateOpInfo->mode == GATE_MODE_MAIN_ERR_INFO)
     {
         Gate_ClearOpInfo();
         pGateOpInfo->mode = GATE_MODE_INFO;
@@ -122,25 +137,32 @@ void Gate_FormatCmd(GATE_OPINFO *pGateOpInfo, u8 *pParams, u16 paramsLen)
 void Gate_TxFrame(GATE_OPINFO *pGateOpInfo, u32 tick)
 {
 
-        if(pGateOpInfo->mode == GATE_MODE_INIT)
-        {
-            Gate_FormatCmd(pGateOpInfo, (u8 *)pGateOpInfo->pGateParams, GATE_PARAMS_LEN);
-            Gate_EnableTxDma(pGateOpInfo->txFrame.buffer, pGateOpInfo->txFrame.len);
-            pGateOpInfo->tick = tick;
-        }
-        else if(pGateOpInfo->mode == GATE_MODE_INFO)
-        {
-            Gate_FormatCmd(pGateOpInfo, NULL, 0);
-            Gate_EnableTxDma(pGateOpInfo->txFrame.buffer, pGateOpInfo->txFrame.len);
-            pGateOpInfo->tick = tick;
-        }
-        else if(pGateOpInfo->mode == GATE_MODE_CMD)
-        {
-            Gate_FormatCmd(pGateOpInfo, pGateOpInfo->slvCmd.params, pGateOpInfo->slvCmd.paramsLen);
-            Gate_EnableTxDma(pGateOpInfo->txFrame.buffer, pGateOpInfo->txFrame.len);
-            pGateOpInfo->tick = tick;
-            pGateOpInfo->tickCmd = tick;
-        }
+	if(pGateOpInfo->mode == GATE_MODE_INIT)
+	{
+		Gate_FormatCmd(pGateOpInfo, (u8 *)pGateOpInfo->pGateParams, GATE_PARAMS_LEN);
+		Gate_EnableTxDma(pGateOpInfo->txFrame.buffer, pGateOpInfo->txFrame.len);
+		pGateOpInfo->tick = tick;
+	}
+	else if(pGateOpInfo->mode == GATE_MODE_INFO)
+	{
+		Gate_FormatCmd(pGateOpInfo, NULL, 0);
+		Gate_EnableTxDma(pGateOpInfo->txFrame.buffer, pGateOpInfo->txFrame.len);
+		pGateOpInfo->tick = tick;
+	}
+	else if(pGateOpInfo->mode == GATE_MODE_CMD)
+	{
+		Gate_FormatCmd(pGateOpInfo, pGateOpInfo->slvCmd.params, pGateOpInfo->slvCmd.paramsLen);
+		Gate_EnableTxDma(pGateOpInfo->txFrame.buffer, pGateOpInfo->txFrame.len);
+		pGateOpInfo->tick = tick;
+		pGateOpInfo->tickCmd = tick;
+	}
+	else if(pGateOpInfo->mode == GATE_MODE_MAIN_ERR_INFO)
+	{
+		//Gate_FormatCmd(pGateOpInfo, pGateOpInfo->slvCmd.params, pGateOpInfo->slvCmd.paramsLen);
+		Gate_EnableTxDma(pGateOpInfo->txFrame.buffer, pGateOpInfo->txFrame.len);
+		pGateOpInfo->tick = tick;
+		pGateOpInfo->tickCmd = tick;
+	}
 
 }
 

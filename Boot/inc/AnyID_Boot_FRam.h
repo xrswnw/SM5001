@@ -6,10 +6,8 @@
 #define FRAM_BOOT_APP_OK                    0x5555
 #define FRAM_BOOT_APP_FAIL                  0xAAAA
 #define FRAM_BOOT_APP_DATA_DOWD             0x1111
-#define FRAM_BOOT_APP_DATA_DOWDING          0x2222
 #define FRAM_BOOT_APP_DATA_DOWN_OVER        0x3333
 #define FRAM_BOOT_APP_REPLACE               0x4444
-#define FRAM_BOOT_APP_REPLACEING            0x6666
 #define FRAM_BOOT_APP_NULL_REPLACE          0x7777
 #define FRAM_BOOT_APP_REPLACE_OVER          0x8888
 

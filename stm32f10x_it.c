@@ -243,7 +243,7 @@ void WATER_TxDMAIRQHandler(void)
 {
     Water_DisableTxDma();//DMA完成后，最后一个字节可能没有发送出去，需要在主循环中做判断处理
     Water_EnableRxDma();
-    g_sWaterInfo.state = WATER_STAT_TX_IDLE;
+    //g_sWaterInfo.state = WATER_STAT_TX_IDLE;
 }
 
 
