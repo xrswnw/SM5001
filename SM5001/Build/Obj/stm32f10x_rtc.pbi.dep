@@ -18,7 +18,7 @@ stm32f10x_rtc.pbi: \
   C:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\string.h \
   C:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\ysizet.h \
   C:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\DLib_Product_string.h \
-  E:\AnyID\Git\FY\SM5001_23072101\SM5001\..\stm32f10x_conf.h \
+  E:\AnyID\Git\FY\SM5001\SM5001\..\stm32f10x_conf.h \
   E:\AnyID\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\inc\stm32f10x_adc.h \
   E:\AnyID\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\inc\stm32f10x_bkp.h \
   E:\AnyID\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\inc\stm32f10x_dma.h \

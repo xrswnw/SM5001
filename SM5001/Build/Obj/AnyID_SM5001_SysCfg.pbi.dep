@@ -1,34 +1,33 @@
-AnyID_SM5001_SysCfg.pbi: \
-  E:\AnyID\Git\FY\SM5001_23072101\SM5001\..\inc\md5.h \
+AnyID_SM5001_SysCfg.pbi: E:\AnyID\Git\FY\SM5001\SM5001\..\inc\md5.h \
   C:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\ycheck.h \
   C:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\stddef.h \
-  E:\AnyID\Git\FY\SM5001_23072101\SM5001\..\inc\base64.h \
-  E:\AnyID\Git\FY\SM5001_23072101\SM5001\..\inc\hmac_sha1.h \
-  E:\AnyID\Git\FY\SM5001_23072101\SM5001\..\inc\AnyID_SM5001_WDG_HL.h \
-  E:\AnyID\Git\FY\SM5001_23072101\SM5001\..\inc\AnyID_SM5001_Gate_HL.h \
-  E:\AnyID\Git\FY\SM5001_23072101\SM5001\..\inc\AnyID_SM5001_Gate.h \
-  E:\AnyID\Git\FY\SM5001_23072101\SM5001\..\inc\AnyID_SM5001_Sound_HL.h \
-  E:\AnyID\Git\FY\SM5001_23072101\SM5001\..\inc\AnyID_SM5001_Sound.h \
-  E:\AnyID\Git\FY\SM5001_23072101\SM5001\..\inc\AnyID_SM5001_AD_HL.h \
-  E:\AnyID\Git\FY\SM5001_23072101\SM5001\..\inc\AnyID_SM5001_AD.h \
-  E:\AnyID\Git\FY\SM5001_23072101\SM5001\..\inc\AnyID_SM5001_IO_HL.h \
-  E:\AnyID\Git\FY\SM5001_23072101\SM5001\..\inc\AnyID_SM5001_IO.h \
+  E:\AnyID\Git\FY\SM5001\SM5001\..\inc\base64.h \
+  E:\AnyID\Git\FY\SM5001\SM5001\..\inc\hmac_sha1.h \
+  E:\AnyID\Git\FY\SM5001\SM5001\..\inc\AnyID_SM5001_WDG_HL.h \
+  E:\AnyID\Git\FY\SM5001\SM5001\..\inc\AnyID_SM5001_Gate_HL.h \
+  E:\AnyID\Git\FY\SM5001\SM5001\..\inc\AnyID_SM5001_Gate.h \
+  E:\AnyID\Git\FY\SM5001\SM5001\..\inc\AnyID_SM5001_Sound_HL.h \
+  E:\AnyID\Git\FY\SM5001\SM5001\..\inc\AnyID_SM5001_Sound.h \
+  E:\AnyID\Git\FY\SM5001\SM5001\..\inc\AnyID_SM5001_AD_HL.h \
+  E:\AnyID\Git\FY\SM5001\SM5001\..\inc\AnyID_SM5001_AD.h \
+  E:\AnyID\Git\FY\SM5001\SM5001\..\inc\AnyID_SM5001_IO_HL.h \
+  E:\AnyID\Git\FY\SM5001\SM5001\..\inc\AnyID_SM5001_IO.h \
   C:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\DLib_Product_stdlib.h \
   C:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\stdlib.h \
-  E:\AnyID\Git\FY\SM5001_23072101\SM5001\..\inc\AnyID_SM5001_Water_HL.h \
-  E:\AnyID\Git\FY\SM5001_23072101\SM5001\..\inc\AnyID_SM5001_Water.h \
-  E:\AnyID\Git\FY\SM5001_23072101\SM5001\..\inc\AnyID_SM5001_Elect_HL.h \
-  E:\AnyID\Git\FY\SM5001_23072101\SM5001\..\inc\AnyID_SM5001_Elect.h \
-  E:\AnyID\Git\FY\SM5001_23072101\SM5001\..\inc\AnyID_SM5001_W232_HL.h \
-  E:\AnyID\Git\FY\SM5001_23072101\SM5001\..\inc\AnyID_SM5001_W232.h \
-  E:\AnyID\Git\FY\SM5001_23072101\SM5001\..\inc\AnyID_SM5001_FRam_HL.h \
-  E:\AnyID\Git\FY\SM5001_23072101\SM5001\..\inc\AnyID_FRam.h \
-  E:\AnyID\Git\FY\SM5001_23072101\SM5001\..\inc\AnyID_SM5001_FRam.h \
-  E:\AnyID\Git\FY\SM5001_23072101\SM5001\..\inc\AnyID_Uart_Receive.h \
-  E:\AnyID\Git\FY\SM5001_23072101\SM5001\..\inc\AnyID_SM5001_Uart_HL.h \
-  E:\AnyID\Git\FY\SM5001_23072101\SM5001\..\inc\AnyID_SM5001_Uart.h \
-  E:\AnyID\Git\FY\SM5001_23072101\SM5001\..\inc\AnyID_SM5001_Device.h \
-  E:\AnyID\Git\FY\SM5001_23072101\SM5001\..\inc\AnyID_SM5001_RTC.h \
+  E:\AnyID\Git\FY\SM5001\SM5001\..\inc\AnyID_SM5001_Water_HL.h \
+  E:\AnyID\Git\FY\SM5001\SM5001\..\inc\AnyID_SM5001_Water.h \
+  E:\AnyID\Git\FY\SM5001\SM5001\..\inc\AnyID_SM5001_Elect_HL.h \
+  E:\AnyID\Git\FY\SM5001\SM5001\..\inc\AnyID_SM5001_Elect.h \
+  E:\AnyID\Git\FY\SM5001\SM5001\..\inc\AnyID_SM5001_W232_HL.h \
+  E:\AnyID\Git\FY\SM5001\SM5001\..\inc\AnyID_SM5001_W232.h \
+  E:\AnyID\Git\FY\SM5001\SM5001\..\inc\AnyID_SM5001_FRam_HL.h \
+  E:\AnyID\Git\FY\SM5001\SM5001\..\inc\AnyID_FRam.h \
+  E:\AnyID\Git\FY\SM5001\SM5001\..\inc\AnyID_SM5001_FRam.h \
+  E:\AnyID\Git\FY\SM5001\SM5001\..\inc\AnyID_Uart_Receive.h \
+  E:\AnyID\Git\FY\SM5001\SM5001\..\inc\AnyID_SM5001_Uart_HL.h \
+  E:\AnyID\Git\FY\SM5001\SM5001\..\inc\AnyID_SM5001_Uart.h \
+  E:\AnyID\Git\FY\SM5001\SM5001\..\inc\AnyID_SM5001_Device.h \
+  E:\AnyID\Git\FY\SM5001\SM5001\..\inc\AnyID_SM5001_RTC.h \
   C:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\stdio.h \
   E:\AnyID\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\inc\misc.h \
   E:\AnyID\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\inc\stm32f10x_usart.h \
@@ -43,7 +42,7 @@ AnyID_SM5001_SysCfg.pbi: \
   E:\AnyID\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\inc\stm32f10x_exti.h \
   E:\AnyID\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\inc\stm32f10x_dma.h \
   E:\AnyID\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\inc\stm32f10x_bkp.h \
-  E:\AnyID\Git\FY\SM5001_23072101\SM5001\..\stm32f10x_conf.h \
+  E:\AnyID\Git\FY\SM5001\SM5001\..\stm32f10x_conf.h \
   E:\AnyID\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\startup\system_stm32f10x.h \
   C:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\iccarm_builtin.h \
   C:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\CMSIS\Core\Include\cmsis_iccarm.h \
@@ -61,7 +60,7 @@ AnyID_SM5001_SysCfg.pbi: \
   C:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\yvals.h \
   C:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\string.h \
   E:\AnyID\AnyID_Embedded\V1.1.0\AnyID_lib_V1.1.0\inc\AnyID_Type.h \
-  E:\AnyID\Git\FY\SM5001_23072101\SM5001\..\AnyID_SM5001_Config.h \
-  E:\AnyID\Git\FY\SM5001_23072101\SM5001\..\inc\AnyID_SM5001_SysTick_HL.h \
-  E:\AnyID\Git\FY\SM5001_23072101\SM5001\..\inc\AnyID_SM5001_SysCfg.h \
-  E:\AnyID\Git\FY\SM5001_23072101\src\AnyID_SM5001_SysCfg.c
+  E:\AnyID\Git\FY\SM5001\SM5001\..\AnyID_SM5001_Config.h \
+  E:\AnyID\Git\FY\SM5001\SM5001\..\inc\AnyID_SM5001_SysTick_HL.h \
+  E:\AnyID\Git\FY\SM5001\SM5001\..\inc\AnyID_SM5001_SysCfg.h \
+  E:\AnyID\Git\FY\SM5001\src\AnyID_SM5001_SysCfg.c

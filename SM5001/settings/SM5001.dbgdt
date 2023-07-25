@@ -159,7 +159,7 @@
                     <item>g_sWaterTempRcv</item>
                     <item>g_sMqttKey</item>
                     <item>g_sW232Connect</item>
-                    <item></item>
+                    <item />
                 </expressions>
                 <col-names>
                     <item>Expression</item>

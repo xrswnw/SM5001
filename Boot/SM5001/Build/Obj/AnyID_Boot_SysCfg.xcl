@@ -1,18 +1,18 @@
-"E:\AnyID\Git\FY\SM5001_23072101\Boot\src\AnyID_Boot_SysCfg.c"
+"E:\AnyID\Git\FY\SM5001\Boot\src\AnyID_Boot_SysCfg.c"
 -std=c11
 -ferror-limit=0
 -fbracket-depth=512
 -MD
 -MF
-E:\AnyID\Git\FY\SM5001_23072101\Boot\SM5001\Build\Obj\AnyID_Boot_SysCfg.pbi.dep
+E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_SysCfg.pbi.dep
 -o
 AnyID_Boot_SysCfg.pbi
 -I
-E:\AnyID\Git\FY\SM5001_23072101\Boot\src
+E:\AnyID\Git\FY\SM5001\Boot\src
 -I
-E:\AnyID\Git\FY\SM5001_23072101\Boot\SM5001\..
+E:\AnyID\Git\FY\SM5001\Boot\SM5001\..
 -I
-E:\AnyID\Git\FY\SM5001_23072101\Boot\SM5001\..\inc
+E:\AnyID\Git\FY\SM5001\Boot\SM5001\..\inc
 -I
 E:\AnyID\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\startup
 -I
@@ -28,9 +28,9 @@ C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.3\arm\inc
 -I
 C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.3\arm\inc\c
 -I
-E:\AnyID\Git\FY\SM5001_23072101\Boot
+E:\AnyID\Git\FY\SM5001\Boot
 -I
-E:\AnyID\Git\FY\SM5001_23072101\Boot\inc
+E:\AnyID\Git\FY\SM5001\Boot\inc
 -I
 E:\AnyID\AnyID_Embedded\V1.1.0\STM32_lib_V3.3\startup
 -I

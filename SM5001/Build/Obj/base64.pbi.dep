@@ -1,5 +1,5 @@
-base64.pbi: E:\AnyID\Git\FY\SM5001_23072101\src\base64.c \
-  E:\AnyID\Git\FY\SM5001_23072101\SM5001\..\inc\base64.h \
+base64.pbi: E:\AnyID\Git\FY\SM5001\src\base64.c \
+  E:\AnyID\Git\FY\SM5001\SM5001\..\inc\base64.h \
   C:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\stddef.h \
   C:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\ycheck.h \
   C:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\yvals.h \
