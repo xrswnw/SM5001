@@ -1044,7 +1044,7 @@
                     <item>g_sGateBootInfo</item>
                     <item>g_sEC20RcvFrame</item>
                     <item>g_nFlashDownData</item>
-                    <item></item>
+                    <item />
                 </expressions>
                 <col-names>
                     <item>Expression</item>

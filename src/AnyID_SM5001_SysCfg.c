@@ -255,7 +255,6 @@ void Sys_LedTask(void)
 				#endif
 				Reader_Delayms(500);
 				Sys_SoftReset();
-            
             }
 
 
@@ -636,7 +635,7 @@ void Sys_ElectTask()
 }
 
 
-
+/*
 void Sys_UartTask(void)
 {
 
@@ -696,7 +695,7 @@ void Sys_UartTask(void)
     }
 
 }
-
+*/
 
 void Sys_W232Task(void)
 {
@@ -1253,13 +1252,38 @@ void Sys_TestTask()
 			}
 			else
 			{
-				IO_Door_Open();
-				Reader_Delayms(400);
-				#if SYS_ENABLE_WDT
-				WDG_FeedIWDog();
-				#endif
-				IO_Door_Close();
-				g_sDeviceTestInfo.flag = DEVICE_TEST_SERSOR;
+				
+				if(a_CheckStateBit(g_nSysState, SYS_STAT_LTEDTU))         //联网区分，未联网开启自检，联网只开各个仓门
+				{
+					g_sDeviceTestInfo.flag = DEVICE_TEST_NULL;
+					IO_Door_Open();
+					g_sIoInfo.state |= IO_DEVICE_STAT_DOOR;
+					g_sIoInfo.ctrlDoorTick = g_nSysTick;
+					a_SetStateBit(g_nSysState, SYS_STAT_KEY_CHK);
+				}
+				else
+				{
+					IO_Door_Open();
+					Reader_Delayms(400);
+					#if SYS_ENABLE_WDT
+					WDG_FeedIWDog();
+					#endif
+					IO_Door_Close();
+					IO_Fan_Open();
+					Reader_Delayms(400);
+					#if SYS_ENABLE_WDT
+					WDG_FeedIWDog();
+					#endif
+					IO_Fan_Close();
+					IO_Led_Open();
+					Reader_Delayms(400);
+					#if SYS_ENABLE_WDT
+					WDG_FeedIWDog();
+					#endif
+					IO_Led_Close();
+					g_sDeviceTestInfo.flag = DEVICE_TEST_SERSOR;
+				}
+				
 
 			}
 			g_sGateOpInfo.state = GATE_OP_STAT_TX;
@@ -1268,33 +1292,7 @@ void Sys_TestTask()
 	
 	if(a_CheckStateBit(g_sDeviceTestInfo.flag, DEVICE_TEST_SERSOR))
 	{
-		if(Device_ChkSersor())
-		{
-			                       //測試完成通過后重啓？
-			a_SetStateBit(g_nSysState, SYS_STAT_KEY_CHK);
-                        
-                        /*
-			W232_CtrlLow();
-			W232_KeyLow();
-			#if SYS_ENABLE_WDT
-			WDG_FeedIWDog();
-			#endif
-			Reader_Delayms(500);
-			#if SYS_ENABLE_WDT
-			WDG_FeedIWDog();
-			#endif
-			Reader_Delayms(500);
-			#if SYS_ENABLE_WDT
-			WDG_FeedIWDog();
-			#endif
-			Reader_Delayms(500);
-			#if SYS_ENABLE_WDT
-			WDG_FeedIWDog();
-			#endif
-			Reader_Delayms(500);
-			Sys_SoftReset();
-                        */
-		}
+		Device_ChkSersor();
 	}
 }
 

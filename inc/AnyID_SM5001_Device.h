@@ -149,6 +149,7 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 
 #define DEVICE_SERVERRSP_NUM            20
 #define DEVICE_TEST_SERSOR				2
+#define DEVICE_TEST_NULL				0
 //modele
 
 #define DEVICE_GATE_OP_TICK             20

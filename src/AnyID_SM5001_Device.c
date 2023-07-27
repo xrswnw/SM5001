@@ -1,6 +1,6 @@
 #include "AnyID_SM5001_Device.h"
 
-const u8 DEVICE_VERSION[DEVICE_VERSION_SIZE]@0x08005000 = "SM5001 23072503 GD322302";
+const u8 DEVICE_VERSION[DEVICE_VERSION_SIZE]@0x08005000 = "SM5001 23072702 GD322302";
 
 READER_RSPFRAME g_sDeviceRspFrame = {0};
 DEVICE_PARAMS g_sDeviceParams = {0};                             		
@@ -2471,9 +2471,9 @@ void Device_FormatMainInfo(GATE_OPINFO *pGateOpInfo)
     pBuffer[pos++] = UART_FRAME_PARAM_RFU;      // RFU
 
 	
-	for(index = 0 ;index < (GATE_SLAVER_NUM << 1); index ++)
+	for(index = 0 ;index < GATE_SLAVER_NUM; index ++)
 	{
-		if(g_aGateSlvInfo[index].bTxInfo)
+		if(g_sGateOpInfo.comErr[index] <= DEVICE_GATE_OP_TICK)
 		{
 			gateState |= (1 << index);
 		}
