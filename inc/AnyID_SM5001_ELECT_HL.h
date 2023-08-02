@@ -40,7 +40,7 @@ extern const PORT_INF ELECT_PORT_CTRL;
 #define ELECT_RXDMA_TC_FLAG                     DMA1_FLAG_TC6                       
 
 #define Elect_EnableRxDma()                  do{\
-												(ELECT_DMA)->IFCR = ELECT_RXDMA_TC_FLAG; \
+                                                (ELECT_DMA)->IFCR = ELECT_RXDMA_TC_FLAG; \
                                                 (ELECT_RXDMA_CH)->CNDTR = ELECT_BUFFER_MAX_LEN; \
                                                 (ELECT_RXDMA_CH)->CCR |= CCR_ENABLE_Set; \
                                                 }while(0)

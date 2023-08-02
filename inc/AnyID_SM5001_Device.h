@@ -165,7 +165,7 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define DEVICE_MODELE_MOTOR             0x04
 #define DEVICE_MODELE_RELAY             0x08
 
-#define DEVICE_BAT_SN_LEN               6
+//#define BAT_SN_LEN               6
 
 #define DEVICE_COM_STAT_FAIL			0xFF
 
@@ -223,10 +223,10 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 
 
 
-#define DEVICE_TEST_FLAG_DOOE_MODE           0x00000001
+#define DEVICE_TEST_FLAG_DOOE_MODE		0x00000001
 
-#define DEVICE_TEST_DOOR_OPEN_TIM               5
-#define DEVICE_GATE_OPEN_DOOR                   0x02
+#define DEVICE_TEST_DOOR_OPEN_TIM		5
+#define DEVICE_GATE_OPEN_DOOR			0x02
 
 #define DEVICE_TEST_ERR_TEMPR		    0x01
 #define DEVICE_TEST_ERR_ELECT		    0x02
@@ -243,10 +243,51 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 													g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;\
 													g_sGateOpInfo.slvCmd.params[1] = frame;\
 												}while(0)    
-#define Device_AnsyTestFrame(add, c, frame)   do{g_sGateOpInfo.mode = GATE_MODE_CMD;g_sGateOpInfo.state = GATE_OP_STAT_TX;g_sGateOpInfo.cmd = c;g_sGateOpInfo.slvIndex = add ;g_sGateOpInfo.slvCmd.paramsLen = 2;g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;g_sGateOpInfo.slvCmd.params[1] = frame;}while(0)
-#define Device_GateRtBat(add)                  do{g_sGateOpInfo.add = add - 1;g_sGateOpInfo.state = GATE_OP_STAT_TX;g_sGateOpInfo.mode = GATE_MODE_CMD;g_sGateOpInfo.cmd = GATE_FRAME_CMD_RTNBAT;g_sGateOpInfo.slvIndex = (add -1)>> 1;g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;g_sGateOpInfo.slvCmd.paramsLen = DEVICE_BAT_SN_LEN + 1;}while(0)                                 
-#define Device_GateBrBat(add)                  do{g_sGateOpInfo.add = add - 1;g_sGateOpInfo.state = GATE_OP_STAT_TX;g_sGateOpInfo.mode = GATE_MODE_CMD;g_sGateOpInfo.cmd = GATE_FRAME_CMD_BRWBAT;g_sGateOpInfo.slvIndex = (add -1)>> 1;g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;g_sGateOpInfo.slvCmd.paramsLen = DEVICE_BAT_SN_LEN + 1;}while(0) 
-#define Device_GatePlBat(add,v)                do{g_sGateOpInfo.add = add - 1;g_sGateOpInfo.state = GATE_OP_STAT_TX;g_sGateOpInfo.mode = GATE_MODE_CMD;g_sGateOpInfo.cmd = GATE_FRAME_CMD_PLANE_BAT;g_sGateOpInfo.slvIndex = (add -1)>> 1;g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;g_sGateOpInfo.slvCmd.params[1]= v;g_sGateOpInfo.slvCmd.paramsLen = DEVICE_BAT_SN_LEN + 1 + 1;}while(0)
+
+
+#define Device_GateBatCtr(add,ctrMode)		do{\
+													g_sGateOpInfo.add = add - 1;\
+													g_sGateOpInfo.state = GATE_OP_STAT_TX;\
+													g_sGateOpInfo.mode = GATE_MODE_CMD;\
+													g_sGateOpInfo.cmd = ctrMode;\
+													g_sGateOpInfo.slvIndex = (add -1)>> 1;\
+													g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;\
+													g_sGateOpInfo.slvCmd.paramsLen = BAT_SN_LEN + 1;\
+													memcpy(g_sGateOpInfo.slvCmd.params + 1 , pFrame, BAT_SN_LEN);\
+												}while(0) 													
+													
+													
+/*
+#define Device_GateRtBat(add)                  do{\
+													g_sGateOpInfo.add = add - 1;\
+													g_sGateOpInfo.state = GATE_OP_STAT_TX;\
+													g_sGateOpInfo.mode = GATE_MODE_CMD;\
+													g_sGateOpInfo.cmd = GATE_FRAME_CMD_RTNBAT;\
+													g_sGateOpInfo.slvIndex = (add -1)>> 1;\
+													g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;\
+													g_sGateOpInfo.slvCmd.paramsLen = BAT_SN_LEN + 1;\
+												}while(0)                                 
+#define Device_GateBrBat(add)                  do{\
+													g_sGateOpInfo.add = add - 1;\
+													g_sGateOpInfo.state = GATE_OP_STAT_TX;\
+													g_sGateOpInfo.mode = GATE_MODE_CMD;\
+													g_sGateOpInfo.cmd = GATE_FRAME_CMD_BRWBAT;\
+													g_sGateOpInfo.slvIndex = (add -1)>> 1;\
+													g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;\
+													g_sGateOpInfo.slvCmd.paramsLen = BAT_SN_LEN + 1;\
+												}while(0) 
+*/
+#define Device_GatePlBat(add,v)                do{\
+													g_sGateOpInfo.add = add - 1;\
+													g_sGateOpInfo.state = GATE_OP_STAT_TX;\
+													g_sGateOpInfo.mode = GATE_MODE_CMD;\
+													g_sGateOpInfo.cmd = GATE_FRAME_CMD_PLANE_BAT;\
+													g_sGateOpInfo.slvIndex = (add -1)>> 1;\
+													g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;\
+													g_sGateOpInfo.slvCmd.params[1]= v;\
+													g_sGateOpInfo.slvCmd.paramsLen = BAT_SN_LEN + 1 + 1;\
+													memcpy(g_sGateOpInfo.slvCmd.params + 1 , pFrame, BAT_SN_LEN + 1);\
+												}while(0)
                                           
 
 #define Device_VoiceApoFrame(opt,repat,cmd,vn)     do{g_sSoundInfo.txBuf.index = 0;g_sSoundInfo.txBuf.num = 0;/**/g_sSoundInfo.txBuf.cd[g_sSoundInfo.txBuf.num] = SOUND_FRAME_CMD_APPOINT_FOLDER; g_sSoundInfo.txBuf.to[g_sSoundInfo.txBuf.num] = opt;g_sSoundInfo.txBuf.id[g_sSoundInfo.txBuf.num] = vn;g_sSoundInfo.txBuf.repeat[g_sSoundInfo.txBuf.num] = repat;g_sSoundInfo.txBuf.op[g_sSoundInfo.txBuf.num++] = cmd;g_sSoundInfo.state = SOUND_STAT_TX;}while(0)

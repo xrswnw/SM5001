@@ -183,14 +183,14 @@ void Sys_LedTask(void)
         g_nLedDelayTime++;
         if(a_CheckStateBit(g_nSysState, SYS_STAT_MQTT_ACCESS))
         {
-            if(g_nLedDelayTime & 0x0A)
+            if(g_nLedDelayTime % 20 == 0)
             {
                 
-                Sys_LedOn();
+                Sys_LedOff();
             }
             else
             {
-                 Sys_LedOff();
+                 Sys_LedOn();
             }
             
         }
@@ -212,7 +212,7 @@ void Sys_LedTask(void)
         {
             if(a_CheckStateBit(g_sDeviceTestInfo.err, DEVICE_TEST_ERR_TEMPR))
             {
-                if(g_nLedDelayTime & 0x0A)
+                if(g_nLedDelayTime % 0x0A == 0)
                 {
                     
                     IO_Led_Open();
@@ -367,10 +367,7 @@ void Sys_GateTask(void)
                     Device_GateBatTwice(GATE_FRAME_CMD_RTNBAT, g_sGateOpInfo.add) ; Gate_TxFrame(&g_sGateOpInfo, g_nSysTick);
                     if(g_sGateOpInfo.batInfoRepat > GATE_OP_BAT_INFO_REPATNUM)
                     {
-                      	g_sGateOpInfo.batInfoRepat = 0;
-                      	g_sGateOpInfo.batOpState = GATE_OP_BAT_STAT_OVER ;
-                      	g_sGateOpInfo.rtnBat.step = 0;
-                      	g_sGateOpInfo.rtnBat.flag = GATE_OP_TIM_FRAME;
+                      	Gate_BatOpInfo();
                       	g_sDeviceImpRspInfo.rtuLen = Device_ResponseRtBat(g_sDeviceImpRspInfo.rtuBuffer);
                      	Device_AtRsp(W232_CNT_TIME_500MS, W232_CNT_REPAT_NULL, W232_MQTT_TOPIC_REBAT);
                     }
@@ -381,10 +378,7 @@ void Sys_GateTask(void)
                     Device_GateBatTwice(GATE_FRAME_CMD_BRWBAT, g_sGateOpInfo.add) ;Gate_TxFrame(&g_sGateOpInfo, g_nSysTick);
                     if(g_sGateOpInfo.batInfoRepat > GATE_OP_BAT_INFO_REPATNUM)
                     {
-                    	g_sGateOpInfo.batInfoRepat = 0;
-                    	g_sGateOpInfo.batOpState = GATE_OP_BAT_STAT_OVER ;
-                    	g_sGateOpInfo.brwBat.step = 0;
-                    	g_sGateOpInfo.brwBat.flag = GATE_OP_TIM_FRAME;
+                    	Gate_BatOpInfo();
                     	g_sDeviceImpRspInfo.rtuLen = Device_ResponseBrBat(g_sDeviceImpRspInfo.rtuBuffer);
                     	Device_AtRsp(W232_CNT_TIME_500MS, W232_CNT_REPAT_NULL, W232_MQTT_TOPIC_BWBAT);
                     }
@@ -425,7 +419,6 @@ void Sys_GateTask(void)
                 }
                 else
                 {
-                    
                     g_sDeviceRspFrame.err = READER_RESPONSE_ERR_DEVICE;
                     g_sDeviceRspFrame.len = Device_ResponseFrame(NULL, 0, &g_sDeviceRspFrame);
                     Device_AtRsp(W232_CNT_TIME_1S, W232_CNT_REPAT_NULL, W232_MQTT_TOPIC_CMD);
@@ -624,8 +617,6 @@ void Sys_ElectTask()
             a_ClearStateBit(g_sElectInfo.state, ELECT_STAT_WAIT);
             a_SetStateBit(g_sElectInfo.state, ELECT_STAT_TX);  
         }
-
-     
     }
     
     if(a_CheckStateBit(g_sElectInfo.state, ELECT_STAT_RCV))
@@ -634,68 +625,6 @@ void Sys_ElectTask()
     }
 }
 
-
-/*
-void Sys_UartTask(void)
-{
-
-    //串口错误处理:重新初始化
-    if(USART_GetFlagStatus(UART_PORT, USART_FLAG_NE | USART_FLAG_FE | USART_FLAG_PE))
-    {
-        USART_ClearFlag(UART_PORT, USART_FLAG_NE | USART_FLAG_FE | USART_FLAG_PE);
-        
-        Uart_EnableInt(DISABLE, DISABLE); 
-        Sys_Delayms(10);
-        memset(&g_sUartRcvFrame, 0, sizeof(UART_RCVFRAME));
-        g_sUartRcvFrame.state = UART_STAT_IDLE; 
-        Uart_InitInterface(UART_BAUDRARE);
-        Uart_ConfigInt();
-        Uart_EnableInt(ENABLE, DISABLE);
-    }
-
-    //串口数据帧解析
-    if(Uart_IsRcvFrame(g_sUartRcvFrame))
-    {
-        memcpy(&g_sUartRcvTempFrame, &g_sUartRcvFrame, sizeof(UART_RCVFRAME));
-        Uart_ResetFrame(&g_sUartRcvFrame);
-        if(g_sUartRcvTempFrame.length >= UART_FRAME_MIN_LEN)
-        {
-            u16 crc1 = 0, crc2 = 0;
-            crc1 = Uart_GetFrameCrc(g_sUartRcvTempFrame.buffer, g_sUartRcvTempFrame.length);
-            crc2 = a_GetCrc(g_sUartRcvTempFrame.buffer + UART_FRAME_POS_LEN, g_sUartRcvTempFrame.length - 4);
-            if(crc1 == crc2)
-            {
-                u16 txLen = 0;
-                txLen = Reader_ProcessUartFrame(g_sUartRcvTempFrame.buffer, 0x00,g_sUartRcvTempFrame.length, g_nSysTick);
-                if(txLen)
-                {
-                    a_SetStateBit(g_nSysState, SYS_STAT_UART_TX);
-                }
-            }
-        }
-        Uart_ResetFrame(&g_sUartRcvTempFrame);
-    }
-    
-    if((a_CheckStateBit(g_nSysState, SYS_STAT_UART_TX)))//
-    {   
-        a_ClearStateBit(g_nSysState, SYS_STAT_UART_TX);
-        Uart_WriteBuffer(g_sDeviceRspFrame.buffer, g_sDeviceRspFrame.len);
-        if(g_sDeviceRspFrame.cmd == DEVICE_CMD_RESET)
-        {
-            Sys_Delayms(5);
-            Sys_SoftReset();
-        }
-    }
-    
-    if((a_CheckStateBit(g_nSysState, SYS_STAT_UART_RX)))//
-    {   
-        a_ClearStateBit(g_nSysState, SYS_STAT_UART_RX);
-        a_SetStateBit(g_nSysState, SYS_STAT_UART_WAIT);
-
-    }
-
-}
-*/
 
 void Sys_W232Task(void)
 {
@@ -882,7 +811,7 @@ void Sys_ServerTask(void)
     
     if(Uart_IsRcvFrame(g_sW232RcvFrame))
     {
-        
+      //Water_WriteStr(g_sW232RcvFrame.buffer);  
       if(a_CheckStateBit(g_sDeviceServerTxBuf.state, DEVICE_SERVER_TXSTAT_RX_AT))
         {
             if(Device_CommunCheckRsp(&g_sDeviceServerTxBuf, g_sW232RcvFrame.buffer))   
@@ -901,8 +830,6 @@ void Sys_ServerTask(void)
 
             if(g_sW232RcvFrame.index > 0)
             {
-
-              
                 if(!a_CheckStateBit(g_sDeviceServerTxBuf.state, DEVICE_SERVER_TXSTAT_RX_AT) && !a_CheckStateBit(g_sDeviceServerTxBuf.state, DEVICE_SERVER_TXSTAT_WAIT))
                  {
                     if(Device_CheckRsp(&g_sW232Connect, g_sW232RcvFrame.buffer, g_sW232RcvFrame.index))
@@ -912,7 +839,6 @@ void Sys_ServerTask(void)
                         {   
                             g_sW232RcvBuffer.flag = W232_RESPONES_NULL;
                             g_sDeviceServerTxBuf.result = W232_CNT_RESULT_OK; 
-                            //a_SetState(g_sDeviceServerTxBuf.state, W232_CNT_OP_STAT_STEP);
                         }
                         else
                         {
@@ -957,12 +883,6 @@ void Sys_ServerTask(void)
                 a_SetStateBit(g_sDeviceServerTxBuf.state, DEVICE_SERVER_TXST_STEP);
 				g_sW232Connect.comErr ++;
                 g_sDeviceServerTxBuf.result = W232_CNT_RESULT_TO;             
-            }
-            else
-            {
-             // u8 bb = 0;
-              //bb = 1;
-                //a_SetStateBit(g_sDeviceServerTxBuf.state, DEVICE_SERVER_TXST_AT);             
             }
         }
     }
@@ -1056,7 +976,7 @@ void Sys_WaterTask()
 				g_sWaterInfo.comErr ++;
 				g_sWaterInfo.txBuf.repat[g_sWaterInfo.txBuf.mode] = 0;
 				g_sWaterInfo.state = WATER_STAT_IDLE;
-               g_sWaterInfo.txBuf.result[g_sWaterInfo.txBuf.mode]  = FALSE;    
+              	 g_sWaterInfo.txBuf.result[g_sWaterInfo.txBuf.mode]  = FALSE;    
             }
         
         }
@@ -1085,13 +1005,13 @@ void Sys_IOTask()
     
     if(a_CheckStateBit(g_nSysState, SYS_STAT_SENSOR_CHK))												//IO采集
     {   
-        if(g_sIoInfo.senserState != tempState )
+        if(g_sIoInfo.sersorState != tempState )
         {
             g_sIoInfo.tick++;
             if(g_sIoInfo.tick > DEVICE_REPEAT_TIME)
             {
                 a_SetState(g_sIoInfo.tick, SYS_NULL_TICK);
-                g_sIoInfo.senserState = tempState;
+                g_sIoInfo.sersorState = tempState;
                 Device_IoCtr(); 
             }
         }
@@ -1106,7 +1026,7 @@ void Sys_IOTask()
     
 	if(g_sIoInfo.state & IO_DEVICE_STAT_DOOR)															//门控
 	{
-		if((g_sIoInfo.senserState & IO_SENSOR_STAT_DOOR_OPEN) || g_sIoInfo.ctrlDoorTick + DEVICE_CTR_DOOR_TIME < g_nSysTick)
+		if((g_sIoInfo.sersorState & IO_SENSOR_STAT_DOOR_OPEN) || g_sIoInfo.ctrlDoorTick + DEVICE_CTR_DOOR_TIME < g_nSysTick)
 		{
 			IO_Door_Close();
 			g_sIoInfo.state &= ~IO_DEVICE_STAT_DOOR;
@@ -1151,7 +1071,7 @@ void Sys_HeratTask()
     if(g_sDeviceParams.offLineTime >=  W232_HEART_OFFLINE_TIME)
     {
         a_ClearStateBit(g_nSysState, SYS_STAT_LTEDTU);                                  //離綫，等待重連
-        Water_WriteStr("twice link") ;                                                //離綫處理
+       // Water_WriteStr("twice link") ;                                                //離綫處理
         a_SetStateBit(g_nSysState,SYS_STAT_MQTT_OFFLINE);
     }
     

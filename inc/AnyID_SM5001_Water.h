@@ -86,6 +86,8 @@ typedef struct WatertInfo{
     u8 mode;
     u8 parmas;
 	u8 comErr;
+	u8 smapleTick;
+	u8 smapleUid[WATER_UID_LEN];
     u8 uid[WATER_UID_LEN];
     WATER_OPINFO slaveInfo[2];
     WATER_TX_BUF txBuf;

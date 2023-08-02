@@ -42,7 +42,7 @@
 
 #define IO_FLAG_TEMPR_UP         0x0001
 #define IO_FLAG_FIRE             0x0002
-
+#define IO_TEMPR_BORDER				2
 
 
 #define IO_SENSOR_STAT_DOOR_OPEN       0x01
@@ -72,7 +72,7 @@ typedef struct ioInfo{
     u8 eleMacTick ;  
     u8 warnValue;
     u8 deviceState;
-    u8 senserState;
+    u8 sersorState;
     u8 tick;
     u8 maskFlag;
     u8 tempState1;

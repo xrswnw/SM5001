@@ -52,6 +52,12 @@ typedef struct batErrInfo{
 }BAT_ERRINFO;
 
 #define BAT_SN_LEN                      6
+
+
+
+
+
+
 #define BAT_STAT_EMPTY                  0x00        //空-无电池
 #define BAT_STAT_EXIST                  0x01        //存在电池
 #define BAT_STAT_CHARGE                 0x20        //电池充电中
@@ -112,7 +118,7 @@ typedef struct gateSensorInfo{
 #define GATE_STAT_OK                0x00        //正常
 #define GATE_STAT_COMERR            0x01        //通信故障
 typedef struct gateSlvInfo{
-    BOOL bTxInfo;                               //是否需要向后台上报数据
+    BOOL bTxInfo;                               //通信故障判断
     u32 txTick;
     u8 state;  
     char softWare[GATE_VERSION_LEN];
@@ -292,6 +298,13 @@ extern GATE_OPINFO g_sGateOpInfo;
                                 }while(0)
 #define Gate_StartOpDelay(d, t) do{g_sGateOpInfo.state = GATE_OP_STAT_DLY; g_sGateOpInfo.tick = (t); }while(0)
 
+									
+#define Gate_BatOpInfo()		do{\
+									g_sGateOpInfo.batInfoRepat = 0;\
+									g_sGateOpInfo.batOpState = GATE_OP_BAT_STAT_OVER ;\
+									g_sGateOpInfo.rtnBat.step = 0;\
+									g_sGateOpInfo.rtnBat.flag = GATE_OP_TIM_FRAME;\
+								  }while(0)
     
 typedef struct gateTestInfo{
   u8 buffer[GATE_PARAMS_LEN];

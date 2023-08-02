@@ -87,7 +87,7 @@ void Uart_ReceiveFrame(u8 byte, UART_RCVFRAME *pRcvFrame);
                                                 if((rcvFrame).state & UART_FLAG_RCV)\
                                                 {\
                                                     (rcvFrame).idleTime++;\
-                                                    if((rcvFrame).idleTime >= 10)\
+                                                    if((rcvFrame).idleTime >= 15)\
                                                     {\
                                                         (rcvFrame).state = UART_STAT_TO;\
                                                     }\
