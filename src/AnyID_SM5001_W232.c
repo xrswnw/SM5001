@@ -246,7 +246,7 @@ BOOL W232_ConnectCheckRsp(W232_CONNECT *pCntOp, u8 *pRxBuf)
             {
                 memcpy(pCntOp->imei, pRxBuf + 2, W232_IMEI_LEN + 2);
                 memcpy(g_nImsiStr, pRxBuf+ 2, W232_IMEI_LEN + 2);
-                memcpy(g_sMqttKey.imsiStr, pRxBuf + 2, W232_IMEI_LEN + 2);
+                //memcpy(g_sMqttKey.imsiStr, pRxBuf + 2, W232_IMEI_LEN + 2);
                 a_Str2Hex((char *)pCntOp->imei, pCntOp->imeiStr);
                 a_Str2Hex((char *)g_nImsiStr, g_nImei);
                 bOK = TRUE;

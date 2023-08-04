@@ -68,6 +68,7 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define DEVICE_SERVER_SATA_TX               2
 #define DEVICE_SERVER_SATA_RX               3
 
+#define DEVICE_SOFT_VERSION_END_LEN				2
 
 #define DEVICE_CTR_DOOR_TIME                    100
 #define DEVICE_TEMPR_HIGH                       32
@@ -152,7 +153,7 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define DEVICE_TEST_NULL				0
 //modele
 
-#define DEVICE_GATE_OP_TICK             20
+#define DEVICE_GATE_OP_TICK             10
 
 //参数校验
 #define DEVICE_NORMAL_ADDR              0x01
@@ -219,6 +220,7 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define DEVICE_VERSION_LEN              8
 #define DEVICE_SERVER_RSP_LEN           1500
 
+#define DEVICE_GATE_STAT_INFO			33
 #define DEVICE_KEY_UID_LEN              0x0C
 
 

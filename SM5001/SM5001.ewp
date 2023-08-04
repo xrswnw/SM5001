@@ -226,6 +226,7 @@
                     <state>_ANYID_HSE12P00_</state>
                     <state>_ANYID_SM5001_</state>
                     <state>_ANYID_BOOT_GD32_</state>
+                    <state>_ANYID_SM500100_</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>

@@ -1,6 +1,7 @@
 #include "AnyID_SM5001_Device.h"
 
-const u8 DEVICE_VERSION[DEVICE_VERSION_SIZE]@0x08005000 = "SM5001 23080105 GD322302";
+const u8 DEVICE_VERSION[DEVICE_VERSION_SIZE]@0x08005000 = "SM5001 23080302 GD322302";
+
 
 READER_RSPFRAME g_sDeviceRspFrame = {0};
 DEVICE_PARAMS g_sDeviceParams = {0};                             		
@@ -514,7 +515,6 @@ u16 Device_ResponseGateFrame(u8 add, u8 mode, READER_RSPFRAME *pOpResult)
             {
                 pOpResult->buffer[pos++] = g_aGateSlvInfo[add].sensorInfo.batInfo.unitVol[i] >> 8;
                 pOpResult->buffer[pos++] = g_aGateSlvInfo[add].sensorInfo.batInfo.unitVol[i] >> 0;
-
             }
             
             pOpResult->buffer[pos++] = g_aGateSlvInfo[add].sensorInfo.chagInfo.state >> 0;
@@ -545,54 +545,54 @@ u16 Device_ResponseGateFrame(u8 add, u8 mode, READER_RSPFRAME *pOpResult)
     {
         for(index = 0 ;index < (GATE_SLAVER_NUM << 1); index ++)
         {
-         if(g_aGateSlvInfo[index].bTxInfo)
-          {
-              pOpResult->buffer[pos++] = index + 1;
-              pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.tmpr >> 0;
-              pOpResult->buffer[pos++] = (g_aGateSlvInfo[index].sensorInfo.sensorState.fan << 3) |
-                             		   (g_aGateSlvInfo[index].sensorInfo.sensorState.smoke << 2) | 
-                             		    (g_aGateSlvInfo[index].sensorInfo.sensorState.rfid << 1) | 
-                             		      (g_aGateSlvInfo[index].sensorInfo.sensorState.door << 0);
-              pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.state >> 0;
-              memcpy(pOpResult->buffer + pos, g_aGateSlvInfo[index].sensorInfo.batInfo.sn, BAT_SN_LEN);
-              pos +=  BAT_SN_LEN ;
-              pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.status.volValue >> 8;
-              pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.status.volValue >> 0;
-              pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.status.volLev >> 0;
-              pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.status.cycleCount >> 8;
-              pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.status.cycleCount >> 0;
-              pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.status.chargeStatus >> 0;
-              pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.status.remainCap >> 8;
-              pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.status.remainCap >> 0;
-              pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.status.curValue >> 8;
-              pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.status.curValue >> 0;
-              pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.status.tmpr >> 0;
-              pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.status.dltVol >> 0;
-              pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.err.fullState >> 0;
-              pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.err.protectStatus1 >> 0;
-              pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.err.alarmStatus1 >> 0;
-              pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.err.alarmStatus2 >> 0;  
-              pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.err.diagStatus >> 0;
-              pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.chagInfo.state >> 0;
-              pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.chagInfo.pwr >> 8;
-              pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.chagInfo.pwr >> 0;
-              pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.chagInfo.maxVol >> 8;
-              pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.chagInfo.maxVol >> 0;
-              pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.chagInfo.maxCur >> 8;
-              pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.chagInfo.maxCur >> 0;
-              pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.chagInfo.chagVol >> 8;
-              pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.chagInfo.chagVol >> 0;
-              pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.chagInfo.chagCur >> 8;
-              pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.chagInfo.chagCur >> 0;
-              pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.chagInfo.errStatusInfo >> 8;
-              pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.chagInfo.errStatusInfo >> 0;
-          }
-          else
-          {
-          		pOpResult->buffer[pos++] = index + 1;
-          		memset(pOpResult->buffer + pos,0xFF, 39);
-          		pos += 39;
-          }
+         	if(g_aGateSlvInfo[index].state == GATE_STAT_OK)
+          	{
+				  pOpResult->buffer[pos++] = index + 1;
+				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.tmpr >> 0;
+				  pOpResult->buffer[pos++] = (g_aGateSlvInfo[index].sensorInfo.sensorState.fan << 3) |
+										   (g_aGateSlvInfo[index].sensorInfo.sensorState.smoke << 2) | 
+											(g_aGateSlvInfo[index].sensorInfo.sensorState.rfid << 1) | 
+											  (g_aGateSlvInfo[index].sensorInfo.sensorState.door << 0);
+				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.state >> 0;
+				  memcpy(pOpResult->buffer + pos, g_aGateSlvInfo[index].sensorInfo.batInfo.sn, BAT_SN_LEN);
+				  pos +=  BAT_SN_LEN ;
+				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.status.volValue >> 8;
+				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.status.volValue >> 0;
+				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.status.volLev >> 0;
+				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.status.cycleCount >> 8;
+				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.status.cycleCount >> 0;
+				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.status.chargeStatus >> 0;
+				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.status.remainCap >> 8;
+				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.status.remainCap >> 0;
+				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.status.curValue >> 8;
+				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.status.curValue >> 0;
+				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.status.tmpr >> 0;
+				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.status.dltVol >> 0;
+				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.err.fullState >> 0;
+				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.err.protectStatus1 >> 0;
+				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.err.alarmStatus1 >> 0;
+				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.err.alarmStatus2 >> 0;  
+				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.batInfo.err.diagStatus >> 0;
+				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.chagInfo.state >> 0;
+				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.chagInfo.pwr >> 8;
+				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.chagInfo.pwr >> 0;
+				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.chagInfo.maxVol >> 8;
+				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.chagInfo.maxVol >> 0;
+				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.chagInfo.maxCur >> 8;
+				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.chagInfo.maxCur >> 0;
+				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.chagInfo.chagVol >> 8;
+				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.chagInfo.chagVol >> 0;
+				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.chagInfo.chagCur >> 8;
+				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.chagInfo.chagCur >> 0;
+				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.chagInfo.errStatusInfo >> 8;
+				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.chagInfo.errStatusInfo >> 0;
+			  }
+			  else
+			  {
+					pOpResult->buffer[pos++] = index + 1;
+					memset(pOpResult->buffer + pos,0xFF, DEVICE_GATE_STAT_INFO + BAT_SN_LEN);
+					pos += (DEVICE_GATE_STAT_INFO + BAT_SN_LEN);
+			  }
         }
     }
       
@@ -1359,9 +1359,9 @@ u16 Reader_ProcessUartFrame(u8 *pFrame, u8 add, u16 len, u32 tick)
                     }
                     else
                     {
-                      if(g_sGateOpInfo.batOpState != GATE_OP_BAT_STAT_ING)
+                     //if(g_sGateOpInfo.batOpState != GATE_OP_BAT_STAT_ING)
                          { 
-                           Gate_TxFrame(&g_sGateOpInfo, tick);
+                          // Gate_TxFrame(&g_sGateOpInfo, tick);
                            g_sDeviceRspFrame.err = READER_RESPONSE_ERR_DEVICE;
                          }
                          
@@ -1390,9 +1390,9 @@ u16 Reader_ProcessUartFrame(u8 *pFrame, u8 add, u16 len, u32 tick)
                     }
                     else
                     {
-                      if(g_sGateOpInfo.batOpState != GATE_OP_BAT_STAT_ING)
+                     // if(g_sGateOpInfo.batOpState != GATE_OP_BAT_STAT_ING)
                          { 
-                           Gate_TxFrame(&g_sGateOpInfo, tick);
+                       //    Gate_TxFrame(&g_sGateOpInfo, tick);
                            g_sDeviceRspFrame.err = READER_RESPONSE_ERR_DEVICE;
                          }
                          
@@ -1623,7 +1623,7 @@ u16 Device_HeartFormat(u8 *pBuffer, u32 tick)
     for(index = 0 ;index < (GATE_SLAVER_NUM << 1); index ++)
     {
         pBuffer[pos++] = index + 1;
-        if(g_aGateSlvInfo[index].bTxInfo)
+        if(g_aGateSlvInfo[index].state == GATE_STAT_OK)
         {
             memcpy(pBuffer + pos, g_aGateSlvInfo[index].softWare, GATE_VERSION_LEN);
             pos += GATE_VERSION_LEN;
@@ -1638,8 +1638,8 @@ u16 Device_HeartFormat(u8 *pBuffer, u32 tick)
         }
         else
         {
-            memset(pBuffer + pos, 0xFF, DEVICE_GATE_LEN);
-            pos += DEVICE_GATE_LEN;
+            memset(pBuffer + pos, 0xFF, GATE_VERSION_LEN + GATE_VERSION_LEN + 1 + 1 + 1 + 1 + 1);
+            pos += GATE_VERSION_LEN + GATE_VERSION_LEN + 1 + 1 + 1 + 1 + 1;
         }
     }
     
@@ -1993,8 +1993,8 @@ void Device_PostRsp(W232_CONNECT *pCntOp0,u8 *pBuffer, char *strAtBuff, char *st
     char strRsplen[4] = {0};
     u8 hexLen[2] = {0};
       
-    hexLen[0] = (len & 0xFF >> 8);
-    hexLen[1] = (len & 0xFF >> 0); 
+    hexLen[0] = ((len & 0xFF00) >> 8);
+    hexLen[1] = ((len & 0x00FF) >> 0); 
     a_Hex2Str(strRspbuffer, pBuffer, len);
     a_Hex2Str(strRsplen, hexLen, 2);
     sprintf(strRspBuff,"{\"id\":%.8s,\"dp\":{\"device\":[{\"v\":\"%.2s%.2s%.4s%s\"}]}}", g_sW232RcvBuffer.idStr, g_sW232RcvBuffer.addStr, g_sW232RcvBuffer.cmdStr, strRsplen, strRspbuffer);
@@ -2461,7 +2461,7 @@ void Device_FormatMainInfo(GATE_OPINFO *pGateOpInfo)
 	
 	for(index = 0 ;index < GATE_SLAVER_NUM; index ++)
 	{
-		if(g_sGateOpInfo.comErr[index] <= DEVICE_GATE_OP_TICK)
+		if(g_sGateOpInfo.comErr[index] < DEVICE_GATE_OP_TICK)
 		{
 			gateState |= (1 << index);
 		}

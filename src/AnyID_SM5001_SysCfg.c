@@ -402,8 +402,11 @@ void Sys_GateTask(void)
             }
             if(g_sGateOpInfo.comErr[g_sGateOpInfo.slvIndex] >= DEVICE_GATE_OP_TICK)
             {
+				/*
                 g_aGateSlvInfo[2 * (g_sGateOpInfo.slvIndex)].bTxInfo = FALSE;
-                g_aGateSlvInfo[2 * (g_sGateOpInfo.slvIndex) + 1].bTxInfo = FALSE;
+                g_aGateSlvInfo[2 * (g_sGateOpInfo.slvIndex) + 1].bTxInfo = FALSE;*/
+				g_aGateSlvInfo[2 * (g_sGateOpInfo.slvIndex)].state = GATE_STAT_COMERR;
+				g_aGateSlvInfo[2 * (g_sGateOpInfo.slvIndex) + 1].state = GATE_STAT_COMERR;
             }
             
             
@@ -738,6 +741,7 @@ void Sys_W232Task(void)
                     a_SetStateBit(g_nSysState, SYS_STAT_MQTT_ACCESS);
                     g_sDeviceParams.offLineTime = 0;
                     g_sDeviceParams.heartTick = 0;
+					memcpy(g_sMqttKey.imsiStr, g_nImsiStr, REAM_IMEI_LEN);
                     Device_WriteMqttKey();
                     Device_GateStateInit();
                     Device_VoiceApoFrame(SOUND_CNT_TIME_1S * 2, SOUND_REPAT_NULL, SOUND_VOICE_DI, SOUND_VOC_OPEN_DEVICE);
