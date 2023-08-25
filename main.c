@@ -1,6 +1,6 @@
 #include "AnyID_SM5001_SysCfg.h"
 
-int main(void)
+ int main(void)
 {
     Sys_Init();
     while(1)

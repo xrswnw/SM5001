@@ -1,5 +1,5 @@
-md5.pbi: E:\AnyID\Git\FY\SM5001\src\md5.c \
-  E:\AnyID\Git\FY\SM5001\SM5001\..\inc\md5.h \
+md5.pbi: E:\AnyID\HFReader\software\SM5001\src\md5.c \
+  E:\AnyID\HFReader\software\SM5001\SM5001\..\inc\md5.h \
   C:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\string.h \
   C:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\ycheck.h \
   C:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\yvals.h \

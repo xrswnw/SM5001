@@ -17,6 +17,7 @@
 #define GATE_BAT_IN                     1
 #define GATE_BAT_OUT                    2
 #define GATE_BAT_FAIL                   3
+#define GATE_BAT_OK                     4
 
 typedef struct gateStateInfo{
     u8 door: 1;     // 1-开门      0-保持
@@ -121,6 +122,7 @@ typedef struct gateSlvInfo{
     BOOL bTxInfo;                               //通信故障判断
     u32 txTick;
     u8 state;  
+	u8 flag;
     char softWare[GATE_VERSION_LEN];
     char hardWare[GATE_VERSION_LEN];
     GATE_SENSORINFO sensorInfo;
@@ -172,10 +174,10 @@ typedef struct gateRxFrame{
 #define GATE_INIT_DLY_TIM       (200 * 3)       //开机延时，等待从机工作正常，才可以操作设别
 #define GATE_OP_DLY_TIM         60//0x01
 #define GATE_OP_TO_TIM          200
-#define GATE_OP_MQTT_CMD_TIM    600
+#define GATE_OP_MQTT_CMD_TIM    200
 #define GATE_OP_TX_TIM          0x05
 
-#define GATE_OP_BR_BAT_TIM      400
+#define GATE_OP_BR_BAT_TIM      200
 
 #define GATE_OP_TIM_FRAME       0xEE
 
@@ -222,7 +224,7 @@ typedef struct gateParams{
 
 
 //开机延时，再初始化仓控板参数，再获取仓控板信息
-#define GATE_SLAVER_NUM         6
+#define GATE_SLAVER_NUM         6			//现阶段最大支持六块级联
 #define GATE_MODE_STARTUP       0x00    //开机延时，等待仓控板正常工作
 #define GATE_MODE_INIT          0x01    //初始化仓控板配置参数
 #define GATE_MODE_INFO          0x02    //获取仓控板信息
@@ -260,7 +262,7 @@ typedef struct gateOpBatResult{
     u32 tick;
 }GATE_OPBAT;
 
-#define GATE_RPT_NUM            5       //通信重发次数
+#define GATE_RPT_NUM            4       //通信重发次数
 typedef struct gateOpInfo{
     u8 mode;
     u8 batAddr;

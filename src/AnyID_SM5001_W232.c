@@ -30,18 +30,16 @@ void W232_ConnectInit(W232_CONNECT *pCntOp, u8 cmd, W232_PARAMS *pParams)
         pCntOp->to[num] = W232_CNT_TIME_100MS * 10;      pCntOp->repeat[num] = 2;    pCntOp->op[num++] = W232_CNT_OP_KEYON;          //开�?=500ms
         pCntOp->to[num] = W232_CNT_TIME_500MS * 2;       pCntOp->repeat[num] = 25;   pCntOp->op[num++] = W232_CNT_OP_COMM;           //开�?0s，串口有响应
         pCntOp->to[num] = W232_CNT_TIME_500MS  * 2;      pCntOp->repeat[num] = 2;    pCntOp->op[num++] = W232_CNT_OP_ATE0;
-        //pCntOp->to[num] = W232_CNT_TIME_500MS  * 2;      pCntOp->repeat[num] = 2;    pCntOp->op[num++] = W232_CNT_OP_GET_QSQ;
-        
         pCntOp->to[num] = W232_CNT_TIME_500MS * 2;       pCntOp->repeat[num] = 10;    pCntOp->op[num++] = W232_CNT_OP_IMEI;
         pCntOp->to[num] = W232_CNT_TIME_500MS * 2;       pCntOp->repeat[num] = 10;    pCntOp->op[num++] = W232_CNT_OP_IMSI;
         pCntOp->to[num] = W232_CNT_TIME_500MS * 2;       pCntOp->repeat[num] = 2;    pCntOp->op[num++] = W232_CNT_OP_DTR1;        
         pCntOp->to[num] = W232_CNT_TIME_500MS * 2;       pCntOp->repeat[num] = 40;   pCntOp->op[num++] = W232_CNT_OP_CPIN;           //查询手机�?=20s
-        pCntOp->to[num] = W232_CNT_TIME_500MS * 2;       pCntOp->repeat[num] = 180;  pCntOp->op[num++] = W232_CNT_OP_CREG;           //查询是否注册网络>=90s
-        pCntOp->to[num] = W232_CNT_TIME_500MS * 2;       pCntOp->repeat[num] = 180;  pCntOp->op[num++] = W232_CNT_OP_CGREG;          //查询是否注册网络>=60s
-        pCntOp->to[num] = W232_CNT_TIME_1S * 4;          pCntOp->repeat[num] = 2;    pCntOp->op[num++] = W232_CNT_OP_DEACT;          //40s
-        pCntOp->to[num] = W232_CNT_TIME_1S * 15;         pCntOp->repeat[num] = 2;    pCntOp->op[num++] = W232_CNT_OP_ACT;            //150s
+        pCntOp->to[num] = W232_CNT_TIME_500MS * 2;       pCntOp->repeat[num] = 90;  pCntOp->op[num++] = W232_CNT_OP_CREG;           //查询是否注册网络>=90s
+        pCntOp->to[num] = W232_CNT_TIME_500MS * 2;       pCntOp->repeat[num] = 60;  pCntOp->op[num++] = W232_CNT_OP_CGREG;          //查询是否注册网络>=60s
+        pCntOp->to[num] = W232_CNT_TIME_1S * 4;          pCntOp->repeat[num] = 10;    pCntOp->op[num++] = W232_CNT_OP_DEACT;          //40s
+        pCntOp->to[num] = W232_CNT_TIME_1S * 15;         pCntOp->repeat[num] = 10;    pCntOp->op[num++] = W232_CNT_OP_ACT;            //150s
         pCntOp->to[num] = W232_CNT_TIME_1S * 4;          pCntOp->repeat[num] = 4;    pCntOp->op[num++] = W232_CNT_OP_QMTCFG;          //配置MQTT参数
-/*time*/ pCntOp->to[num] = W232_CNT_TIME_1S * 4;          pCntOp->repeat[num] = 4;    pCntOp->op[num++] = W232_CNT_OP_QMTCFG_TIME;
+/*time*/ pCntOp->to[num] = W232_CNT_TIME_1S * 4;         pCntOp->repeat[num] = 4;    pCntOp->op[num++] = W232_CNT_OP_QMTCFG_TIME;
         pCntOp->to[num] = W232_CNT_TIME_1S * 4 ;         pCntOp->repeat[num] = 50;    pCntOp->op[num++] = W232_CNT_OP_QMTCFG_VERSION;
         pCntOp->to[num] = W232_CNT_TIME_1S * 4;          pCntOp->repeat[num] = 2;    pCntOp->op[num++] = W232_CNT_OP_QMTOPEN;             //连接网络
         pCntOp->to[num] = W232_CNT_TIME_1S * 4;          pCntOp->repeat[num] = 5;    pCntOp->op[num++] = W232_CNT_OP_QMTCONN;           //连接MQTT客户�?
@@ -49,11 +47,10 @@ void W232_ConnectInit(W232_CONNECT *pCntOp, u8 cmd, W232_PARAMS *pParams)
         pCntOp->to[num] = W232_CNT_TIME_1S * 4 ;         pCntOp->repeat[num] = 50;    pCntOp->op[num++] = W232_CNT_OP_QMTSUB_JSON_ACCEPT;              //订阅主题
         pCntOp->to[num] = W232_CNT_TIME_1S * 4 ;         pCntOp->repeat[num] = 50;    pCntOp->op[num++] = W232_CNT_OP_QMTSUB_OTA;  
         pCntOp->to[num] = W232_CNT_TIME_1S * 4 ;         pCntOp->repeat[num] = 50;    pCntOp->op[num++] = W232_CNT_OP_QMTSUB_RESPONSE_CMD;  
-       //pCntOp->to[num] = W232_CNT_TIME_1S * 4 ;         pCntOp->repeat[num] = 50;    pCntOp->op[num++] = W232_CNT_OP_QMTSUB_OTA;  
-    
     }
     else
     {
+		//关机流程、休眠、此项目暂不启用
         pCntOp->to[num] = W232_CNT_TIME_1S * 10;  pCntOp->repeat[num] = 1;    pCntOp->op[num++] = W232_CNT_OP_CLOSE;
         pCntOp->to[num] = W232_CNT_TIME_100MS * 9;  pCntOp->repeat[num] = 1;    pCntOp->op[num++] = W232_CNT_OP_KEYOFF;          //关机>=650ms
         pCntOp->to[num] = W232_CNT_TIME_1S * 2;  pCntOp->repeat[num] = 1;    pCntOp->op[num++] = W232_CNT_OP_WAIT; 
@@ -79,8 +76,7 @@ void W232_ConnectTxCmd(W232_CONNECT *pCntOp, u32 sysTick)
         case W232_CNT_OP_WAIT:   //不需要发送，等待即可
             break;
         case W232_CNT_OP_PWROFF:    
-            W232_CtrlLow();
-            W232_KeyLow();
+            W232_CtrlHigh();
             break;
         case W232_CNT_OP_PWRON:
             W232_CtrlLow();

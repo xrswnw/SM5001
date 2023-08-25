@@ -1,6 +1,8 @@
 #include "AnyID_SM5001_Device.h"
 
-const u8 DEVICE_VERSION[DEVICE_VERSION_SIZE]@0x08005000 = "SM5001 23080302 GD322302";
+//ÀÖÃ¢
+
+const u8 DEVICE_VERSION[DEVICE_VERSION_SIZE]@0x08005000 = "SM5001 23082301 GD322302";
 
 
 READER_RSPFRAME g_sDeviceRspFrame = {0};
@@ -128,8 +130,7 @@ BOOL Device_ParmenterChkCode(DEVICE_PARAMS *pPaementInfo)
        || (pPaementInfo->gateNum == 0) 
        || ((pPaementInfo->gateTick) > DEVICE_NORMAL_HEART_TIME)  
        || (pPaementInfo->voiceSth > SOUND_VOCIE_MAX) 
-       || (pPaementInfo->gateParams.alarmTmpr > DEVICE_NORMAL_TEMPR_MAST) 
-       || (pPaementInfo->gateParams.chagParams.fulVolLev < DEVICE_LED_LOWVOL_DFT))
+       || (pPaementInfo->gateParams.alarmTmpr > DEVICE_NORMAL_TEMPR_MAST))
         {
             bOk = TRUE;
         }
@@ -417,7 +418,7 @@ u16 Device_ResponseCfg( READER_RSPFRAME *pOpResult)
     pOpResult->buffer[pos++] = g_sDeviceParams.gateParams.chagParams.stepParams[CHAG_STEP_IDX2].vol >> 0;
     pOpResult->buffer[pos++] = g_sDeviceParams.gateParams.chagParams.stepParams[CHAG_STEP_IDX2].cur >> 8;
     pOpResult->buffer[pos++] = g_sDeviceParams.gateParams.chagParams.stepParams[CHAG_STEP_IDX2].cur >> 0;
-    pOpResult->buffer[pos++] = pOpResult->err;
+    pOpResult->buffer[pos++] = UART_FRAME_PARAM_RFU;
     pOpResult->buffer[pos++] = UART_FRAME_PARAM_RFU;
     pOpResult->buffer[pos++] = UART_FRAME_PARAM_RFU;
     crc = a_GetCrc(pOpResult->buffer, pos); //´ÓLEN¿ªÊ¼¼ÆËãcrc
@@ -464,7 +465,7 @@ u16 Device_ResponseGateFrame(u8 add, u8 mode, READER_RSPFRAME *pOpResult)
     pOpResult->buffer[pos++] = UART_FRAME_RESPONSE_FLAG;
     if(mode == DEVICE_GET_GATEINFO_MODE_ONCE)
     {
-          if(add <=(GATE_SLAVER_NUM << 1))
+          if(add <=(g_sDeviceParams.gateNum << 1))
           {
              pOpResult->buffer[pos++] = g_aGateSlvInfo[add].sensorInfo.tmpr;
              pOpResult->buffer[pos++] = (g_aGateSlvInfo[add].sensorInfo.sensorState.fan << 3) | 
@@ -543,9 +544,9 @@ u16 Device_ResponseGateFrame(u8 add, u8 mode, READER_RSPFRAME *pOpResult)
     }
     else
     {
-        for(index = 0 ;index < (GATE_SLAVER_NUM << 1); index ++)
+        for(index = 0 ;index < (g_sDeviceParams.gateNum << 1); index ++)
         {
-         	if(g_aGateSlvInfo[index].state == GATE_STAT_OK)
+         	if(g_aGateSlvInfo[index].state == GATE_STAT_OK || g_aGateSlvInfo[index].flag == GATE_STAT_OK)
           	{
 				  pOpResult->buffer[pos++] = index + 1;
 				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.tmpr >> 0;
@@ -616,10 +617,10 @@ void Device_GateRsvSlvInfo(u8 *pParams, u16 paramsLen, GATE_OPINFO *pOpInfo)
     GATE_SENSORINFO *pInfo = NULL, *pPreInfo = NULL;
     
     num = pParams[pos++];
-    for(i = 0; i < num; i++)
+    for(i = 0; i < num; i++)													//num = 1å¯èƒ½é€ æˆï¼Ÿï¼Ÿï¼Ÿï¼Ÿï¼Ÿï¼Ÿ
     {
-        pInfo = (GATE_SENSORINFO *)(pParams + pos);
-        infoIdx = (pOpInfo->slvIndex << 1) + pInfo->addr;
+        pInfo = (GATE_SENSORINFO *)(pParams + pos);									
+        infoIdx = (pOpInfo->slvIndex << 1) + pInfo->addr;						//ä¸¤æ¡è¿žç»­åœ°å€ç›¸åŒå¯¼è‡´ä¸€ä»“æ•°æ®ä¸¢å¤±ï¼Ÿï¼Ÿï¼Ÿ
         pPreInfo = &g_aGateSlvInfo[infoIdx].sensorInfo;
         if(g_aGateSlvInfo[infoIdx].state != GATE_STAT_OK)
         {
@@ -642,6 +643,11 @@ void Device_GateRsvSlvInfo(u8 *pParams, u16 paramsLen, GATE_OPINFO *pOpInfo)
                 }
             }
         }
+		
+		if(g_aGateSlvInfo[infoIdx].flag != GATE_STAT_OK)				//æŽ’é™¤å‚æ•°å¹²æ‰°ï¼Œ
+		{
+			g_aGateSlvInfo[infoIdx].flag = GATE_STAT_OK;
+		}
         memcpy(pPreInfo, pInfo, sizeof(GATE_SENSORINFO));
 
         pos += sizeof(GATE_SENSORINFO);
@@ -846,7 +852,7 @@ BOOL Device_GateProceRspFrame(u8 *pFrame, GATE_OPINFO *pOpInfo, u32 tick)
             case GATE_FRAME_CMD_SET_PARAMS:   //  10
               if(paramsLen > 0)
               {
-                    //°æ±¾ÐÅÏ¢
+                    //°æ±¾ÐÅÏ¢£¬Ò»¿é²Ö¿Ø¿ØÖÆÁ½¸ö²Ö£¬°æ±¾ÐÅÏ¢Ò»ÖÂ
                     memcpy(g_aGateSlvInfo[2 * (addr - 1)].softWare, pParams, GATE_VERSION_LEN);
                     memcpy(g_aGateSlvInfo[2 * (addr - 1) + 1].softWare, pParams, GATE_VERSION_LEN);
                     memcpy(g_aGateSlvInfo[2 * (addr - 1)].hardWare, pParams + GATE_VERSION_LEN + 1 , GATE_VERSION_LEN);
@@ -878,29 +884,31 @@ void  Device_GateBatTwice(u8 cmd, u8 addr)
     g_sGateOpInfo.slvCmd.paramsLen = 1;
 }
 
-u16 Device_WaterProceRspFrame(u8 *pFrame, WATER_INFO *pOpInfo, u8 len)
+BOOL Device_WaterProceRspFrame(u8 *pFrame, WATER_INFO *pOpInfo, u8 len)
 {
     u8 cmd = 0;
     u8 paramsLen = 0;
-
-    cmd = *(pFrame + UART_FRAME_POS_CMD + 1);
-    pOpInfo->txBuf.cmd = cmd;
-    pOpInfo->txBuf.flag = UART_FRAME_FLAG_OK;
-    pOpInfo->txBuf.err = UART_FRAME_RSP_NOERR;
-    pOpInfo->txBuf.len = 0;
-    paramsLen = len - UART_FRAME_MIN_LEN;
+	
+	BOOL resluts = FALSE;
+		
+	if(pOpInfo->mode == WATER_STAT_MODE_GET_INFO_RFID)
+	{
+    	cmd = *(pFrame + UART_FRAME_POS_CMD + 1);
+    	paramsLen = len - UART_FRAME_MIN_LEN;
+		pOpInfo->comErr[WATER_DEVICE_RFID] = 0;
+	}
+	else if(pOpInfo->mode == WATER_STAT_MODE_CTR_CMD_RELAY || pOpInfo->mode ==WATER_STAT_MODE_GET_INFO_RELAY)
+	{
+		cmd = *(pFrame + 1);
+		paramsLen = len - 2;
+		pOpInfo->comErr[WATER_DEVICE_RELAY] = 0;
+	}
+	
     switch(cmd)
     {
         case WATER_CMD_GET_UID:
             if(paramsLen > 0)
             {
-				/*
-                if(memcmp(pOpInfo->uid, pFrame + 20, WATER_UID_LEN))
-                {
-                    memcpy(pOpInfo->uid, pFrame + 20, WATER_UID_LEN);
-                }
-				*/
-				
 				if(memcmp(pOpInfo->smapleUid, pFrame + 20, WATER_UID_LEN))
                 {
                     memcpy(pOpInfo->smapleUid, pFrame + 20, WATER_UID_LEN);
@@ -920,14 +928,22 @@ u16 Device_WaterProceRspFrame(u8 *pFrame, WATER_INFO *pOpInfo, u8 len)
 					pOpInfo->smapleTick = 0;
 				}
 				
-                g_sWaterInfo.txBuf.repat[WATER_STAT_MODE_RFID] = 0;
-                g_sWaterInfo.txBuf.result[WATER_STAT_MODE_RFID] = TRUE;
+				resluts = TRUE;
+               
             }
             break;
-          case DEVICE_CMD_MQTT_GET_IMEI:
+          case WATER_MODBUS_READ_PDU:
             if(paramsLen > 0)
             {
+				Water_AnsyRelayInfo(pFrame);
                 //Water_WriteStr((char *)g_nImsiStr);
+            }
+            break; 
+		  case WATER_MODBUS_WRITE_PDU:
+			if(paramsLen > 0)
+            {
+				a_ClearStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_GATE);
+				Device_AtRsp(W232_CNT_TIME_500MS, W232_CNT_REPAT_NULL, W232_MQTT_TOPIC_CMD);
             }
             break; 
             
@@ -938,7 +954,7 @@ u16 Device_WaterProceRspFrame(u8 *pFrame, WATER_INFO *pOpInfo, u8 len)
         pOpInfo->txBuf.err = UART_FRAME_RSP_CRCERR;
 
     }
-    return pOpInfo->txBuf.len;
+    return resluts;
 }
 
 
@@ -950,8 +966,10 @@ u16 Reader_ProcessUartFrame(u8 *pFrame, u8 add, u16 len, u32 tick)
     u8 cmd = 0;
     BOOL bRfOperation = FALSE;
     u16 paramsLen = 0;
-    g_sDeviceRspFrame.len = 0;
-    
+    u8 index = 0;
+    u16 relayValue = 0;
+	
+
     memset(&g_sDeviceRspFrame, 0, sizeof(READER_RSPFRAME));
     cmd = g_sW232RcvBuffer.cmd;
     if(cmd == UART_FRAME_RESPONSE_FLAG)
@@ -1015,18 +1033,6 @@ u16 Reader_ProcessUartFrame(u8 *pFrame, u8 add, u16 len, u32 tick)
                     g_sDeviceRspFrame.len = Device_ResponseFrame(NULL, 0, &g_sDeviceRspFrame);
                 }
                 break;
-            case DEVICE_CMD_GET_VERSION:
-                if(paramsLen == 20)
-                {
-                    g_sDeviceRspFrame.len = Device_ResponseFrame((u8 *)DEVICE_VERSION, DEVICE_VERSION_SIZE, &g_sDeviceRspFrame);
-                }
-                break;
-            case DEVICE_CMD_GET_CPUID:
-                if(paramsLen == 0)
-                {
-                    g_sDeviceRspFrame.len = Device_ResponseFrame((u8 *)STM32_CPUID_ADDR, STM32_CPUID_LEN, &g_sDeviceRspFrame);
-                }
-                break;
             case DEVICE_CMD_GATE_VOICE_CTR:
                 if(paramsLen == 5)
                 {
@@ -1074,6 +1080,8 @@ u16 Reader_ProcessUartFrame(u8 *pFrame, u8 add, u16 len, u32 tick)
                     if(add == DEVICE_SM5001_ID)
                     {
                          g_sDeviceTestInfo.flag = GATE_FLAG_DOOR_TEST ;
+						 g_sDeviceTestInfo.gateAddr = 0x01;
+						 Device_AnsyFrame(g_sDeviceTestInfo.gateAddr, GATE_FRAME_CMD_SET_OUTINFO, GATE_CTR_DOOR_OPEN);
                          Device_VoiceApoFrame(SOUND_CNT_TIME_1S * 2, SOUND_REPAT_NULL, SOUND_VOICE_DI, SOUND_VOC_DI);
 
                     }
@@ -1100,7 +1108,7 @@ u16 Reader_ProcessUartFrame(u8 *pFrame, u8 add, u16 len, u32 tick)
                 g_sDeviceRspFrame.len = Device_ResponseFrame(NULL, 0, &g_sDeviceRspFrame);
                 break;
             case DEVICE_CMD_CTR_LED :
-              if(paramsLen == DEVICE_ACTCTL_CTL_FRAME_LEN + 1)
+              if(paramsLen == DEVICE_FRAME_LEN_ACTCTL_CTL + 1)
                 {
                     if(add == DEVICE_SM5001_ID)
                     {
@@ -1113,11 +1121,15 @@ u16 Reader_ProcessUartFrame(u8 *pFrame, u8 add, u16 len, u32 tick)
                              		a_SetStateBit(g_sIoInfo.deviceState,IO_DEVICE_STAT_LED); 
                              		
                              }
-                             else 
+                             else if(*(pFrame + 1) == DEVICE_IO_DEVICE_CLOSE) 
                              {
                              		IO_Led_Close();
                              		a_ClearStateBit(g_sIoInfo.deviceState,IO_DEVICE_STAT_LED); 
                              }
+							 else
+							 {
+							 	g_sDeviceRspFrame.err = READER_RESPONSE_ERR_FREAM;
+							 }
                          }
                          else if(*(pFrame + 0) == DEVICE_MASK_FLAG_NULL)
                          {
@@ -1128,11 +1140,15 @@ u16 Reader_ProcessUartFrame(u8 *pFrame, u8 add, u16 len, u32 tick)
                              		a_SetStateBit(g_sIoInfo.deviceState,IO_DEVICE_STAT_LED); 
                              		
                              }
-                             else 
+                             else if(*(pFrame + 1) == DEVICE_IO_DEVICE_CLOSE) 
                              {
                              		IO_Led_Close();
                              		a_ClearStateBit(g_sIoInfo.deviceState,IO_DEVICE_STAT_LED); 
                              }
+							 else
+							 {
+							 	g_sDeviceRspFrame.err = READER_RESPONSE_ERR_FREAM;
+							 }
                          }
                          else
 						 {
@@ -1148,7 +1164,7 @@ u16 Reader_ProcessUartFrame(u8 *pFrame, u8 add, u16 len, u32 tick)
           
             break;
              case DEVICE_CMD_CTR_RELAY :
-                if(paramsLen == DEVICE_ACTCTL_CTL_FRAME_LEN + 1)
+                if(paramsLen == DEVICE_FRAME_LEN_ACTCTL_CTL + 1)
                 {
                     if(add == DEVICE_SM5001_ID)
                     {
@@ -1161,11 +1177,15 @@ u16 Reader_ProcessUartFrame(u8 *pFrame, u8 add, u16 len, u32 tick)
                              		a_SetStateBit(g_sIoInfo.deviceState,IO_DEVICE_STAT_RELAY); 
                              		
                              }
-                             else 
+                             else if(*(pFrame + 1) == DEVICE_IO_DEVICE_CLOSE) 
                              {
                                     IO_Realy_Close();
                              		a_ClearStateBit(g_sIoInfo.deviceState,IO_DEVICE_STAT_RELAY); 
                              }
+                             else
+							 {
+							 	g_sDeviceRspFrame.err = READER_RESPONSE_ERR_FREAM;
+							 }
                          }
                          else if(*(pFrame + 0) == DEVICE_MASK_FLAG_NULL)
                          {
@@ -1176,11 +1196,15 @@ u16 Reader_ProcessUartFrame(u8 *pFrame, u8 add, u16 len, u32 tick)
                              		a_SetStateBit(g_sIoInfo.deviceState,IO_DEVICE_STAT_RELAY); 
                              		
                              }
-                             else 
+                             else if(*(pFrame + 1) == DEVICE_IO_DEVICE_CLOSE) 
                              {
                                     IO_Realy_Close();
                              		a_ClearStateBit(g_sIoInfo.deviceState,IO_DEVICE_STAT_RELAY); 
                              }
+                             else
+							 {
+							 	g_sDeviceRspFrame.err = READER_RESPONSE_ERR_FREAM;
+							 }
                          }
                          else 
 						 {
@@ -1196,7 +1220,7 @@ u16 Reader_ProcessUartFrame(u8 *pFrame, u8 add, u16 len, u32 tick)
           
             break;
               case DEVICE_CMD_CTR_FAN :
-                if(paramsLen == DEVICE_ACTCTL_CTL_FRAME_LEN + 1)
+                if(paramsLen == DEVICE_FRAME_LEN_ACTCTL_CTL + 1)
                 {
                     if(add == DEVICE_SM5001_ID)
                     {
@@ -1208,11 +1232,15 @@ u16 Reader_ProcessUartFrame(u8 *pFrame, u8 add, u16 len, u32 tick)
                                    IO_Fan_Open();
                                    a_SetStateBit(g_sIoInfo.deviceState,IO_DEVICE_STAT_FAN); 
                               }
-                              else 
+                              else if(*(pFrame + 1) == DEVICE_IO_DEVICE_CLOSE) 
                               {
                                    IO_Fan_Close();
                                    a_ClearStateBit(g_sIoInfo.deviceState,IO_DEVICE_STAT_FAN); 
                               }
+                              else 
+							 {
+									g_sDeviceRspFrame.err = READER_RESPONSE_ERR_FREAM;
+							  }
                          }
                          else if(*(pFrame + 0) == DEVICE_MASK_FLAG_NULL)
                          {
@@ -1222,11 +1250,15 @@ u16 Reader_ProcessUartFrame(u8 *pFrame, u8 add, u16 len, u32 tick)
                                    IO_Fan_Open();
                                    a_SetStateBit(g_sIoInfo.deviceState,IO_DEVICE_STAT_FAN); 
                               }
-                              else 
+                              else if(*(pFrame + 1) == DEVICE_IO_DEVICE_CLOSE) 
                               {
                                    IO_Fan_Close();
                                    a_ClearStateBit(g_sIoInfo.deviceState,IO_DEVICE_STAT_FAN); 
                               }
+                              else 
+							 {
+									g_sDeviceRspFrame.err = READER_RESPONSE_ERR_FREAM;
+							  }
                          }
                          else 
 						 {
@@ -1243,7 +1275,7 @@ u16 Reader_ProcessUartFrame(u8 *pFrame, u8 add, u16 len, u32 tick)
           
             break;
                case DEVICE_CMD_CTR_DOOR :
-                if(paramsLen == DEVICE_ACTCTL_CTL_FRAME_LEN + 1)
+                if(paramsLen == DEVICE_FRAME_LEN_ACTCTL_CTL + 1)
                 {
                     if(add == DEVICE_SM5001_ID)
                     {
@@ -1281,29 +1313,24 @@ u16 Reader_ProcessUartFrame(u8 *pFrame, u8 add, u16 len, u32 tick)
           
             break;
             case GATE_FRAME_CMD_SET_OUTINFO:
-                if(paramsLen == DEVICE_ACTCTL_CTL_FRAME_LEN)
-                {
-                    a_SetStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_GATE);
-
+                if(paramsLen == DEVICE_FRAME_LEN_ACTCTL_CTL)
+                {                
                     if(Device_ChkGate(add))
                     {
                          if(*(pFrame + 0) & DEVICE_OUT_CTRL_POS_FAN || *(pFrame + 0) & DEVICE_OUT_CTRL_POS_DOOR || *(pFrame + 0) == DEVICE_OUT_NULL)
                          {
+							 g_sGateOpInfo.rpt = 0;
                              Device_AnsyFrame(add, GATE_FRAME_CMD_SET_OUTINFO, *(pFrame + 0));
+							 a_SetStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_GATE);
                              Gate_TxFrame(&g_sGateOpInfo, tick);
                          }
                          else
                          {
-                             Device_AnsyFrame(add, GATE_FRAME_CMD_SET_OUTINFO, *(pFrame + 0));
-                             Gate_TxFrame(&g_sGateOpInfo, tick);
                              g_sDeviceRspFrame.err = READER_RESPONSE_ERR_FREAM;
-                         
                          }
                     }
                     else
                     {
-                         Device_AnsyFrame(add, GATE_FRAME_CMD_SET_OUTINFO, *(pFrame + 0));
-                         Gate_TxFrame(&g_sGateOpInfo, tick);
                          g_sDeviceRspFrame.err = READER_RESPONSE_ERR_DEVICE;
                          
                     }  
@@ -1312,110 +1339,86 @@ u16 Reader_ProcessUartFrame(u8 *pFrame, u8 add, u16 len, u32 tick)
                 break;
                 
             case GATE_FRAME_CMD_CHARGE:
-                if(paramsLen == DEVICE_ACTCTL_CTL_FRAME_LEN)
+                if(paramsLen == DEVICE_FRAME_LEN_ACTCTL_CTL)
                 {
-                    a_SetStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_GATE);
                     if(Device_ChkGate(add))
                     {
                          if(*(pFrame + 0) & DEVICE_OUT_CTRL_POS_FAN || *(pFrame + 0) & DEVICE_OUT_CTRL_POS_DOOR || *(pFrame + 0) == DEVICE_OUT_NULL)
                          {
+							 g_sGateOpInfo.rpt = 0;
                              Device_AnsyFrame(add, GATE_FRAME_CMD_CHARGE, *(pFrame + 0));
+							 a_SetStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_GATE);
                              Gate_TxFrame(&g_sGateOpInfo, tick);
                              
                          }
                          else
                          {
-                             Device_AnsyFrame(add, GATE_FRAME_CMD_CHARGE, *(pFrame + 0));
-                             Gate_TxFrame(&g_sGateOpInfo, tick);
                              g_sDeviceRspFrame.err = READER_RESPONSE_ERR_FREAM;
                          }
                     }
                     else
                     {
-                         Device_AnsyFrame(add, GATE_FRAME_CMD_CHARGE, *(pFrame + 0));
-                         Gate_TxFrame(&g_sGateOpInfo, tick);
                          g_sDeviceRspFrame.err = READER_RESPONSE_ERR_DEVICE;
-                         
                     }  
                     g_sDeviceRspFrame.len = Device_ResponseFrame(NULL, 0, &g_sDeviceRspFrame);
                 }
                 break;
     
           case GATE_FRAME_CMD_RTNBAT:
-                if(paramsLen == DEVICE_RETURN_BAT_FRAME_LEN)
+                if(paramsLen == DEVICE_FRAME_LEN_RETURN_BAT)
                 {
-                    //static u8 snRData[BAT_SN_LEN]={0}               ;
-					//Device_GateRtBat(add);
-                    //memcpy(g_sGateOpInfo.slvCmd.params + 1 , pFrame, BAT_SN_LEN);
-                    //memcpy(snRData , pFrame, BAT_SN_LEN);
-					
-                    a_SetStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_REBAT);
-					
                     if(Device_ChkGate(add))
                     {
+						g_sGateOpInfo.rpt = 0;
 						g_sDeviceImpRspInfo.add = add;
 						Device_GateBatCtr(add, GATE_FRAME_CMD_RTNBAT);
+						a_SetStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_REBAT);
 						Gate_TxFrame(&g_sGateOpInfo, tick);
                     }
                     else
                     {
-                     //if(g_sGateOpInfo.batOpState != GATE_OP_BAT_STAT_ING)
-                         { 
-                          // Gate_TxFrame(&g_sGateOpInfo, tick);
-                           g_sDeviceRspFrame.err = READER_RESPONSE_ERR_DEVICE;
-                         }
-                         
+						g_sDeviceRspFrame.err = READER_RESPONSE_ERR_DEVICE;
                     }  
-
                     g_sDeviceRspFrame.len = Device_ResponseFrame(NULL, 0, &g_sDeviceRspFrame);
                 }
                 break;
         case GATE_FRAME_CMD_BRWBAT:
-                if(paramsLen == DEVICE_RETURN_BAT_FRAME_LEN)
+                if(paramsLen == DEVICE_FRAME_LEN_RETURN_BAT)
                 {
-                    a_SetStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_BWBAT);
-					
-					
-                    //static u8 snBData[BAT_SN_LEN]={0} ;
-					//if(g_sGateOpInfo.batOpState != GATE_OP_BAT_STAT_ING)
-					// Device_GateBrBat(add);
-					//memcpy(g_sGateOpInfo.slvCmd.params + 1 , pFrame, BAT_SN_LEN);
-					//memcpy(snBData , pFrame, BAT_SN_LEN);
-					
                     if(Device_ChkGate(add))
                     {
+						g_sGateOpInfo.rpt = 0;
 						g_sDeviceImpRspInfo.add = add;
 						Device_GateBatCtr(add, GATE_FRAME_CMD_BRWBAT);
+						a_SetStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_BWBAT);
 						Gate_TxFrame(&g_sGateOpInfo, tick);
                     }
                     else
                     {
-                     // if(g_sGateOpInfo.batOpState != GATE_OP_BAT_STAT_ING)
-                         { 
-                       //    Gate_TxFrame(&g_sGateOpInfo, tick);
-                           g_sDeviceRspFrame.err = READER_RESPONSE_ERR_DEVICE;
-                         }
-                         
+						g_sDeviceRspFrame.err = READER_RESPONSE_ERR_DEVICE;
                     }
                     g_sDeviceRspFrame.len = Device_ResponseFrame(NULL, 0, &g_sDeviceRspFrame);
                 }
                 break;
           case GATE_FRAME_CMD_PLANE_BAT:
-                if(paramsLen == DEVICE_RETURN_BAT_FRAME_LEN + 1)
+                if(paramsLen == DEVICE_FRAME_LEN_RETURN_BAT + 1)
                 {
-                    a_SetStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_GATE);
-                    
                     if(Device_ChkGate(add))
                     {
                          if(g_sGateOpInfo.batOpState != GATE_OP_BAT_STAT_ING)
                          {
-                           Device_GatePlBat(add, *(pFrame + 1));
-                           Gate_TxFrame(&g_sGateOpInfo, tick);
+							g_sGateOpInfo.rpt = 0;
+                            Device_GatePlBat(add, *(pFrame + 1));
+						    a_SetStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_GATE);
+                            Gate_TxFrame(&g_sGateOpInfo, tick);
                          }
+						 else
+						 {
+						 	g_sDeviceRspFrame.err = READER_RESPONSE_ERR_DEVICE; //²Ù×÷Ã¦
+						 }
                     }
                     else
                     {                             		                             		            
-                         Gate_TxFrame(&g_sGateOpInfo, tick);
                          g_sDeviceRspFrame.err = READER_RESPONSE_ERR_DEVICE;
                          
                     }  
@@ -1423,25 +1426,35 @@ u16 Reader_ProcessUartFrame(u8 *pFrame, u8 add, u16 len, u32 tick)
                 }
                 break;
           case GATE_FRAME_CMD_GET_ININFO:
-                if(paramsLen == DEVICE_ACTCTL_CTL_FRAME_LEN)
+                if(paramsLen == DEVICE_FRAME_LEN_ACTCTL_CTL)                                 //ÐÞ¸Ä£¿£¿£¿£¿£¿£¿
                 {
-                    if( *(pFrame + 0) == DEVICE_GET_GATEINFO_MODE_ONCE || *(pFrame + 0) == DEVICE_GET_GATEINFO_MODE_ALL)
-                    {
-                         g_sDeviceRspFrame.len = Device_ResponseGateFrame(add -1 , *(pFrame + 0) ,&g_sDeviceRspFrame);
-                    }
-                    else
-                    {
-                         g_sDeviceRspFrame.err = READER_RESPONSE_ERR_FREAM;
-                         g_sDeviceRspFrame.len = Device_ResponseFrame(NULL, 0, &g_sDeviceRspFrame);
-                    }
+					{
+						if( *(pFrame + 0) == DEVICE_GET_GATEINFO_MODE_ONCE || *(pFrame + 0) == DEVICE_GET_GATEINFO_MODE_ALL)
+						{
+							 g_sDeviceRspFrame.len = Device_ResponseGateFrame(add -1 , *(pFrame + 0) ,&g_sDeviceRspFrame);
+						}
+						else
+						{
+							 g_sDeviceRspFrame.err = READER_RESPONSE_ERR_FREAM;
+							 g_sDeviceRspFrame.len = Device_ResponseFrame(NULL, 0, &g_sDeviceRspFrame);
+						}
+					}
+
                 }
                 break;
             case DEVICE_CMD_GATE_KEY_CTR:
-                if(paramsLen == DEVICE_KEY_UID_LEN)
+                if(paramsLen == DEVICE_FRAME_LEN_KEY_UID)
                 {
-					memcpy(&g_sMqttKey.uid, pFrame , FRAME_UID_LEN);
-					g_sDeviceRspFrame.err = READER_RESPONSE_NOERR;
-					Device_WriteMqttKey();
+					if(add == DEVICE_SM5001_ID)
+					{
+						memcpy(&g_sMqttKey.uid, pFrame , FRAME_UID_LEN);
+						g_sDeviceRspFrame.err = READER_RESPONSE_NOERR;
+						Device_WriteMqttKey();
+					}
+					else
+					{
+						g_sDeviceRspFrame.err = READER_RESPONSE_ERR_DEVICE;
+					}
                 }
 				else
 				{
@@ -1449,8 +1462,69 @@ u16 Reader_ProcessUartFrame(u8 *pFrame, u8 add, u16 len, u32 tick)
 				}
 				g_sDeviceRspFrame.len = Device_ResponseFrame(NULL, 0, &g_sDeviceRspFrame);  
                 break;
+			case DEVICE_CMD_RELAY_CTR:
+                if(paramsLen == DEVICE_FRAME_LEN_CTR_RELAY)
+                {
+					if(add == DEVICE_SM5001_ID)
+					{
+						if((*(pFrame + 0)) < WATER_DEVICE_RELAY_NUM)
+						{
+							if((*(pFrame + 1)) & DEVICE_OUT_CTRL_POS_RELAY || *(pFrame + 1) == DEVICE_OUT_NULL)
+							{
+								Water_AnsyFrame(*(pFrame + 0) * 4, *(pFrame + 1) << 8);
+								a_SetStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_RELAY);
+							}
+							else
+							{
+								g_sDeviceRspFrame.err = READER_RESPONSE_ERR_FREAM;
+							
+							}
+						}
+						else
+						{
+							g_sDeviceRspFrame.err = READER_RESPONSE_ERR_DEVICE;
+						}
+                    }
+                    else
+                    {
+                         g_sDeviceRspFrame.err = READER_RESPONSE_ERR_DEVICE;
+                    }  
+                }
+				else
+				{
+					g_sDeviceRspFrame.err = READER_RESPONSE_ERR_LEN;	
+				}
+				g_sDeviceRspFrame.len = Device_ResponseFrame(NULL, 0, &g_sDeviceRspFrame);  
+                break;
+			case DEVICE_CMD_RELAY_GET:
+                if(paramsLen == 0)
+                {	
+					u16 tempValue = 0;
+					if(add == DEVICE_SM5001_ID)
+					{
+						for(index = 0; index < WATER_DEVICE_RELAY_NUM; index++)
+						{
+							if(g_sWaterDeviceRelayInfo[index].doutdv)
+							{
+								tempValue |= (1 << index);
+							}
+						}
+						relayValue = ((tempValue & 0x00FF) << 8) | ((tempValue & 0xFF00) >> 8);
+						//g_sDeviceRspFrame.len = Device_ResponseFrame((u8 *)&relayValue, 2, &g_sDeviceRspFrame);
+                    }
+                    else
+                    {
+                         g_sDeviceRspFrame.err = READER_RESPONSE_ERR_DEVICE;
+                    }  
+                }
+				else
+				{
+					g_sDeviceRspFrame.err = READER_RESPONSE_ERR_LEN;	
+				}
+				g_sDeviceRspFrame.len = Device_ResponseFrame((u8 *)&relayValue, 2, &g_sDeviceRspFrame); 
+                break;
 
-        }
+	}
      if(g_sDeviceRspFrame.len == 0 && bRfOperation == FALSE)
     {
         g_sDeviceRspFrame.flag = DEVICE_RSPFRAME_FLAG_FAIL;
@@ -1462,19 +1536,7 @@ u16 Reader_ProcessUartFrame(u8 *pFrame, u8 add, u16 len, u32 tick)
 }
 
 
-void Device_Gate_Rsp(u8 flag)
-{
-  
 
-
-}
-
-void Device_Io_Ctr()
-{
-
-
-
-}
 
 
 BOOL Device_SetCfg(u8 *pBuffer)
@@ -1530,7 +1592,7 @@ void Device_ServerProcessRxInfo(W232_RCVBUFFER *pRcvBuffer, u32 tick)           
 			crc2 = a_GetCrc(pRcvBuffer->buffer, pRcvBuffer->len - 2);
 
 		}
-		else if(pRcvBuffer->len == 0)
+		else if(pRcvBuffer->len == 0)    //³¤¶ÈÎª0£¬²»Ð£Ñé£¿£¿£¿
 		{
 		   crc1 = crc2 = 0xFF;
 		}
@@ -1544,9 +1606,9 @@ void Device_ServerProcessRxInfo(W232_RCVBUFFER *pRcvBuffer, u32 tick)           
 			txLen = Reader_ProcessUartFrame(pRcvBuffer->buffer, pRcvBuffer->addr, pRcvBuffer->len, tick);
 			if(txLen > 0)
 			{
-				if(!a_CheckStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_GATE) && !a_CheckStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_BWBAT) && !a_CheckStateBit(g_sDeviceRspFrame.mark, DEVIDE_MARK_REBAT))
+				if(!g_sDeviceRspFrame.mark)
 				{
-					Device_AtRsp(W232_CNT_TIME_500MS, W232_CNT_REPAT_NULL, W232_MQTT_TOPIC_CMD);     
+					Device_AtRsp(W232_CNT_TIME_500MS, W232_CNT_REPAT_NULL, W232_MQTT_TOPIC_CMD);          
 				}
 			}
 		}
@@ -1558,6 +1620,11 @@ void Device_ServerProcessRxInfo(W232_RCVBUFFER *pRcvBuffer, u32 tick)           
 
 		}
 	}
+	else
+	{
+			txLen = 0;
+	
+	}
 }
 
 
@@ -1567,7 +1634,7 @@ void Device_UpHeartData(u32 id, u8 *pBuffer, char *strAtBuff, char *strRspBuff, 
     char strRspbuffer[W232_STR_BUFFER_HEART_LEN] ={0};  
     a_Hex2Str(strRspbuffer, pBuffer, lenth);
 
-    sprintf(strRspBuff,"{\"id\":%.8d,\"dp\":{\"device\":[{\"v\":\"FF20%.4d%s\"}]}}",id, lenth, strRspbuffer);
+    sprintf(strRspBuff,"{\"id\":%.8d,\"dp\":{\"device\":[{\"v\":\"FF20%.4d%s\"}]}}",id, lenth, strRspbuffer);//bug£¬³¤¶ÈÓ¦¸ÃÊÇÊ®Áù½øÖÆ
     sprintf(strAtBuff,"AT+QMTPUBEX=0,0,0,0,\"$sys/%.6s/%.15s/dp/post/json\",%d",W232_PRDOCT_ID, g_nImsiStr, strlen(strRspBuff));
 }
 
@@ -1620,10 +1687,10 @@ u16 Device_HeartFormat(u8 *pBuffer, u32 tick)
     pBuffer[pos++] = 0x00;
     
   //²ÖÌåÐÅÏ¢
-    for(index = 0 ;index < (GATE_SLAVER_NUM << 1); index ++)
+    for(index = 0 ;index < (g_sDeviceParams.gateNum << 1); index ++)
     {
         pBuffer[pos++] = index + 1;
-        if(g_aGateSlvInfo[index].state == GATE_STAT_OK)
+        if(g_aGateSlvInfo[index].state == GATE_STAT_OK || g_aGateSlvInfo[index].flag == GATE_STAT_OK)
         {
             memcpy(pBuffer + pos, g_aGateSlvInfo[index].softWare, GATE_VERSION_LEN);
             pos += GATE_VERSION_LEN;
@@ -1644,7 +1711,7 @@ u16 Device_HeartFormat(u8 *pBuffer, u32 tick)
     }
     
     pBuffer[pos++] = g_sW232Connect.sigNum;//ÐÅºÅÇ¿¶È
-    pBuffer[pos++] = UART_FRAME_PARAM_RFU;
+	pBuffer[pos++] = (g_sIoInfo.sersorState & IO_SENSOR_STAT_RFID_OPEN ?1:0);
     crc = a_GetCrc(pBuffer, pos); //´ÓLEN¿ªÊ¼¼ÆËãcrc
     pBuffer[pos++] = crc & 0xFF;
     pBuffer[pos++] = (crc >> 8) & 0xFF;
@@ -1730,9 +1797,12 @@ void Device_CtrBatVolce(u16 add, u8 mode, u8 step, u8 flag)
           switch(flag)
           {
             case DEVICE_STEP_FLAG_OK:
-
+				if(g_sGateOpInfo.batAddr != GATE_BAT_OK)
+				{
+					g_sGateOpInfo.batAddr = GATE_BAT_OK;
                     Device_VoiceApoFrame(SOUND_CNT_TIME_1S * 8, SOUND_REPAT_NULL, SOUND_VOICE_RTU_BAT_OK, SOUND_VOC_RETURN_OK );
-                  //»¹µç³ØÍê³É
+				}  
+					//»¹µç³ØÍê³É
               break;
             case DEVICE_STEP_FLAG_DOOR_FAIL:
               
@@ -1802,8 +1872,11 @@ void Device_CtrBatVolce(u16 add, u8 mode, u8 step, u8 flag)
           switch(flag)
           {
             case DEVICE_STEP_FLAG_OK:
-                Device_VoiceApoFrame(SOUND_CNT_TIME_1S , SOUND_REPAT_NULL, SOUND_VOICE_DI, SOUND_VOC_DI);
-                  //½èµç³ØÍê³É
+				if(g_sGateOpInfo.batAddr != GATE_BAT_OK)
+				{
+					g_sGateOpInfo.batAddr = GATE_BAT_OK;
+					Device_VoiceApoFrame(SOUND_CNT_TIME_1S , SOUND_REPAT_NULL, SOUND_VOICE_DI, SOUND_VOC_DI);
+				} //½èµç³ØÍê³É
               break;
             case DEVICE_STEP_FLAG_DOOR_FAIL:
               
@@ -1875,6 +1948,7 @@ char g_aStrBuffcmdOta[W232_STR_BUFFER_RSP_LEN] = {0};
 BOOL Device_CheckRsp(W232_CONNECT *pCntOp, u8 *pRxBuf, u8 len)
 {
     BOOL bOK = FALSE;
+	char*  idStrAdd = 0;
 	
     sprintf(g_aStrBuffRequst,"cmd/request/");
     sprintf(g_aStrBuffJsonAccept,"dp/post/json/accepted");
@@ -1884,23 +1958,45 @@ BOOL Device_CheckRsp(W232_CONNECT *pCntOp, u8 *pRxBuf, u8 len)
   
     if(strstr((char const *)pRxBuf, g_aStrBuffRequst) != NULL)
     {
-        memcpy(pCntOp->requestId, pRxBuf + W232_RQUEST_ID_POS, W232_RQUEST_ID_LEN);
-
+        idStrAdd = strstr((char *)pRxBuf, "request") + DEVICE_GET_REQUEST_STR_LEN;
+        //memcpy(pCntOp->requestId, pRxBuf + W232_RQUEST_ID_POS, W232_RQUEST_ID_LEN);
+		memcpy(pCntOp->requestId, idStrAdd, W232_RQUEST_ID_LEN);
         if((*(pCntOp->requestId +  DEVICE_MQTT_FRAME_CMDID_TAG_1) == DEVICE_MQTT_FRAME_CMDID_MASK) &&        //¹ýÂËËð»µÊý¾ÝÖ¡£¬·ñÔò±»·þÎñÆ÷Ìß³ö
            (*(pCntOp->requestId +  DEVICE_MQTT_FRAME_CMDID_TAG_2) == DEVICE_MQTT_FRAME_CMDID_MASK) && 
            (*(pCntOp->requestId +  DEVICE_MQTT_FRAME_CMDID_TAG_3) == DEVICE_MQTT_FRAME_CMDID_MASK) &&
            (*(pCntOp->requestId +  DEVICE_MQTT_FRAME_CMDID_TAG_4) == DEVICE_MQTT_FRAME_CMDID_MASK))
         {
               g_sW232RcvBuffer.flag = W232_RESPONES_CMD_GET;
-              memcpy(pCntOp->requestBuffer, pRxBuf + W232_RQUEST_ID_POS + W232_RQUEST_ID_LEN + 3, W232_RQUEST_BUFFER_LEN);   //×ö³¤¶ÈÐ£Ñé
-             if(W232_DataHandle(&g_sW232RcvBuffer, pRxBuf + W232_RQUEST_ID_POS + W232_RQUEST_ID_LEN + 3))
+              memcpy(pCntOp->requestBuffer,  (u8 *)(idStrAdd + W232_RQUEST_ID_LEN + W232_RQUEST_ID_DTU_LEN), W232_RQUEST_BUFFER_LEN);   //×ö³¤¶ÈÐ£Ñé
+             if(W232_DataHandle(&g_sW232RcvBuffer, (u8 *)(idStrAdd + W232_RQUEST_ID_LEN + W232_RQUEST_ID_DTU_LEN)))
              {
+				 g_sDeviceParams.offLineTime = 0;				//åŒæœåŠ¡å™¨æœ‰æ•°æ®äº¤äº’ï¼Œåˆ¤å®šæ­£å¸¸
                  bOK = TRUE;
              }
         }
 		else
 		{
-			 bOK = FALSE;													//³¬Ê±½ÓÊÕ¿ÉÄÜ½Ø¶ÏÊý¾Ý£¬
+			memset(pRxBuf, 0, (u8 *)idStrAdd - pRxBuf);													//¹ýÂËµÚÒ»²ãËð»µÊý¾Ý£¬¼ÌÐø²éÑ¯
+			
+			idStrAdd = strstr((char *)pRxBuf, "request") + DEVICE_GET_REQUEST_STR_LEN;
+			memcpy(pCntOp->requestId, idStrAdd, W232_RQUEST_ID_LEN);
+			if((*(pCntOp->requestId +  DEVICE_MQTT_FRAME_CMDID_TAG_1) == DEVICE_MQTT_FRAME_CMDID_MASK) &&        
+			   (*(pCntOp->requestId +  DEVICE_MQTT_FRAME_CMDID_TAG_2) == DEVICE_MQTT_FRAME_CMDID_MASK) && 
+			   (*(pCntOp->requestId +  DEVICE_MQTT_FRAME_CMDID_TAG_3) == DEVICE_MQTT_FRAME_CMDID_MASK) &&
+			   (*(pCntOp->requestId +  DEVICE_MQTT_FRAME_CMDID_TAG_4) == DEVICE_MQTT_FRAME_CMDID_MASK))
+			{
+				  g_sW232RcvBuffer.flag = W232_RESPONES_CMD_GET;
+				  memcpy(pCntOp->requestBuffer, (u8 *)(idStrAdd + W232_RQUEST_ID_LEN + W232_RQUEST_ID_DTU_LEN) , W232_RQUEST_BUFFER_LEN);   //×ö³¤¶ÈÐ£Ñé
+				 if(W232_DataHandle(&g_sW232RcvBuffer, (u8 *)(idStrAdd + W232_RQUEST_ID_LEN + W232_RQUEST_ID_DTU_LEN)))
+				 {
+					 g_sDeviceParams.offLineTime = 0;
+					 bOK = TRUE;
+				 }
+			}
+			else
+			{
+				bOK = FALSE;																							//Á½´Î²éÑ¯£¬25ms³¬Ê±£¬»¹³öÏÖÊý¾ÝËð»µ£¬ÊÓÎª´íÎóÊý¾Ý£¬·ÅÆú
+			}
 		}
     }
     else if(strstr((char const *)pRxBuf, g_aStrBuffJsonAccept) != NULL)
@@ -1918,19 +2014,67 @@ BOOL Device_CheckRsp(W232_CONNECT *pCntOp, u8 *pRxBuf, u8 len)
     }
     else if(strstr((char const *)pRxBuf, g_aStrBuffcmdAccept) != NULL)
     {
-        bOK = TRUE;
-        g_sW232RcvBuffer.flag = W232_RESPONES_CMD_RESP;
+			
+		{
+			bOK = TRUE;
+			g_sDeviceParams.offLineTime = 0;
+			g_sW232RcvBuffer.flag = W232_RESPONES_CMD_RESP;
+			if(g_sDeviceRspFrame.cmd == DEVICE_CMD_RESET && g_sDeviceRspFrame.flag == DEVICE_RESPONSE_FLAG_RESET)
+			{
+                    g_sFramBootParamenter.appState = FRAM_BOOT_APP_OK;
+                    if(Fram_WriteBootParamenter())
+                    {
+						W232_KeyHigh();
+						W232_CtrlHigh();
+						#if SYS_ENABLE_WDT
+						WDG_FeedIWDog();
+						#endif
+						Reader_Delayms(500);
+						#if SYS_ENABLE_WDT
+						WDG_FeedIWDog();
+						#endif
+						Reader_Delayms(500);
+						W232_CtrlLow();
+						W232_KeyLow();
+                         Sys_SoftReset();
+                    }
+                }
+                else if(g_sDeviceRspFrame.cmd == DEVICE_CMD_VERSION_UPDATA && g_sDeviceRspFrame.flag == DEVICE_RESPONSE_FLAG_UPDATA)
+                {
+                    g_sFramBootParamenter.appState = FRAM_BOOT_APP_DATA_DOWD;
+                    if(Fram_WriteBootParamenter())
+                    {
+						W232_KeyHigh();
+						W232_CtrlHigh();
+						#if SYS_ENABLE_WDT
+						WDG_FeedIWDog();
+						#endif
+						Reader_Delayms(500);
+						#if SYS_ENABLE_WDT
+						WDG_FeedIWDog();
+						#endif
+						Reader_Delayms(500);
+						W232_CtrlLow();
+						W232_KeyLow();
+						Sys_SoftReset();
+                    }
+                  
+                }
+		}
+
 
     }
     else if(strstr((char const *)pRxBuf, g_aStrBuffcmdOta) != NULL)
     {
         //¸üÐÂÍ¨Öª
         bOK = TRUE;
+		/*
         g_sW232RcvBuffer.flag = W232_RESPONES_CMD_RESP;
         g_sFramBootParamenter.appState = FRAM_BOOT_APP_FAIL;
         Fram_WriteBootParamenter();
         Reader_Delayms(5);
         Sys_SoftReset();
+		*/
     }
    
     return bOK;
@@ -2054,58 +2198,6 @@ BOOL Device_CommunCheckRsp(DEVICE_SENVER_TXBUFFER *pCntOp, u8 *pRxBuf)
             {
                 bOK = TRUE;
                 W232_WriteCmd(g_aMqttBuf);
-                if(g_sDeviceRspFrame.cmd == DEVICE_CMD_RESET && g_sDeviceRspFrame.flag == DEVICE_RESPONSE_FLAG_RESET)
-                {
-                    g_sFramBootParamenter.appState = FRAM_BOOT_APP_OK;
-                    if(Fram_WriteBootParamenter())
-                    {
-                         W232_CtrlLow();
-                         W232_KeyLow();
-                         #if SYS_ENABLE_WDT
-                         WDG_FeedIWDog();
-                         #endif
-                         Reader_Delayms(500);
-                         #if SYS_ENABLE_WDT
-                         WDG_FeedIWDog();
-                         #endif
-                         Reader_Delayms(500);
-                         #if SYS_ENABLE_WDT
-                         WDG_FeedIWDog();
-                         #endif
-                         Reader_Delayms(500);
-                         #if SYS_ENABLE_WDT
-                         WDG_FeedIWDog();
-                         #endif
-                         Reader_Delayms(500);
-                         Sys_SoftReset();
-                    }
-                }
-                else if(g_sDeviceRspFrame.cmd == DEVICE_CMD_VERSION_UPDATA && g_sDeviceRspFrame.flag == DEVICE_RESPONSE_FLAG_UPDATA)
-                {
-                    g_sFramBootParamenter.appState = FRAM_BOOT_APP_DATA_DOWD;
-                    if(Fram_WriteBootParamenter())
-                    {
-                         W232_CtrlLow();
-                         W232_KeyLow();
-                         #if SYS_ENABLE_WDT
-                         WDG_FeedIWDog();
-                         #endif
-                         Reader_Delayms(500);
-                         #if SYS_ENABLE_WDT
-                         WDG_FeedIWDog();
-                         #endif
-                         Reader_Delayms(500);
-                         #if SYS_ENABLE_WDT
-                         WDG_FeedIWDog();
-                         #endif
-                         Reader_Delayms(500);
-                         #if SYS_ENABLE_WDT
-                         WDG_FeedIWDog();
-                         #endif
-                         Sys_SoftReset();
-                    }
-                  
-                }
             }
             break;
     }
@@ -2195,19 +2287,19 @@ void Device_InfoChgRsp(u8 *pBuffer, char *strAtBuff, char *strRspBuff, u8 addr, 
 void Device_GateStateRsp()    //×´Ì¬±ä»¯·´À¡£¬ÐÄÌø¸üÐÂ£¬ÊÇ·ñÑ¹Á¦¹ý´ó
 { 
 	u8 index = 0;
-	if(index < (GATE_SLAVER_NUM << 1))
+	if(index < (g_sDeviceParams.gateNum << 1))
 	{
-	    for(index = 0; index < (GATE_SLAVER_NUM << 1); index ++)
+	    for(index = 0; index < (g_sDeviceParams.gateNum << 1); index ++)
 	    {
-		if(memcmp(&(g_aGateSlvStat[index].sensorState), &(g_aGateSlvInfo[index].sensorInfo.sensorState), sizeof(GATE_STATINFO)) ||
-			memcmp(&(g_aGateSlvStat[index].batState), &(g_aGateSlvInfo[index].sensorInfo.batInfo.state), sizeof(u8)) ||
-			memcmp(&(g_aGateSlvStat[index].chagState), &(g_aGateSlvInfo[index].sensorInfo.chagInfo.state), sizeof(u8)))     //×´Ì¬±ä»¯
-		{
-		    memcpy(&(g_aGateSlvStat[index].sensorState), &(g_aGateSlvInfo[index].sensorInfo.sensorState), sizeof(GATE_STATINFO));
-		    memcpy(&(g_aGateSlvStat[index].batState), &(g_aGateSlvInfo[index].sensorInfo.batInfo.state), sizeof(u8));
-		    memcpy(&(g_aGateSlvStat[index ].chagState), &(g_aGateSlvInfo[index].sensorInfo.chagInfo.state), sizeof(u8));
-		    Device_AtRsp(W232_CNT_TIME_100MS, W232_CNT_REPAT_NULL, W232_MQTT_TOPIC_HEART);
-		}
+			if(memcmp(&(g_aGateSlvStat[index].sensorState), &(g_aGateSlvInfo[index].sensorInfo.sensorState), sizeof(GATE_STATINFO)) ||
+				memcmp(&(g_aGateSlvStat[index].batState), &(g_aGateSlvInfo[index].sensorInfo.batInfo.state), sizeof(u8)) ||
+				memcmp(&(g_aGateSlvStat[index].chagState), &(g_aGateSlvInfo[index].sensorInfo.chagInfo.state), sizeof(u8)))     //×´Ì¬±ä»¯
+			{
+				memcpy(&(g_aGateSlvStat[index].sensorState), &(g_aGateSlvInfo[index].sensorInfo.sensorState), sizeof(GATE_STATINFO));
+				memcpy(&(g_aGateSlvStat[index].batState), &(g_aGateSlvInfo[index].sensorInfo.batInfo.state), sizeof(u8));
+				memcpy(&(g_aGateSlvStat[index ].chagState), &(g_aGateSlvInfo[index].sensorInfo.chagInfo.state), sizeof(u8));
+				Device_AtRsp(W232_CNT_TIME_100MS, W232_CNT_REPAT_NULL, W232_MQTT_TOPIC_HEART);
+			}
 	    }
 
 	}
@@ -2223,7 +2315,7 @@ void Device_GateStateInit()
 { 
 	u8 index = 0;
 
-	for(index = 0; index < (GATE_SLAVER_NUM << 1); index ++)
+	for(index = 0; index < (g_sDeviceParams.gateNum << 1); index ++)
 	{
 		memcpy(&(g_aGateSlvStat[index].sensorState), &(g_aGateSlvInfo[index].sensorInfo.sensorState), sizeof(GATE_STATINFO));
 		memcpy(&(g_aGateSlvStat[index].batState), &(g_aGateSlvInfo[index].sensorInfo.batInfo.state), sizeof(u8));
@@ -2459,7 +2551,7 @@ void Device_FormatMainInfo(GATE_OPINFO *pGateOpInfo)
     pBuffer[pos++] = UART_FRAME_PARAM_RFU;      // RFU
 
 	
-	for(index = 0 ;index < GATE_SLAVER_NUM; index ++)
+	for(index = 0 ;index < g_sDeviceParams.gateNum; index ++)
 	{
 		if(g_sGateOpInfo.comErr[index] < DEVICE_GATE_OP_TICK)
 		{
@@ -2478,7 +2570,7 @@ void Device_FormatMainInfo(GATE_OPINFO *pGateOpInfo)
     
 
 
-	if(g_sWaterInfo.comErr <= WATER_COM_OP_TICK)
+	if(g_sWaterInfo.comErr[0] <= WATER_COM_OP_TICK)
 	{
 		 pBuffer[pos++] = 0;
 	}

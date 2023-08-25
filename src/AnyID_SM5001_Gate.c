@@ -1,7 +1,7 @@
 #include "AnyID_SM5001_Gate.h"
 
 GATE_OPINFO g_sGateOpInfo = {0};
-GATE_INFO g_aGateSlvInfo[GATE_SLAVER_NUM << 1] = {0};
+GATE_INFO g_aGateSlvInfo[GATE_SLAVER_NUM << 1] ;							
 GATE_STAT g_aGateSlvStat[GATE_SLAVER_NUM << 1] = {0};
 GATE_TEST_INFO g_nGateTestInfo=  {0};
 
@@ -23,7 +23,8 @@ void Gate_Init(GATE_PARAMS *pGateParams, u32 tick)
     {
         memset(g_aGateSlvInfo + i, 0, sizeof(GATE_INFO));
         g_aGateSlvInfo[i].state = GATE_STAT_UNKNOW;     //默认未知状态
-    }
+		g_aGateSlvInfo[i].flag = GATE_STAT_UNKNOW;     //默蓮未知状态
+	}
 }
 
 void Gate_Stop(void)
@@ -70,13 +71,7 @@ void Gate_GetNextOp(GATE_OPINFO *pGateOpInfo, u32 tick)
 			if(pGateOpInfo->slvIndex >= GATE_SLAVER_NUM)
             {
                 Gate_ClearOpInfo();
-				
-				/*
-                pGateOpInfo->mode = GATE_MODE_INFO;
-                pGateOpInfo->state = GATE_OP_STAT_TX;
-                pGateOpInfo->cmd = GATE_FRAME_CMD_GET_ININFO;       //获取信息
-                pGateOpInfo->tick = tick;
-*/
+
 				pGateOpInfo->mode = GATE_MODE_MAIN_ERR_INFO;
                 pGateOpInfo->state = GATE_OP_STAT_TX;
                 pGateOpInfo->cmd = GATE_FRAME_CMD_GET_ININFO;       //获取信息

@@ -21,11 +21,11 @@ void W232_InitInterface(u32 baudrate)
 
     GPIO_InitStructure.GPIO_Pin = W232_PORT_KEY.Pin;
     GPIO_Init(W232_PORT_KEY.Port, &GPIO_InitStructure);
-    W232_KeyLow();
+   // W232_KeyLow();
 
     GPIO_InitStructure.GPIO_Pin = W232_PORT_CTRL.Pin;
     GPIO_Init(W232_PORT_CTRL.Port, &GPIO_InitStructure);
-    W232_CtrlHigh();
+    //W232_CtrlLow();
     USART_DeInit(W232_PORT);
 
     GPIO_InitStructure.GPIO_Pin = W232_PORT_TX.Pin;

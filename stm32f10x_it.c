@@ -212,7 +212,7 @@ void ELECT_RxDMAIRQHandler(void)
 void ELECT_TxDMAIRQHandler(void)
 {
     Elect_DisableTxDma();                    //DMA完成后，最后一个字节可能没有发送出去，需要在主循环中做判断处理
-    g_sElectInfo.state = ELECT_STAT_TX_IDLE;
+    Elect_EnableRxDma();
 }
 
 

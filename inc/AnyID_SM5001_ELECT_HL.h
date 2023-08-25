@@ -21,6 +21,7 @@ extern const PORT_INF ELECT_PORT_CTRL;
 #define ELECT_TXDMA_TC_FLAG                     DMA1_FLAG_TC7
 
 #define Elect_EnableTxDma(p,s)                  do{\
+													Elect_EnableTx();\
                                                     (ELECT_DMA)->IFCR = ELECT_TXDMA_TC_FLAG; \
                                                     (ELECT_TXDMA_CH)->CMAR = ((u32)(p)); \
                                                     (ELECT_TXDMA_CH)->CNDTR = (s); \
@@ -30,6 +31,8 @@ extern const PORT_INF ELECT_PORT_CTRL;
 #define Elect_DisableTxDma()                    do{\
                                                     (ELECT_DMA)->IFCR = ELECT_TXDMA_TC_FLAG;\
                                                     (ELECT_TXDMA_CH)->CCR &= CCR_ENABLE_Reset;\
+                                                    Elect_ChkTxOver();\
+                                                    Elect_EnableRx();\
                                                 }while(0)
 
    
@@ -40,6 +43,7 @@ extern const PORT_INF ELECT_PORT_CTRL;
 #define ELECT_RXDMA_TC_FLAG                     DMA1_FLAG_TC6                       
 
 #define Elect_EnableRxDma()                  do{\
+                                                Elect_EnableRx();\
                                                 (ELECT_DMA)->IFCR = ELECT_RXDMA_TC_FLAG; \
                                                 (ELECT_RXDMA_CH)->CNDTR = ELECT_BUFFER_MAX_LEN; \
                                                 (ELECT_RXDMA_CH)->CCR |= CCR_ENABLE_Set; \

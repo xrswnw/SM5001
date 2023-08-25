@@ -16,6 +16,11 @@ u8 IO_Sersor_Chk(u8 tUp, u8 tDown, u8 limitTempr)
     {
          State |=  IO_SENSOR_STAT_DOOR_OPEN;
     } 
+	
+	if(IO_Rfid_Chk())
+	{//rfid启用
+	 	State |=  IO_SENSOR_STAT_RFID_OPEN; 
+	}
     if(IO_Smoke_Chk())
     {
          State |= IO_SENSOR_STAT_SMOKE; 

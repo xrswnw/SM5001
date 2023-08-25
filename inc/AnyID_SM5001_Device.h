@@ -52,6 +52,8 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define DEVICE_CMD_CTR_RELAY                0x27
 #define DEVICE_CMD_CTR_FAN                  0x28
 #define DEVICE_CMD_VERSION_UPDATA           0x29
+#define DEVICE_CMD_RELAY_CTR                0x2A
+#define DEVICE_CMD_RELAY_GET                0x2B
 
 #define DEVICE_CMD_INFOR_MAIN_INFO          0x52
 #define DEVICE_CMD_MQTT_GET_IMEI            0x53
@@ -69,6 +71,7 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define DEVICE_SERVER_SATA_RX               3
 
 #define DEVICE_SOFT_VERSION_END_LEN				2
+#define DEVICE_GET_REQUEST_STR_LEN				8
 
 #define DEVICE_CTR_DOOR_TIME                    100
 #define DEVICE_TEMPR_HIGH                       32
@@ -205,8 +208,10 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define DEVIDE_MARK_GATE                0x00000002
 #define DEVIDE_MARK_REBAT               0x00000004
 #define DEVIDE_MARK_BWBAT               0x00000008
+#define DEVIDE_MARK_RELAY               0x00000010
 #define DEVICE_OUT_NULL                 0x00
 
+#define DEVICE_OUT_CTRL_POS_RELAY		0xFF
 #define DEVICE_OUT_CTRL_POS_FAN         0x01
 #define DEVICE_OUT_CTRL_POS_DOOR        0x02
 
@@ -225,6 +230,13 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 
 
 
+#define DEVICE_FRAME_LEN_KEY_UID		0x0C
+#define DEVICE_FRAME_LEN_CTR_RELAY 		0x06
+#define DEVICE_FRAME_LEN_SET_CFG		0x1C    
+#define DEVICE_FRAME_LEN_ACTCTL_CTL		0x05  
+#define DEVICE_FRAME_LEN_RETURN_BAT		0x0A
+
+
 #define DEVICE_TEST_FLAG_DOOE_MODE		0x00000001
 
 #define DEVICE_TEST_DOOR_OPEN_TIM		5
@@ -235,7 +247,7 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 
 
 
-#define Device_ChkGate(v)                      (v != DEVICE_SM5001_ID && v != DEVICE_SM5003_ID)
+#define Device_ChkGate(v)                      (v > 0 && v <= (GATE_SLAVER_NUM << 1))//(v != DEVICE_SM5001_ID && v != DEVICE_SM5003_ID)
 #define Device_AnsyFrame(add, c, frame)        do{\
 													g_sGateOpInfo.mode = GATE_MODE_CMD;\
 													g_sGateOpInfo.state = GATE_OP_STAT_TX;\
@@ -454,8 +466,8 @@ BOOL Device_GateProceRspFrame(u8 *pFrame, GATE_OPINFO *pOpInfo, u32 tick);
 BOOL Device_CommunCheckRsp(DEVICE_SENVER_TXBUFFER *pCntOp, u8 *pRxBuf);
 BOOL Device_ChkVersion();
 BOOL Device_ParmenterChkCode(DEVICE_PARAMS *pPaementInfo);
+BOOL Device_WaterProceRspFrame(u8 *pFrame, WATER_INFO *pOpInfo, u8 len);
 
-u16 Device_WaterProceRspFrame(u8 *pFrame, WATER_INFO *pOpInfo, u8 len);
 u16 Device_ResponseGateFrame(u8 add, u8 mode, READER_RSPFRAME *pOpResult);
 u16 Device_ResponseFrame(u8 *pParam, u8 len, READER_RSPFRAME *pOpResult);
 u16 Reader_ProcessUartFrame(u8 *pFrame, u8 add, u16 len, u32 tick);

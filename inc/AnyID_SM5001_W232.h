@@ -21,6 +21,7 @@ extern UART_RCVFRAME g_sW232RcvFrame;
 #define W232_PAR_ADDR_MOD_IP                    0
 #define W232_PAR_ADDR_MOD_URL                   1
 #define W232_PAR_ADDR_URL_LEN                   64
+#define W232_RQUEST_ID_DTU_LEN                   3
 #define W232_RQUEST_ID_LEN                      36
 #define W232_RQUEST_ID_POS                      57
 #define W232_RQUEST_ID_JSON_POS                 69
@@ -96,7 +97,7 @@ typedef struct w232Par{
 #define W232_CNT_OP_STAT_RX_AT                  0x0200
 
 #define W232_CNT_TIME_1S                        200
-#define W232_CNT_TIME_500MS                    100
+#define W232_CNT_TIME_500MS                     100
 #define W232_CNT_TIME_100MS                     20
 
 #define W232_CNT_REPAT_NULL                     1
@@ -130,7 +131,7 @@ typedef struct w232Par{
 #define W232_TOKEN_LEN                          99//131//129//129//127
 #define W232_CNT_IMEI_SRT_LEN					8
 
-#define W232_HEART_OFFLINE_TIME                 5
+#define W232_HEART_OFFLINE_TIME                 3
 
 #define W232_SERVER_TX_TO_TIME                  100
 typedef struct w232Connect{

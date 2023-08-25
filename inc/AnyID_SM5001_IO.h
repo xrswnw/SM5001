@@ -51,6 +51,7 @@
 #define IO_SENSOR_STAT_THUNDER         0x08
 #define IO_SENSOR_STAT_THUNDER_ERR     0x10
 #define IO_SENSOR_STAT_TEMPR_CHANGE    0x20
+#define IO_SENSOR_STAT_RFID_OPEN       0x40
 
 #define IO_SENSOR_STAT_RFID            0x08
 #define IO_SENSOR_STAT_TEMPR           0x40

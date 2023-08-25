@@ -26,7 +26,7 @@ u8 Elect_FormatFrame(u8 cmd,u16 regAdd,u16 regNum,u8 *pFrame)
     pFrame[pos++] = (regAdd >> 0) & 0xFF;
     pFrame[pos++] = (regNum >> 8) & 0xFF;
     pFrame[pos++] = (regNum >> 0) & 0xFF;
-	//校验
+	//校药
     crc = Elect_GetCrc16(pFrame, pos);
     pFrame[pos++] = (crc >> 0) & 0xFF;
     pFrame[pos++] = (crc >> 8) & 0xFF;
@@ -70,7 +70,7 @@ void Elect_TransmitCmd(ELECT_TX_BUF *pBuffer)
     g_sElectInfo.txBuf.regAdd = ELECT_REG_ADDR_ELECTVALUE;
     g_sElectInfo.txBuf.regNum = 0x0002;
     g_sElectInfo.txBuf.len = Elect_FormatFrame(pBuffer->cmd, pBuffer->regAdd, pBuffer->regNum,  pBuffer->buffer);
-    Elect_WriteBuffer(g_sElectInfo.txBuf.buffer, g_sElectInfo.txBuf.len);
+    Elect_EnableTxDma(g_sElectInfo.txBuf.buffer, g_sElectInfo.txBuf.len);
 }
 
 
@@ -104,11 +104,11 @@ u32 Float32(u32 NumFloat32)
     ebits =  ( NumFloat32 >> 23 ) & 0xff ;
     mbits =  NumFloat32 & 0x7fffff ; 
  
-    if(sbit)    //若需要负数部分，sbit为1时，result*-1,去掉判断；
+    if(sbit)    //纱穴要睾私铱貣矛sbit为1时矛result*-1,去执茞讖没
     {
         return -1 ;
     }
-    ebits -= 127;    //得到阶码<0，即结果小于1，返回0；
+    ebits -= 127;    //謨战迼毛<0矛艽蕖诨小詺1矛椎軜0没
     if(ebits < 0)
     {
         return 0;

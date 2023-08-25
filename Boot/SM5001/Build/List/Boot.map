@@ -1,45 +1,47 @@
 ###############################################################################
 #
-# IAR ELF Linker V8.40.1.212/W32 for ARM                  01/Aug/2023  10:19:36
+# IAR ELF Linker V8.40.1.212/W32 for ARM                  21/Aug/2023  09:24:42
 # Copyright 2007-2019 IAR Systems AB.
 #
-#    Output file  =  E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Exe\Boot.out
-#    Map file     =  E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\List\Boot.map
+#    Output file  =
+#        E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\Exe\Boot.out
+#    Map file     =
+#        E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\List\Boot.map
 #    Command line =
-#        -f C:\Users\Administrator\AppData\Local\Temp\EWB59E.tmp
-#        (E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_Device.o
-#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_EC20.o
-#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_EC20_HL.o
-#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_Flash_HL.o
-#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_FlashM25.o
-#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_FRam.o
-#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_FRam_HL.o
-#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_Gate.o
-#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_Gate_HL.o
-#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_SysCfg.o
-#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_SysTick_HL.o
-#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_Uart.o
-#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\AnyID_FlashM25.o
-#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\AnyID_FRam.o
-#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\AnyID_Stdlib.o
-#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\AnyID_Uart_Receive.o
-#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\main.o
-#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\misc.o
-#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\startup_stm32f10x_hd.o
-#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\stm32f10x_flash.o
-#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\stm32f10x_gpio.o
-#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\stm32f10x_it.o
-#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\stm32f10x_iwdg.o
-#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\stm32f10x_rcc.o
-#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\stm32f10x_spi.o
-#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\stm32f10x_usart.o
-#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj\system_stm32f10x.o
+#        -f C:\Users\Administrator\AppData\Local\Temp\EW1EDB.tmp
+#        (E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_Device.o
+#        E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_EC20.o
+#        E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_EC20_HL.o
+#        E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_Flash_HL.o
+#        E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_FlashM25.o
+#        E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_FRam.o
+#        E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_FRam_HL.o
+#        E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_Gate.o
+#        E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_Gate_HL.o
+#        E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_SysCfg.o
+#        E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_SysTick_HL.o
+#        E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\Obj\AnyID_Boot_Uart.o
+#        E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\Obj\AnyID_FlashM25.o
+#        E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\Obj\AnyID_FRam.o
+#        E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\Obj\AnyID_Stdlib.o
+#        E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\Obj\AnyID_Uart_Receive.o
+#        E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\Obj\main.o
+#        E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\Obj\misc.o
+#        E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\Obj\startup_stm32f10x_hd.o
+#        E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\Obj\stm32f10x_flash.o
+#        E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\Obj\stm32f10x_gpio.o
+#        E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\Obj\stm32f10x_it.o
+#        E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\Obj\stm32f10x_iwdg.o
+#        E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\Obj\stm32f10x_rcc.o
+#        E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\Obj\stm32f10x_spi.o
+#        E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\Obj\stm32f10x_usart.o
+#        E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\Obj\system_stm32f10x.o
 #        --redirect _Printf=_PrintfFull --redirect _Scanf=_ScanfFull
 #        --no_out_extension -o
-#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Exe\Boot.out --map
-#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\List\Boot.map --config
-#        E:\AnyID\Git\FY\SM5001\Boot\SM5001\GD32F303xC.icf --semihosting
-#        --entry __iar_program_start --vfe --text_out locale)
+#        E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\Exe\Boot.out --map
+#        E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\List\Boot.map
+#        --config E:\AnyID\HFReader\software\SM5001\Boot\SM5001\GD32F303xC.icf
+#        --semihosting --entry __iar_program_start --vfe --text_out locale)
 #
 ###############################################################################
 
@@ -259,7 +261,7 @@ command line/config:
     --------------------------------------------------
     Total:
 
-E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj: [1]
+E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\Obj: [1]
     AnyID_Boot_Device.o        1'748      224    4'132
     AnyID_Boot_EC20.o          1'728      104    3'984
     AnyID_Boot_EC20_HL.o         368       16
@@ -575,7 +577,7 @@ strlen                   0x800'3659         Code  Gb  strlen.o [3]
 strstr                   0x800'35a5   0x2c  Code  Gb  strstr.o [2]
 
 
-[1] = E:\AnyID\Git\FY\SM5001\Boot\SM5001\Build\Obj
+[1] = E:\AnyID\HFReader\software\SM5001\Boot\SM5001\Build\Obj
 [2] = dl7M_tlf.a
 [3] = rt7M_tl.a
 [4] = shb_l.a

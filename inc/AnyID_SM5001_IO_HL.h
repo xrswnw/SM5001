@@ -10,6 +10,10 @@ extern const PORT_INF IO_MOTOR_CTL;
 #define IO_Door_Close()                  IO_MOTOR_CTL.Port->BRR = IO_MOTOR_CTL.Pin
 #define IO_Door_Open()                   IO_MOTOR_CTL.Port->BSRR = IO_MOTOR_CTL.Pin
 
+extern const PORT_INF IO_DOOR_INPUT;
+#define IO_Door_Chk()              (IO_DOOR_INPUT.Port->IDR & IO_DOOR_INPUT.Pin)
+
+
 extern const PORT_INF IO_LED_CTL;
 #define IO_Led_Close()                  IO_LED_CTL.Port->BRR = IO_LED_CTL.Pin
 #define IO_Led_Open()                   IO_LED_CTL.Port->BSRR = IO_LED_CTL.Pin
@@ -29,10 +33,12 @@ extern const PORT_INF IO_WATER_INPUT;
 #define IO_Water_Chk()              ((IO_WATER_INPUT.Port->IDR & IO_WATER_INPUT.Pin) != (uint32_t)Bit_RESET)
 
 extern const PORT_INF IO_LIMIT_INPUT;
-#define IO_Rfid_Chk()              ((IO_LIMIT_INPUT.Port->IDR & IO_LIMIT_INPUT.Pin)  != (uint32_t)Bit_RESET)
+#define IO_Rfid_Chk()              (IO_LIMIT_INPUT.Port->IDR & IO_LIMIT_INPUT.Pin)
 
+/*
 extern const PORT_INF IO_LIMIT_INPUT;
 #define IO_Door_Chk()              (IO_LIMIT_INPUT.Port->IDR & IO_LIMIT_INPUT.Pin)
+*/
 
 extern const PORT_INF IO_PWR_INPUT;
 #define IO_Pwr_Chk()              ((IO_PWR_INPUT.Port->IDR & IO_PWR_INPUT.Pin) != (uint32_t)Bit_RESET)
