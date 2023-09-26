@@ -64,19 +64,21 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define DEVICE_MQTT_FRAME_CMDID_TAG_3           18
 #define DEVICE_MQTT_FRAME_CMDID_TAG_4           23
 
+
+#define DEVICE_GET_REQUEST_STR_LEN				8
+#define DEVICE_GET_MATT_STAT_STR_LEN			12
 #define DEVICE_MQTT_FRAME_CMDID_MASK            0x2D
-#define DEVICE_SERVER_SATA_IDLE             0
-#define DEVICE_SERVER_SATA_WATI_TX          1
-#define DEVICE_SERVER_SATA_TX               2
-#define DEVICE_SERVER_SATA_RX               3
+#define DEVICE_SERVER_SATA_IDLE					0
+#define DEVICE_SERVER_SATA_WATI_TX				1
+#define DEVICE_SERVER_SATA_TX					2
+#define DEVICE_SERVER_SATA_RX					3
 
 #define DEVICE_SOFT_VERSION_END_LEN				2
-#define DEVICE_GET_REQUEST_STR_LEN				8
 
 #define DEVICE_CTR_DOOR_TIME                    100
 #define DEVICE_TEMPR_HIGH                       32
 
-#define DEVICE_HEART_MIN                     570
+#define DEVICE_HEART_MIN						570			//å‘é€æŽ¥æ”¶ä¼šè€—æ—¶ï¼?70 * 5æŽ¥è¿‘1min
 
 #define DEVICE_SET_CFG_FRAME_LEN            0x1C    
 #define DEVICE_ACTCTL_CTL_FRAME_LEN         0x05  
@@ -134,8 +136,12 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define READER_RESPONSE_ERR_FREAM       0x02
 #define READER_RESPONSE_ERR_DEVICE      0x03
 
+/*
 #define DEVICE_RESPONSE_FLAG_RESET      0x01
 #define DEVICE_RESPONSE_FLAG_UPDATA     0x02
+#define DEVICE_RESPONSE_FLAG_ALL_RESET  0x04
+#define DEVICE_RESPONSE_FLAG_GATE_RESET 0x08
+*/
 
 #define DEVICE_FRAME_BROADCAST_ADDR     0xFFFF
 
@@ -152,8 +158,21 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 
 
 #define DEVICE_SERVERRSP_NUM            20
-#define DEVICE_TEST_SERSOR				2
+//#define DEVICE_TEST_SERSOR				2
 #define DEVICE_TEST_NULL				0
+
+
+#define DEVICE_BAT_OP_LOADING_TIME		24000
+
+
+
+#define DEVICE_TEST_FLAG_DOOR			0x01
+#define DEVICE_TEST_FLAG_SERSOR			0x02
+#define DEVICE_TEST_FLAG_RESET_MASTER   0x04
+#define DEVICE_TEST_FLAG_RESET_ALL      0x08
+#define DEVICE_TEST_FLAG_RESET_GATE     0x10
+#define DEVICE_TEST_FLAG_UPDATE         0x20
+
 //modele
 
 #define DEVICE_GATE_OP_TICK             10
@@ -177,7 +196,7 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define DEVICE_BAT_RTN                  0x01
 #define DEVICE_BAT_BRW                  0x02 
 
-#define DEVICE_HEART_TIME				1
+#define DEVICE_HEART_TIME				5
 #define DEVICE_CMD_NORMAL               0x00
 #define DEVICE_TIME_HEART               50                      //²âÊÔ5s
 
@@ -190,10 +209,20 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define DEVICE_TAG_RCD_SIZE             1500    
 #define DEVICE_RSP_ID_LEN               36
 
-
+#define DEVICE_IN_SESNOR_NUM            3
+#define DEVICE_IN_CHECK_TIM             2
+typedef struct deviceCheckInInfo{
+	u8 batChTick;
+	u8 chanTick;
+    u16 checkTick[DEVICE_IN_SESNOR_NUM];
+    u16 inValue;
+    u16 changeFlag;
+}DEVICE_INCHECK;
+extern DEVICE_INCHECK g_sDeviceInCheck[GATE_SLAVER_NUM * 2];
 #define DEVICE_SM5001_ID                0xFF
 #define DEVICE_SM5002_ID                0x05
 #define DEVICE_SM5003_ID                0x00
+#define DEVICE_ALL_ID                   0xFE
 
 #define DEVICE_TMPR_ALARM_DFT           30
 #define DEVICE_LED_LOWVOL_DFT           80
@@ -209,9 +238,11 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define DEVIDE_MARK_REBAT               0x00000004
 #define DEVIDE_MARK_BWBAT               0x00000008
 #define DEVIDE_MARK_RELAY               0x00000010
+#define DEVIDE_MARK_WATER               0x00000020
 #define DEVICE_OUT_NULL                 0x00
-
 #define DEVICE_OUT_CTRL_POS_RELAY		0xFF
+#define DEVICE_OUT_CTRL_POS_CHANG       0x01
+#define DEVICE_OUT_CTRL_POS_DOOR        0x02
 #define DEVICE_OUT_CTRL_POS_FAN         0x01
 #define DEVICE_OUT_CTRL_POS_DOOR        0x02
 
@@ -245,9 +276,10 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 #define DEVICE_TEST_ERR_TEMPR		    0x01
 #define DEVICE_TEST_ERR_ELECT		    0x02
 
+#define DEVICE_STR_HEX_0				0x30
 
 
-#define Device_ChkGate(v)                      (v > 0 && v <= (GATE_SLAVER_NUM << 1))//(v != DEVICE_SM5001_ID && v != DEVICE_SM5003_ID)
+#define Device_ChkGate(v)                      (v > 0 && v <= (g_sDeviceParams.gateNum << 1))//(v != DEVICE_SM5001_ID && v != DEVICE_SM5003_ID)
 #define Device_AnsyFrame(add, c, frame)        do{\
 													g_sGateOpInfo.mode = GATE_MODE_CMD;\
 													g_sGateOpInfo.state = GATE_OP_STAT_TX;\
@@ -256,7 +288,14 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 													g_sGateOpInfo.slvCmd.paramsLen = 2;\
 													g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;\
 													g_sGateOpInfo.slvCmd.params[1] = frame;\
-												}while(0)    
+												}while(0) 
+#define Device_FormatReset(add, c)            do{\
+													g_sGateOpInfo.mode = GATE_MODE_CMD;\
+													g_sGateOpInfo.state = GATE_OP_STAT_TX;\
+													g_sGateOpInfo.cmd = c;\
+													g_sGateOpInfo.slvIndex = (add -1)>> 1;\
+													g_sGateOpInfo.slvCmd.paramsLen = 0;\
+												}while(0)
 
 
 #define Device_GateBatCtr(add,ctrMode)		do{\
@@ -269,28 +308,7 @@ extern const PORT_INF DEV_INSEN_WAT_FB;
 													g_sGateOpInfo.slvCmd.paramsLen = BAT_SN_LEN + 1;\
 													memcpy(g_sGateOpInfo.slvCmd.params + 1 , pFrame, BAT_SN_LEN);\
 												}while(0) 													
-													
-													
-/*
-#define Device_GateRtBat(add)                  do{\
-													g_sGateOpInfo.add = add - 1;\
-													g_sGateOpInfo.state = GATE_OP_STAT_TX;\
-													g_sGateOpInfo.mode = GATE_MODE_CMD;\
-													g_sGateOpInfo.cmd = GATE_FRAME_CMD_RTNBAT;\
-													g_sGateOpInfo.slvIndex = (add -1)>> 1;\
-													g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;\
-													g_sGateOpInfo.slvCmd.paramsLen = BAT_SN_LEN + 1;\
-												}while(0)                                 
-#define Device_GateBrBat(add)                  do{\
-													g_sGateOpInfo.add = add - 1;\
-													g_sGateOpInfo.state = GATE_OP_STAT_TX;\
-													g_sGateOpInfo.mode = GATE_MODE_CMD;\
-													g_sGateOpInfo.cmd = GATE_FRAME_CMD_BRWBAT;\
-													g_sGateOpInfo.slvIndex = (add -1)>> 1;\
-													g_sGateOpInfo.slvCmd.params[0] = (add + 1)% 2;\
-													g_sGateOpInfo.slvCmd.paramsLen = BAT_SN_LEN + 1;\
-												}while(0) 
-*/
+
 #define Device_GatePlBat(add,v)                do{\
 													g_sGateOpInfo.add = add - 1;\
 													g_sGateOpInfo.state = GATE_OP_STAT_TX;\
@@ -412,12 +430,16 @@ typedef struct deviceImpRspInfo{
   u8 rtuLen;
   u8 brwLen;
   u8 warnLen;
+  u8 batOpenFlag;
   u8 rtuBuffer[UART_FRAME_POS_MQTT_NORMAL_LEN];
   u8 brwBuffer[UART_FRAME_POS_MQTT_NORMAL_LEN];
   u8 warnBuffer[UART_FRAME_POS_MQTT_NORMAL_LEN];
+  u32 batLimitTime;
+  u32 batOpTime;
 }DEVICE_IMPRSP_INFO;
 
 typedef struct deviceTestInfo{
+	u8 lteErr;
 	u8 flag;
 	u8 gateAddr;
 	u8 err;
@@ -427,6 +449,7 @@ typedef struct deviceTestInfo{
 
 
 extern BOOL g_nBatOpenFlag;
+extern u32 g_nBratOpIngTick;
 extern u32 g_nBratIngTick  ;
 extern DEVICE_IMPRSP_INFO g_sDeviceImpRspInfo;
 extern DEVICE_SENVER_TXBUFFER g_sDeviceServerTxBuf;
@@ -443,7 +466,7 @@ void Device_ReadDeviceParamenter(void);
 void Device_ReadMqttKey();
 void Device_IoCtr();
 void Device_CtrBatVolce(u16 add, u8 mode, u8 step, u8 flag);
-void Device_VoiceCtr();
+void Device_SmokeCtr();
 void Device_InfoChgRsp(u8 *pBuffer, char *strAtBuff, char *strRspBuff, u8 addr, u32 id);
 void Device_RtuRsp(u8 *pBuffer, char *strAtBuff, char *strRspBuff, u8 addr, u32 id);
 void Device_BrwRsp(u8 *pBuffer, char *strAtBuff, char *strRspBuff, u8 addr, u32 id);
@@ -467,6 +490,8 @@ BOOL Device_CommunCheckRsp(DEVICE_SENVER_TXBUFFER *pCntOp, u8 *pRxBuf);
 BOOL Device_ChkVersion();
 BOOL Device_ParmenterChkCode(DEVICE_PARAMS *pPaementInfo);
 BOOL Device_WaterProceRspFrame(u8 *pFrame, WATER_INFO *pOpInfo, u8 len);
+
+BOOL Device_ChkGateState(DEVICE_INCHECK *pInCheck,GATE_STATINFO *pOldStae, GATE_STATINFO *pNewState, u8 oldBatStat, u8 newBatStat, u8 oldChanStat, u8 newChanStat);
 
 u16 Device_ResponseGateFrame(u8 add, u8 mode, READER_RSPFRAME *pOpResult);
 u16 Device_ResponseFrame(u8 *pParam, u8 len, READER_RSPFRAME *pOpResult);

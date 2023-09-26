@@ -4,7 +4,7 @@ GATE_OPINFO g_sGateOpInfo = {0};
 GATE_INFO g_aGateSlvInfo[GATE_SLAVER_NUM << 1] ;							
 GATE_STAT g_aGateSlvStat[GATE_SLAVER_NUM << 1] = {0};
 GATE_TEST_INFO g_nGateTestInfo=  {0};
-
+GATE_BRBATINFO g_nGateBRBatInfo = {0};
 void Gate_Init(GATE_PARAMS *pGateParams, u32 tick)
 {
     u8 i = 0;
@@ -23,7 +23,6 @@ void Gate_Init(GATE_PARAMS *pGateParams, u32 tick)
     {
         memset(g_aGateSlvInfo + i, 0, sizeof(GATE_INFO));
         g_aGateSlvInfo[i].state = GATE_STAT_UNKNOW;     //默认未知状态
-		g_aGateSlvInfo[i].flag = GATE_STAT_UNKNOW;     //默蓮未知状态
 	}
 }
 
@@ -43,7 +42,7 @@ void Gate_Stop(void)
     USART_DeInit(uart);
 }
 
-void Gate_GetNextOp(GATE_OPINFO *pGateOpInfo, u32 tick)
+void Gate_GetNextOp(GATE_OPINFO *pGateOpInfo, u16 gateNum, u32 tick)
 {
     if(pGateOpInfo->mode == GATE_MODE_STARTUP)              //开机延时完成，配置设备参数
     {
@@ -68,7 +67,7 @@ void Gate_GetNextOp(GATE_OPINFO *pGateOpInfo, u32 tick)
         {
             pGateOpInfo->slvIndex++;
             pGateOpInfo->rpt = 0;
-			if(pGateOpInfo->slvIndex >= GATE_SLAVER_NUM)
+			if(pGateOpInfo->slvIndex >= gateNum)
             {
                 Gate_ClearOpInfo();
 

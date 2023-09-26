@@ -44,6 +44,8 @@
 
 #define UART_FRAME_MIN_MQTT_LEN         0
 
+
+#define UART_STAT_RX_OP                 0x05
 #define UART_STAT_RX_END                0x02
 #define UART_STAT_RX_OVR                0x01
 #define UART_STAT_RX_IDLE               0x00
@@ -100,6 +102,7 @@ BOOL Uart_IsRcvFrameOver(UART_RCVFRAME *pRcvFrame);
 
 
 #define Gate_IsRcvFrame(rcvFrame)               ((rcvFrame).state == UART_STAT_RX_END || (rcvFrame).state == UART_STAT_RX_OVR)
+#define Gate_IsRcvFrames(rcvFrame)               ((rcvFrame).state == UART_STAT_RX_END || (rcvFrame).state == UART_STAT_RX_OVR || (rcvFrame).state == UART_STAT_RX_OP)
 #define Gate_ResetFrame(rcvFrame)           ((rcvFrame).state = UART_STAT_RX_IDLE, (rcvFrame).len = 0)
 #define Uart_ResetFrame0(rcvFrame)           (memset(&(rcvFrame), 0, sizeof(UART_RCVFRAME)))
 

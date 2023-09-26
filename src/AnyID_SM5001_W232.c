@@ -3,7 +3,7 @@
 UART_RCVFRAME g_sW232RcvFrame = {0};
 W232_CONNECT g_sW232Connect = {0};
 W232_RCVBUFFER g_sW232RcvBuffer = {0};
-
+W232_MQTT_INFO g_sW232MqttInfo = {0};
 u8 bOk = 0; 
 
 char g_nReaderTkoen[W232_TOKEN_LEN] = {0};
@@ -66,7 +66,7 @@ void W232_ConnectInit(W232_CONNECT *pCntOp, u8 cmd, W232_PARAMS *pParams)
 char g_aGprsServerInfo[W232_PAR_ADDR_URL_LEN + 32] = {0};
 
 
-void W232_ConnectTxCmd(W232_CONNECT *pCntOp, u32 sysTick)
+void W232_ConnectTxCmd(W232_CONNECT *pCntOp, u8 keepAliveTime, u32 sysTick)
 {
     u8 op = 0;
     char strBuff[W232_STR_BUFFER_LEN] = {0};
@@ -153,7 +153,9 @@ void W232_ConnectTxCmd(W232_CONNECT *pCntOp, u32 sysTick)
             W232_WriteCmd("AT+QMTCFG=\"onenet\",0,\"598243\",\"zexoEnvCWH86x8eWjfpW32wUlWbELWEbUO1REV3OYyg=\""); //配置移动平台 
             break;
         case  W232_CNT_OP_QMTCFG_TIME:
-              W232_WriteCmd("AT+QMTCFG=\"keepalive\",0,295"); 
+			
+			sprintf(strBuff,"AT+QMTCFG=\"keepalive\",0,%d", keepAliveTime * 60);
+			W232_WriteCmd(strBuff); 
           break;
         case W232_CNT_OP_QMTCFG_VERSION:
             
@@ -315,6 +317,7 @@ BOOL W232_ConnectCheckRsp(W232_CONNECT *pCntOp, u8 *pRxBuf)
             if(strstr((char const *)pRxBuf, "OK") != NULL)
             {
                 bOK = TRUE;
+				g_sW232MqttInfo.stat = W232_MQTT_STAT_OK;
             }
             break;
         case W232_CNT_OP_QMTPUBEX:

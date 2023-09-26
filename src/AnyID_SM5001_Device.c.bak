@@ -2,7 +2,7 @@
 
 //ÀÖÃ¢
 
-const u8 DEVICE_VERSION[DEVICE_VERSION_SIZE]@0x08005000 = "SM5001 23081000 GD322302";
+const u8 DEVICE_VERSION[DEVICE_VERSION_SIZE]@0x08005000 = "SM5001 23083104 GD322302";
 
 
 READER_RSPFRAME g_sDeviceRspFrame = {0};
@@ -10,6 +10,7 @@ DEVICE_PARAMS g_sDeviceParams = {0};
 DEVICE_SENVER_TXBUFFER g_sDeviceServerTxBuf = {0};
 DEVICE_IMPRSP_INFO g_sDeviceImpRspInfo = {0};
 DEVICE_TEST_INFO g_sDeviceTestInfo = {0};
+DEVICE_INCHECK g_sDeviceInCheck[GATE_SLAVER_NUM] = {0};
 BOOL g_nBatOpenFlag = TRUE;
 u32 g_nBratIngTick = 0;
 
@@ -546,7 +547,7 @@ u16 Device_ResponseGateFrame(u8 add, u8 mode, READER_RSPFRAME *pOpResult)
     {
         for(index = 0 ;index < (g_sDeviceParams.gateNum << 1); index ++)
         {
-         	if(g_aGateSlvInfo[index].state == GATE_STAT_OK)
+         	if(g_aGateSlvInfo[index].state == GATE_STAT_OK || g_aGateSlvInfo[index].flag == GATE_STAT_OK)
           	{
 				  pOpResult->buffer[pos++] = index + 1;
 				  pOpResult->buffer[pos++] = g_aGateSlvInfo[index].sensorInfo.tmpr >> 0;
@@ -617,10 +618,10 @@ void Device_GateRsvSlvInfo(u8 *pParams, u16 paramsLen, GATE_OPINFO *pOpInfo)
     GATE_SENSORINFO *pInfo = NULL, *pPreInfo = NULL;
     
     num = pParams[pos++];
-    for(i = 0; i < num; i++)
+    for(i = 0; i < num; i++)													//num = 1å¯èƒ½é€ æˆï¼Ÿï¼Ÿï¼Ÿï¼Ÿï¼Ÿï¼Ÿ
     {
-        pInfo = (GATE_SENSORINFO *)(pParams + pos);
-        infoIdx = (pOpInfo->slvIndex << 1) + pInfo->addr;
+        pInfo = (GATE_SENSORINFO *)(pParams + pos);									
+        infoIdx = (pOpInfo->slvIndex << 1) + pInfo->addr;						//ä¸¤æ¡è¿žç»­åœ°å€ç›¸åŒå¯¼è‡´ä¸€ä»“æ•°æ®ä¸¢å¤±ï¼Ÿï¼Ÿï¼Ÿ
         pPreInfo = &g_aGateSlvInfo[infoIdx].sensorInfo;
         if(g_aGateSlvInfo[infoIdx].state != GATE_STAT_OK)
         {
@@ -643,6 +644,11 @@ void Device_GateRsvSlvInfo(u8 *pParams, u16 paramsLen, GATE_OPINFO *pOpInfo)
                 }
             }
         }
+		
+		if(g_aGateSlvInfo[infoIdx].flag != GATE_STAT_OK)				//æŽ’é™¤å‚æ•°å¹²æ‰°ï¼Œ
+		{
+			g_aGateSlvInfo[infoIdx].flag = GATE_STAT_OK;
+		}
         memcpy(pPreInfo, pInfo, sizeof(GATE_SENSORINFO));
 
         pos += sizeof(GATE_SENSORINFO);
@@ -735,9 +741,11 @@ BOOL Device_GateProceRspFrame(u8 *pFrame, GATE_OPINFO *pOpInfo, u32 tick)
 
 						pOpInfo->rtnBat.tick = g_nSysTick;
 						g_nBatOpenFlag = TRUE;
+                                                g_sDeviceParams.heartTick = 0;   //ÐÄÌøÖØÐÂ¼ÆÊ±
 						pOpInfo->rtnBat.step  = pParams[0];     
 						pOpInfo->rtnBat.flag = pParams[1]; 
 						pOpInfo->batOpState = GATE_OP_BAT_STAT_OVER;
+                                                g_sGateOpInfo.slvIndex = addr;//Ë¢ÐÂ¸Ã²ÖÐÅÏ¢¡¢Î´²âÊÔ
 						g_sDeviceImpRspInfo.rtuLen = Device_ResponseRtBat(g_sDeviceImpRspInfo.rtuBuffer);
 						Device_AtRsp(W232_CNT_TIME_500MS, W232_CNT_REPAT_NULL, W232_MQTT_TOPIC_REBAT);
 								 
@@ -766,6 +774,7 @@ BOOL Device_GateProceRspFrame(u8 *pFrame, GATE_OPINFO *pOpInfo, u32 tick)
 					}
 				
 				}
+                                g_nGateBRBatInfo.limitTime = g_nSysTick;    //´ÓÕ¾µç³ØÊý¾ÝÉÏ±¨£¬´ú±íÁ÷³ÌÎ´½áÊø
 				g_sGateOpInfo.batInfoRepat = 0 ;
 				Device_CtrBatVolce(g_sDeviceImpRspInfo.add - 1, DEVICE_BAT_RTN, pOpInfo->rtnBat.step, pOpInfo->rtnBat.flag)  ;
             }
@@ -802,10 +811,12 @@ BOOL Device_GateProceRspFrame(u8 *pFrame, GATE_OPINFO *pOpInfo, u32 tick)
 							b = TRUE;       //ÕâÀïÒªÉÏ±¨Êý¾Ý
 							pOpInfo->slvCmd.cmd = 0;            //²Ù×÷Íê³É£¬Çå¿Õ²Ù×÷
 							g_nBatOpenFlag = TRUE;
+                                                        g_sDeviceParams.heartTick = 0;   //ÐÄÌøÖØÐÂ¼ÆÊ±
 							pOpInfo->brwBat.step  = pParams[0];     
 							pOpInfo->brwBat.flag = pParams[1];
 							pOpInfo->brwBat.tick = g_nSysTick;
 							pOpInfo->batOpState = GATE_OP_BAT_STAT_OVER;
+                                                        g_sGateOpInfo.slvIndex = addr;//Ë¢ÐÂ¸Ã²ÖÐÅÏ¢¡¢Î´²âÊÔ
 							g_sDeviceImpRspInfo.brwLen = Device_ResponseBrBat(g_sDeviceImpRspInfo.brwBuffer);
 							Device_AtRsp(W232_CNT_TIME_500MS, W232_CNT_REPAT_NULL, W232_MQTT_TOPIC_BWBAT);
 								   
@@ -834,6 +845,7 @@ BOOL Device_GateProceRspFrame(u8 *pFrame, GATE_OPINFO *pOpInfo, u32 tick)
 						  }
 						  
                     }
+                    g_nGateBRBatInfo.limitTime = g_nSysTick;    //´ÓÕ¾µç³ØÊý¾ÝÉÏ±¨£¬´ú±íÁ÷³ÌÎ´½áÊø
                     g_sGateOpInfo.batInfoRepat = 0;
                     Device_CtrBatVolce(g_sDeviceImpRspInfo.add - 1, DEVICE_BAT_BRW, pOpInfo->brwBat.step, pOpInfo->brwBat.flag);
             }
@@ -847,7 +859,7 @@ BOOL Device_GateProceRspFrame(u8 *pFrame, GATE_OPINFO *pOpInfo, u32 tick)
             case GATE_FRAME_CMD_SET_PARAMS:   //  10
               if(paramsLen > 0)
               {
-                    //°æ±¾ÐÅÏ¢
+                    //°æ±¾ÐÅÏ¢£¬Ò»¿é²Ö¿Ø¿ØÖÆÁ½¸ö²Ö£¬°æ±¾ÐÅÏ¢Ò»ÖÂ
                     memcpy(g_aGateSlvInfo[2 * (addr - 1)].softWare, pParams, GATE_VERSION_LEN);
                     memcpy(g_aGateSlvInfo[2 * (addr - 1) + 1].softWare, pParams, GATE_VERSION_LEN);
                     memcpy(g_aGateSlvInfo[2 * (addr - 1)].hardWare, pParams + GATE_VERSION_LEN + 1 , GATE_VERSION_LEN);
@@ -1414,7 +1426,6 @@ u16 Reader_ProcessUartFrame(u8 *pFrame, u8 add, u16 len, u32 tick)
                     }
                     else
                     {                             		                             		            
-                         //Gate_TxFrame(&g_sGateOpInfo, tick);
                          g_sDeviceRspFrame.err = READER_RESPONSE_ERR_DEVICE;
                          
                     }  
@@ -1534,6 +1545,7 @@ u16 Reader_ProcessUartFrame(u8 *pFrame, u8 add, u16 len, u32 tick)
 
 
 
+
 BOOL Device_SetCfg(u8 *pBuffer)
 {
     BOOL bOk = TRUE;
@@ -1587,7 +1599,7 @@ void Device_ServerProcessRxInfo(W232_RCVBUFFER *pRcvBuffer, u32 tick)           
 			crc2 = a_GetCrc(pRcvBuffer->buffer, pRcvBuffer->len - 2);
 
 		}
-		else if(pRcvBuffer->len == 0)
+		else if(pRcvBuffer->len == 0)    //³¤¶ÈÎª0£¬²»Ð£Ñé£¿£¿£¿
 		{
 		   crc1 = crc2 = 0xFF;
 		}
@@ -1603,7 +1615,7 @@ void Device_ServerProcessRxInfo(W232_RCVBUFFER *pRcvBuffer, u32 tick)           
 			{
 				if(!g_sDeviceRspFrame.mark)
 				{
-					Device_AtRsp(W232_CNT_TIME_500MS, W232_CNT_REPAT_NULL, W232_MQTT_TOPIC_CMD);     
+					Device_AtRsp(W232_CNT_TIME_500MS, W232_CNT_REPAT_NULL, W232_MQTT_TOPIC_CMD);          
 				}
 			}
 		}
@@ -1614,6 +1626,11 @@ void Device_ServerProcessRxInfo(W232_RCVBUFFER *pRcvBuffer, u32 tick)           
 			Device_AtRsp(W232_CNT_TIME_500MS, W232_CNT_REPAT_NULL, W232_MQTT_TOPIC_CMD);
 
 		}
+	}
+	else
+	{
+			txLen = 0;
+	
 	}
 }
 
@@ -1680,7 +1697,7 @@ u16 Device_HeartFormat(u8 *pBuffer, u32 tick)
     for(index = 0 ;index < (g_sDeviceParams.gateNum << 1); index ++)
     {
         pBuffer[pos++] = index + 1;
-        if(g_aGateSlvInfo[index].state == GATE_STAT_OK)
+        if(g_aGateSlvInfo[index].state == GATE_STAT_OK || g_aGateSlvInfo[index].flag == GATE_STAT_OK)
         {
             memcpy(pBuffer + pos, g_aGateSlvInfo[index].softWare, GATE_VERSION_LEN);
             pos += GATE_VERSION_LEN;
@@ -1701,7 +1718,7 @@ u16 Device_HeartFormat(u8 *pBuffer, u32 tick)
     }
     
     pBuffer[pos++] = g_sW232Connect.sigNum;//ÐÅºÅÇ¿¶È
-    pBuffer[pos++] = UART_FRAME_PARAM_RFU;
+	pBuffer[pos++] = (g_sIoInfo.sersorState & IO_SENSOR_STAT_RFID_OPEN ?1:0);
     crc = a_GetCrc(pBuffer, pos); //´ÓLEN¿ªÊ¼¼ÆËãcrc
     pBuffer[pos++] = crc & 0xFF;
     pBuffer[pos++] = (crc >> 8) & 0xFF;
@@ -1960,6 +1977,7 @@ BOOL Device_CheckRsp(W232_CONNECT *pCntOp, u8 *pRxBuf, u8 len)
               memcpy(pCntOp->requestBuffer,  (u8 *)(idStrAdd + W232_RQUEST_ID_LEN + W232_RQUEST_ID_DTU_LEN), W232_RQUEST_BUFFER_LEN);   //×ö³¤¶ÈÐ£Ñé
              if(W232_DataHandle(&g_sW232RcvBuffer, (u8 *)(idStrAdd + W232_RQUEST_ID_LEN + W232_RQUEST_ID_DTU_LEN)))
              {
+				 g_sDeviceParams.offLineTime = 0;				//åŒæœåŠ¡å™¨æœ‰æ•°æ®äº¤äº’ï¼Œåˆ¤å®šæ­£å¸¸
                  bOK = TRUE;
              }
         }
@@ -1978,6 +1996,7 @@ BOOL Device_CheckRsp(W232_CONNECT *pCntOp, u8 *pRxBuf, u8 len)
 				  memcpy(pCntOp->requestBuffer, (u8 *)(idStrAdd + W232_RQUEST_ID_LEN + W232_RQUEST_ID_DTU_LEN) , W232_RQUEST_BUFFER_LEN);   //×ö³¤¶ÈÐ£Ñé
 				 if(W232_DataHandle(&g_sW232RcvBuffer, (u8 *)(idStrAdd + W232_RQUEST_ID_LEN + W232_RQUEST_ID_DTU_LEN)))
 				 {
+					 g_sDeviceParams.offLineTime = 0;
 					 bOK = TRUE;
 				 }
 			}
@@ -2005,6 +2024,7 @@ BOOL Device_CheckRsp(W232_CONNECT *pCntOp, u8 *pRxBuf, u8 len)
 			
 		{
 			bOK = TRUE;
+			g_sDeviceParams.offLineTime = 0;
 			g_sW232RcvBuffer.flag = W232_RESPONES_CMD_RESP;
 			if(g_sDeviceRspFrame.cmd == DEVICE_CMD_RESET && g_sDeviceRspFrame.flag == DEVICE_RESPONSE_FLAG_RESET)
 			{
@@ -2270,7 +2290,7 @@ void Device_InfoChgRsp(u8 *pBuffer, char *strAtBuff, char *strRspBuff, u8 addr, 
 
 
 
-
+//Êý¾Ý¼à¿Ø£¬´ýÓÅ»¯
 void Device_GateStateRsp()    //×´Ì¬±ä»¯·´À¡£¬ÐÄÌø¸üÐÂ£¬ÊÇ·ñÑ¹Á¦¹ý´ó
 { 
 	u8 index = 0;
@@ -2278,15 +2298,16 @@ void Device_GateStateRsp()    //×´Ì¬±ä»¯·´À¡£¬ÐÄÌø¸üÐÂ£¬ÊÇ·ñÑ¹Á¦¹ý´ó
 	{
 	    for(index = 0; index < (g_sDeviceParams.gateNum << 1); index ++)
 	    {
-		if(memcmp(&(g_aGateSlvStat[index].sensorState), &(g_aGateSlvInfo[index].sensorInfo.sensorState), sizeof(GATE_STATINFO)) ||
-			memcmp(&(g_aGateSlvStat[index].batState), &(g_aGateSlvInfo[index].sensorInfo.batInfo.state), sizeof(u8)) ||
-			memcmp(&(g_aGateSlvStat[index].chagState), &(g_aGateSlvInfo[index].sensorInfo.chagInfo.state), sizeof(u8)))     //×´Ì¬±ä»¯
-		{
-		    memcpy(&(g_aGateSlvStat[index].sensorState), &(g_aGateSlvInfo[index].sensorInfo.sensorState), sizeof(GATE_STATINFO));
-		    memcpy(&(g_aGateSlvStat[index].batState), &(g_aGateSlvInfo[index].sensorInfo.batInfo.state), sizeof(u8));
-		    memcpy(&(g_aGateSlvStat[index ].chagState), &(g_aGateSlvInfo[index].sensorInfo.chagInfo.state), sizeof(u8));
-		    Device_AtRsp(W232_CNT_TIME_100MS, W232_CNT_REPAT_NULL, W232_MQTT_TOPIC_HEART);
-		}
+			if(/*memcmp(&(g_aGateSlvStat[index].sensorState), &(g_aGateSlvInfo[index].sensorInfo.sensorState), sizeof(GATE_STATINFO))*/
+                           Device_ChkGateState(&g_sDeviceInCheck[index], &(g_aGateSlvStat[index].sensorState),&(g_aGateSlvInfo[index].sensorInfo.sensorState))||
+				memcmp(&(g_aGateSlvStat[index].batState), &(g_aGateSlvInfo[index].sensorInfo.batInfo.state), sizeof(u8)) ||
+				memcmp(&(g_aGateSlvStat[index].chagState), &(g_aGateSlvInfo[index].sensorInfo.chagInfo.state), sizeof(u8)))     //×´Ì¬±ä»¯
+			{
+				memcpy(&(g_aGateSlvStat[index].sensorState), &(g_aGateSlvInfo[index].sensorInfo.sensorState), sizeof(GATE_STATINFO));
+				memcpy(&(g_aGateSlvStat[index].batState), &(g_aGateSlvInfo[index].sensorInfo.batInfo.state), sizeof(u8));
+				memcpy(&(g_aGateSlvStat[index ].chagState), &(g_aGateSlvInfo[index].sensorInfo.chagInfo.state), sizeof(u8));
+				Device_AtRsp(W232_CNT_TIME_100MS, W232_CNT_REPAT_NULL, W232_MQTT_TOPIC_HEART);
+			}
 	    }
 
 	}
@@ -2297,6 +2318,54 @@ void Device_GateStateRsp()    //×´Ì¬±ä»¯·´À¡£¬ÐÄÌø¸üÐÂ£¬ÊÇ·ñÑ¹Á¦¹ý´ó
 	}
 
 }
+
+BOOL Device_ChkGateState(DEVICE_INCHECK *pInCheck,GATE_STATINFO *pOldStae, GATE_STATINFO *pNewState)
+{//È¥³ý·çÉÈ¼à¿Ø£¬ÁÙÊ±´¦Àí£¬ºóÐø¸ü¸Ä
+  BOOL tF = FALSE;  
+  
+  if(pOldStae->door != pNewState->door ||
+     pOldStae->rfid != pNewState->rfid ||
+       pOldStae->smoke != pNewState->smoke)
+  {
+    tF = TRUE;
+  }
+  
+  
+  
+  /*
+  
+   u32 changeFlag = 0;
+    u8 i = 0;
+    u16 t = 0, checkFlag = 0;
+    u16 flag = 0;
+	
+    t = *((u32 *)(&pOldStae));
+    checkFlag = t ^ pInCheck->inValue;
+    for(i = 0; i < DEVICE_IN_SESNOR_NUM; i++)
+    {
+        flag = 1 << i;
+		if(checkFlag & flag)
+		{
+			pInCheck->checkTick[i]++;
+			if(pInCheck->checkTick[i] > DEVICE_IN_CHECK_TIM)
+			{
+				pInCheck->inValue &= (~flag);
+				pInCheck->inValue |= (t & flag);			
+				changeFlag |= flag;
+                                tF = TRUE;
+			}
+		}
+		else
+		{
+			pInCheck->checkTick[i] = 0;
+		}
+		
+    }
+    pInCheck->changeFlag = changeFlag;
+  */
+  return tF;
+}
+
 
 void Device_GateStateInit()
 { 

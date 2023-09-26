@@ -1,6 +1,6 @@
 #include "AnyID_SM5001_IO.h"
 
-IO_INFO g_sIoInfo = {0};
+IO_INFO g_sIoInfo;
 
 void IO_Init()
 {

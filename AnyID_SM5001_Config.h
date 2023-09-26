@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define SYS_ENABLE_WDT               1
+#define SYS_ENABLE_WDT               0
 #define SYS_WM_DISH                  0
 #define SYS_WM_NORMAL                1
 

@@ -115,6 +115,31 @@ typedef struct w232Par{
 #define W232_RESPONES_JSON_REJECT               0x08
 
 
+//
+
+#define W232_MQTT_STAT_OK						0xFF
+#define W232_MQTT_STAT_CONNECTING				0x00				//连接中
+#define W232_MQTT_STAT_S_DISCONNECT				0x01				//服务器主动断开MQTT连接
+#define W232_MQTT_STAT_OP_PING					0x02				//PING超时，应反激活PDP、重建MQTT连接
+#define W232_MQTT_STAT_OP_CONNECT				0x03				//发送连接超时，可能密码错误、或者被占用
+#define W232_MQTT_STAT_OP_CONNACK				0x04				//接收连接超时，可能密码错误、或者被占用
+#define W232_MQTT_STAT_C_DISCONNECT				0x05				//客户端主动发起disconnect包,客户端主动断开MQTT连接
+#define W232_MQTT_STAT_C_DATA_DISCONNECT		0x06				//客户端发送数据多次错误，客户端主动断开MQTT连接。检查数据包格式
+#define W232_MQTT_STAT_S_FAIL					0x07				//链路异常或服务器不可用
+#define W232_MQTT_STAT_C_DISCONNECTS			0x08				//客户端主动断开MQTT连接
+
+
+typedef struct w232MqttInfo{
+	u8 stat;
+	u8 flag;
+	u32 tick;
+}W232_MQTT_INFO;
+extern W232_MQTT_INFO g_sW232MqttInfo;
+
+
+//
+
+
 #define W232_CNT_MODE_CONNECT                   1
 #define W232_CNT_MODE_DISCONCT                  0
 #define W232_IMEI_LEN                           15
@@ -199,13 +224,12 @@ BOOL W232_FormatRsp(W232_CONNECT *pCntOp);
 
 void W232_Init();
 void W232_ConnectInit(W232_CONNECT *pCntOp, u8 cmd, W232_PARAMS *pParams);
-void W232_ConnectTxCmd(W232_CONNECT *pCntOp, u32 sysTick);
 void W232_ConnectStep(W232_CONNECT *pCntOp);
 void W232_PostRsp(W232_CONNECT *pCntOp,u8 *pBuffer, u16 len);
 BOOL W232_DataHandle(W232_RCVBUFFER *pData, u8 *pBuffer);
 void W232_PostRtBatRsp(W232_CONNECT *pCntOp,u8 *pBuffer, u8 addr, u32 id);
 void W232_PostBwBatRsp(W232_CONNECT *pCntOp,u8 *pBuffer, u8 addr, u32 id);
 
-
+void W232_ConnectTxCmd(W232_CONNECT *pCntOp, u8 keepAliveTime, u32 sysTick);
 #endif
 

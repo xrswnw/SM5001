@@ -209,30 +209,38 @@ BOOL Device_Chk_VersionFrame(u8 *pBuffer, DEVICE_UPDATA_INFO *pDataInfo)
             memcpy(pDataInfo->tid, pBuffer + DEVICE_UPDATA_BUFFER_TID_LEN, DEVICE_SOFTVERSION_TID_LEN);
             memcpy(pDataInfo->bufferSize, pBuffer + DEVICE_UPDATA_BUFFER_SIZE_LEN, DEVICE_SOFTVERSION_BUFFER_SIZE);
             memcpy(pDataInfo->md5, pBuffer + DEVICE_UPDATA_BUFFER_MD5_LEN, DEVICE_SOFTVERSION_MD5);
-            Device_Analys_Data(pDataInfo);
-            Device_Erase_Flash();  
-            g_sFramBootParamenter.size = pDataInfo->num ;
-            if(*(pDataInfo->name + 16) == 0x31 && *(pDataInfo->name + 17) == 0x30 && *(pDataInfo->name + 18) == 0x30 && *(pDataInfo->name + 19) == 0x30)
-            {
-                g_sFramBootParamenter.flag = DEVICE_TYPE_SM5001;                    //-----主控更新
-                pDataInfo->type = DEVICE_TYPE_SM5001;
-                pDataInfo->flag = DEVICE_UPDATA_FLAG_DOWN; 	
-            }else if(*(pDataInfo->name + 16) == 0x30 && *(pDataInfo->name + 17) == 0x31 && *(pDataInfo->name + 18) == 0x30 && *(pDataInfo->name + 19) == 0x30)
-            {
-                g_sFramBootParamenter.flag = DEVICE_TYPE_SM5002;                  //-----仓控更新
-                pDataInfo->type = DEVICE_TYPE_SM5002;
-                pDataInfo->flag = DEVICE_UPDATA_FLAG_DOWN; 	
-            }
-            else if(*(pDataInfo->name + 16) == 0x30 && *(pDataInfo->name + 17) == 0x30 && *(pDataInfo->name + 18) == 0x31 && *(pDataInfo->name + 19) == 0x30)
-            {
-                g_sFramBootParamenter.flag = DEVICE_TYPE_SM5003;
-                pDataInfo->type = DEVICE_TYPE_SM5003;
-                pDataInfo->flag = DEVICE_UPDATA_FLAG_DOWN; 	
-            }
-            else
-            {
-                pDataInfo->flag = DEVICE_UPDATA_INFORM_OK;  //无需更新
-            }
+			
+			if(!memcmp(g_sFramBootParamenter.aimVerSion, pDataInfo->name, FRAM_VERSION_SIZE))
+			{
+				Device_Analys_Data(pDataInfo);
+				Device_Erase_Flash();  
+				g_sFramBootParamenter.size = pDataInfo->num ;
+				if(*(pDataInfo->name + 16) == 0x31 && *(pDataInfo->name + 17) == 0x30 && *(pDataInfo->name + 18) == 0x30 && *(pDataInfo->name + 19) == 0x30)
+				{
+					g_sFramBootParamenter.flag = DEVICE_TYPE_SM5001;                    //-----涓绘帶鏇存柊
+					pDataInfo->type = DEVICE_TYPE_SM5001;
+					pDataInfo->flag = DEVICE_UPDATA_FLAG_DOWN; 	
+				}else if(*(pDataInfo->name + 16) == 0x30 && *(pDataInfo->name + 17) == 0x31 && *(pDataInfo->name + 18) == 0x30 && *(pDataInfo->name + 19) == 0x30)
+				{
+					g_sFramBootParamenter.flag = DEVICE_TYPE_SM5002;                  //-----浠撴帶鏇存柊
+					pDataInfo->type = DEVICE_TYPE_SM5002;
+					pDataInfo->flag = DEVICE_UPDATA_FLAG_DOWN; 	
+				}
+				else if(*(pDataInfo->name + 16) == 0x30 && *(pDataInfo->name + 17) == 0x30 && *(pDataInfo->name + 18) == 0x31 && *(pDataInfo->name + 19) == 0x30)
+				{
+					g_sFramBootParamenter.flag = DEVICE_TYPE_SM5003;
+					pDataInfo->type = DEVICE_TYPE_SM5003;
+					pDataInfo->flag = DEVICE_UPDATA_FLAG_DOWN; 	
+				}
+				else
+				{
+					pDataInfo->flag = DEVICE_UPDATA_INFORM_OK;  //鏃犻渶鏇存柊
+				}
+			}
+			else
+			{
+				g_sFramBootParamenter.appState = FRAM_BOOT_APP_NULL_REPLACE;//鏇存柊鐗堟湰鍙峰拰鏂囦欢鐗堟湰鍙蜂笉鍚岋紝鏍￠獙澶辫触銆佹棤闇�鏇存柊
+			}
 
             bOk = TRUE;
         } 

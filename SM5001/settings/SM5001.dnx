@@ -16,7 +16,7 @@
         <LeaveTargetRunning>_ 0</LeaveTargetRunning>
     </JLinkDriver>
     <DebugChecksum>
-        <Checksum>1257151949</Checksum>
+        <Checksum>700847782</Checksum>
     </DebugChecksum>
     <Trace1>
         <Enabled>0</Enabled>
@@ -56,14 +56,6 @@
         <ITMportsLogFile>0</ITMportsLogFile>
         <ITMlogFile>$PROJ_DIR$\ITM.log</ITMlogFile>
     </SWOTraceHWSettings>
-    <struct_types>
-        <Fmt0>ELECT_INFO-electValue	4	0</Fmt0>
-        <Fmt1>IO_INFO-sersorState	4	0</Fmt1>
-        <Fmt2>IO_INFO-state	4	0</Fmt2>
-    </struct_types>
-    <array_types>
-        <Fmt0>u8[100]	3	0</Fmt0>
-    </array_types>
     <Trace2>
         <Enabled>0</Enabled>
         <ShowSource>0</ShowSource>
@@ -148,8 +140,13 @@
         <mode>0</mode>
     </DisassembleMode>
     <Breakpoints2>
-        <Bp0>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_SysCfg.c}.648.9" 0 0 1 "" 0 "" 0</Bp0>
-        <Count>1</Count>
+        <Bp0>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_SysCfg.c}.1140.9" 0 0 1 "" 0 "" 0</Bp0>
+        <Bp1>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_SysCfg.c}.1149.4" 0 0 1 "" 0 "" 0</Bp1>
+        <Bp2>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_SysCfg.c}.674.3" 0 0 1 "" 0 "" 0</Bp2>
+        <Bp3>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_Device.c}.2084.3" 0 0 1 "" 0 "" 0</Bp3>
+        <Bp4>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_Device.c}.1625.3" 0 0 1 "" 0 "" 0</Bp4>
+        <Bp5>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\src\AnyID_SM5001_Device.c}.1988.18" 0 0 1 "" 0 "" 0</Bp5>
+        <Count>6</Count>
     </Breakpoints2>
     <Aliases>
         <Count>0</Count>

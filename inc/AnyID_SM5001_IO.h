@@ -68,15 +68,20 @@
 #define IO_DEVICE_MASK_FLAG_LED         0x08
 
 
+
 typedef struct ioInfo{
+	BOOL upFlag;
     u8 ioState ;
     u8 eleMacTick ;  
     u8 warnValue;
     u8 deviceState;
     u8 sersorState;
-    u8 tick;
+    u8 sersorTick;
+	u8 deviceTick;
+	u8 maskTick;
     u8 maskFlag;
-    u8 tempState1;
+    u8 tempSersorState;
+	u8 tempSersorTick;
     u8 tempFlag;
     u32 state;
     u32 tempState;

@@ -122,7 +122,6 @@ typedef struct gateSlvInfo{
     BOOL bTxInfo;                               //通信故障判断
     u32 txTick;
     u8 state;  
-	u8 flag;
     char softWare[GATE_VERSION_LEN];
     char hardWare[GATE_VERSION_LEN];
     GATE_SENSORINFO sensorInfo;
@@ -161,6 +160,11 @@ typedef struct gateRxFrame{
     u8 state;
 }GATE_RXFRAME;
 
+typedef struct gateBRBatInfo{   //电池操作持续时间 
+  u8 flag;
+  u32 limitTime;
+}GATE_BRBATINFO;
+
 #define GATE_OP_STAT_INIT       0
 #define GATE_OP_STAT_IDLE       1
 #define GATE_OP_STAT_TX         2
@@ -172,12 +176,13 @@ typedef struct gateRxFrame{
 #define GATE_OP_CMD_WAIT        8
 
 #define GATE_INIT_DLY_TIM       (200 * 3)       //开机延时，等待从机工作正常，才可以操作设别
-#define GATE_OP_DLY_TIM         60//0x01
+#define GATE_OP_DLY_TIM         60
 #define GATE_OP_TO_TIM          200
 #define GATE_OP_MQTT_CMD_TIM    200
 #define GATE_OP_TX_TIM          0x05
 
 #define GATE_OP_BR_BAT_TIM      200
+#define GATE_OP_BR_BAT_OP_TIM   25 * 200
 
 #define GATE_OP_TIM_FRAME       0xEE
 
@@ -238,6 +243,7 @@ typedef struct gateParams{
 
 #define GATE_OPCMD_PARAMS_LEN   64
 
+#define GATE_OP_BAT_STAT_IDLE                       0x00
 #define GATE_OP_BAT_STAT_OVER                       0x01
 #define GATE_OP_BAT_STAT_ING                        0x02
 #define GATE_OP_BAT_STAT_OPEN                       0x04
@@ -246,7 +252,8 @@ typedef struct gateParams{
 
 #define GATE_OP_BAT_INFO_REPATNUM                       5
 
-#define GATE_FLAG_DOOR_TEST             1
+//#define GATE_FLAG_DOOR_TEST             			1
+
 
 
 typedef struct gateSlvCmd{
@@ -265,7 +272,7 @@ typedef struct gateOpBatResult{
 #define GATE_RPT_NUM            4       //通信重发次数
 typedef struct gateOpInfo{
     u8 mode;
-    u8 batAddr;
+    u8 batState;
     u8 state;
     u8 add;
     u8 slvIndex;
@@ -313,23 +320,22 @@ typedef struct gateTestInfo{
   u8 len;
 }GATE_TEST_INFO;
                                   
-                                  
-                                 
-
 extern GATE_STAT g_aGateSlvStat[GATE_SLAVER_NUM << 1] ;
 extern GATE_INFO g_aGateSlvInfo[GATE_SLAVER_NUM << 1];      //每个从站有两个子设备（仓控）
 extern GATE_TEST_INFO g_nGateTestInfo ;
-BOOL Gate_CheckRspFrame(GATE_RXFRAME *pRxFrame, u16 *pStartPos);
+extern GATE_BRBATINFO g_nGateBRBatInfo ;
 
+u8 Gate_FormatTestFrame(u8 *pBuffer,u8 add,u8 id,u8 cmd);
+
+BOOL Gate_CheckRspFrame(GATE_RXFRAME *pRxFrame, u16 *pStartPos);
 
 void Gate_Init(GATE_PARAMS *pGateParams, u32 tick);
 void Gate_Stop(void);
 void Gate_FormatCmd(GATE_OPINFO *pGateOpInfo, u8 *pParams, u16 paramsLen);
-void Gate_GetNextOp(GATE_OPINFO *pOpInfo, u32 tick);
+void Gate_GetNextOp(GATE_OPINFO *pGateOpInfo, u16 gateNum, u32 tick);
 void Gate_TxFrame(GATE_OPINFO *pGateOpInfo, u32 tick);
 void Gate_CfgSlaver(GATE_OPINFO *pGateOpInfo);
 void Gate_ChagSlaver(GATE_SLVCMD *pGateSlvCmd, u8 index, u8 subIndex, u8 mode);
 void Gate_BrwBat(GATE_SLVCMD *pGateSlvCmd, u8 index, u8 subIndex, u8 *pBatSn);
-u8 Gate_FormatTestFrame(u8 *pBuffer,u8 add,u8 id,u8 cmd);
 
 #endif
